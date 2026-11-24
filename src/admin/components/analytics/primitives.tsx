@@ -22,7 +22,7 @@ export function AnalyticsCard({
 }
 
 type AnalyticsTableProps = ComponentProps<typeof Table> & {
-  /** Opt in to Medusa's header and row borders for denser datasets. */
+  /** Opt in to Medusa's table-section and row borders for denser datasets. */
   divided?: boolean
 }
 
@@ -35,7 +35,9 @@ function AnalyticsTableRoot({
     <Table
       {...props}
       className={[
-        divided ? undefined : "[&_thead]:border-y-0 [&_tr]:border-b-0",
+        divided
+          ? undefined
+          : "[&_thead]:border-y-0 [&_tbody]:border-y-0 [&_tfoot]:border-y-0 [&_tr]:border-b-0",
         className,
       ]
         .filter(Boolean)
