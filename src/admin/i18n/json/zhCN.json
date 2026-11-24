@@ -3,8 +3,13 @@
     "label": "评价管理",
     "title": "评价管理",
     "description": "已购验证评价、审核、商家回复以及邀评邮件管理。",
-    "tabs": { "reviews": "评价列表", "requests": "邀评邮件" },
-    "summary": { "all": "全部", "pending": "待审核", "approved": "已通过", "rejected": "已拒绝" },
+    "tabs": {"reviews": "评价列表", "requests": "邀评邮件"},
+    "summary": {
+      "all": "全部",
+      "pending": "待审核",
+      "approved": "已通过",
+      "rejected": "已拒绝"
+    },
     "autoApproveOn": "自动通过已开启",
     "search": "搜索评价正文、标题、姓名或邮箱",
     "filters": {
@@ -20,7 +25,13 @@
       "clearProduct": "显示全部商品",
       "clearOrder": "显示全部订单"
     },
-    "sort": { "tooltip": "排序", "newest": "最新优先", "oldest": "最早优先", "highest": "评分最高", "lowest": "评分最低" },
+    "sort": {
+      "tooltip": "排序",
+      "newest": "最新优先",
+      "oldest": "最早优先",
+      "highest": "评分最高",
+      "lowest": "评分最低"
+    },
     "columns": {
       "status": "状态",
       "rating": "评分",
@@ -47,10 +58,10 @@
     "emptyFilteredDescription": "当前搜索或筛选条件下没有匹配的评价。",
     "loadError": "加载评价列表失败。",
     "pagination": "第 {{from}}–{{to}} 条，共 {{count}} 条",
-    "paginationLabels": { "of": "共", "results": "条", "pages": "页" },
+    "paginationLabels": {"of": "共", "results": "条", "pages": "页"},
     "prev": "上一页",
     "next": "下一页",
-    "status": { "pending": "待审核", "approved": "已通过", "rejected": "已拒绝" },
+    "status": {"pending": "待审核", "approved": "已通过", "rejected": "已拒绝"},
     "requestStatus": {
       "scheduled": "已排期",
       "sent": "已发送",
@@ -123,7 +134,11 @@
       "settings": "触发条件：{{trigger}} + {{days}} 天；邀请链接 {{ttl}} 天后过期。",
       "rules_one": "{{count}} 条地区 / 销售渠道覆盖规则。",
       "rules_other": "{{count}} 条地区 / 销售渠道覆盖规则。",
-      "trigger": { "shipped": "已发货", "delivered": "已签收", "completed": "已完成" },
+      "trigger": {
+        "shipped": "已发货",
+        "delivered": "已签收",
+        "completed": "已完成"
+      },
       "disabled": "插件配置中已禁用邀评邮件功能",
       "noLinkUrl": "未配置 review_requests.link_url：无法发送邮件",
       "scheduleButton": "手动排期邀评",
@@ -148,7 +163,11 @@
       "openOrder": "查看订单",
       "sendNow": "立即发送",
       "resend": "重新发送链接",
-      "sendResult": { "sent": "邮件已发送", "skipped": "未发送：暂无可评价商品或该邮箱已退订", "failed": "发送失败，请查看该记录错误信息" },
+      "sendResult": {
+        "sent": "邮件已发送",
+        "skipped": "未发送：暂无可评价商品或该邮箱已退订",
+        "failed": "发送失败，请查看该记录错误信息"
+      },
       "scheduleResult": {
         "scheduled": "已创建邀评排期",
         "exists": "该订单已存在邀评任务",
@@ -180,7 +199,7 @@
         "sendRequest": "立即发送邀评邮件"
       }
     },
-    "credit": { "text": "Reviews & Wishlist — by Haus Kayu", "help": "帮助" }
+    "credit": {"text": "Reviews & Wishlist — by Haus Kayu", "help": "帮助"}
   },
   "extensions": {
     "settings": {
@@ -381,9 +400,9 @@
     "multiCurrencyNotice": "检测到多币种订单。顶部核心指标与趋势图当前按 {{currency}} 统计；可在上方切换币种或查看「销售与财务 > 币种」。",
     "views": {
       "overview": "经营总览",
-      "live": "实时监控",
       "sales": "销售与财务",
       "products": "商品与口径",
+      "engagement": "评价与心愿单",
       "traffic": "流量与漏斗",
       "customers": "客户与留存",
       "inventory": "库存、履约与导出"

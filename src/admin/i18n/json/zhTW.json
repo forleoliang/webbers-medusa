@@ -3,8 +3,13 @@
     "label": "評價管理",
     "title": "評價管理",
     "description": "已購驗證評價、審核、商店回覆以及邀評郵件管理。",
-    "tabs": { "reviews": "評價列表", "requests": "邀評郵件" },
-    "summary": { "all": "全部", "pending": "待審核", "approved": "已通過", "rejected": "已拒絕" },
+    "tabs": {"reviews": "評價列表", "requests": "邀評郵件"},
+    "summary": {
+      "all": "全部",
+      "pending": "待審核",
+      "approved": "已通過",
+      "rejected": "已拒絕"
+    },
     "autoApproveOn": "自動通過已開啟",
     "search": "搜尋評價內容、標題、姓名或電子郵件",
     "filters": {
@@ -20,7 +25,13 @@
       "clearProduct": "顯示全部商品",
       "clearOrder": "顯示全部訂單"
     },
-    "sort": { "tooltip": "排序", "newest": "最新優先", "oldest": "最舊優先", "highest": "評分最高", "lowest": "評分最低" },
+    "sort": {
+      "tooltip": "排序",
+      "newest": "最新優先",
+      "oldest": "最舊優先",
+      "highest": "評分最高",
+      "lowest": "評分最低"
+    },
     "columns": {
       "status": "狀態",
       "rating": "評分",
@@ -47,10 +58,10 @@
     "emptyFilteredDescription": "目前的搜尋或篩選條件沒有符合的評價。",
     "loadError": "無法載入評價列表。",
     "pagination": "第 {{from}}–{{to}} 筆，共 {{count}} 筆",
-    "paginationLabels": { "of": "共", "results": "筆", "pages": "頁" },
+    "paginationLabels": {"of": "共", "results": "筆", "pages": "頁"},
     "prev": "上一頁",
     "next": "下一頁",
-    "status": { "pending": "待審核", "approved": "已通過", "rejected": "已拒絕" },
+    "status": {"pending": "待審核", "approved": "已通過", "rejected": "已拒絕"},
     "requestStatus": {
       "scheduled": "已排程",
       "sent": "已發送",
@@ -123,7 +134,11 @@
       "settings": "觸發條件：{{trigger}} + {{days}} 天；邀請連結將於 {{ttl}} 天後失效。",
       "rules_one": "{{count}} 條地區 / 銷售通路覆蓋規則。",
       "rules_other": "{{count}} 條地區 / 銷售通路覆蓋規則。",
-      "trigger": { "shipped": "已出貨", "delivered": "已送達", "completed": "已完成" },
+      "trigger": {
+        "shipped": "已出貨",
+        "delivered": "已送達",
+        "completed": "已完成"
+      },
       "disabled": "外掛設定中已停用邀評郵件功能",
       "noLinkUrl": "尚未設定 review_requests.link_url：無法發送郵件",
       "scheduleButton": "排程邀評",
@@ -148,7 +163,11 @@
       "openOrder": "開啟訂單",
       "sendNow": "立即發送",
       "resend": "重新發送連結",
-      "sendResult": { "sent": "郵件已發送", "skipped": "未發送：無待評價商品或該信箱已退訂", "failed": "發送失敗，請檢視該紀錄錯誤訊息" },
+      "sendResult": {
+        "sent": "郵件已發送",
+        "skipped": "未發送：無待評價商品或該信箱已退訂",
+        "failed": "發送失敗，請檢視該紀錄錯誤訊息"
+      },
       "scheduleResult": {
         "scheduled": "已建立邀評排程",
         "exists": "此訂單已有邀評任務",
@@ -180,7 +199,7 @@
         "sendRequest": "立即發送邀評郵件"
       }
     },
-    "credit": { "text": "Reviews & Wishlist — by Haus Kayu", "help": "說明" }
+    "credit": {"text": "Reviews & Wishlist — by Haus Kayu", "help": "說明"}
   },
   "extensions": {
     "settings": {
@@ -381,9 +400,9 @@
     "multiCurrencyNotice": "偵測到多幣別訂單。上方核心指標與趨勢圖目前以 {{currency}} 統計；可於上方切換幣別或查看「銷售與財務 > 幣別」。",
     "views": {
       "overview": "經營總覽",
-      "live": "即時監控",
       "sales": "銷售與財務",
       "products": "商品與口徑",
+      "engagement": "評價與心願單",
       "traffic": "流量與漏斗",
       "customers": "顧客與留存",
       "inventory": "庫存、履約與匯出"

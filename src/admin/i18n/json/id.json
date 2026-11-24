@@ -3,8 +3,13 @@
     "label": "Ulasan",
     "title": "Ulasan",
     "description": "Ulasan pembeli terverifikasi, moderasi, balasan toko, dan e-mail permintaan ulasan.",
-    "tabs": { "reviews": "Ulasan", "requests": "Permintaan ulasan" },
-    "summary": { "all": "Semua", "pending": "Menunggu", "approved": "Disetujui", "rejected": "Ditolak" },
+    "tabs": {"reviews": "Ulasan", "requests": "Permintaan ulasan"},
+    "summary": {
+      "all": "Semua",
+      "pending": "Menunggu",
+      "approved": "Disetujui",
+      "rejected": "Ditolak"
+    },
     "autoApproveOn": "Setujui otomatis aktif",
     "search": "Cari teks, judul, nama, atau e-mail",
     "filters": {
@@ -20,7 +25,13 @@
       "clearProduct": "Tampilkan semua produk",
       "clearOrder": "Tampilkan semua pesanan"
     },
-    "sort": { "tooltip": "Urutkan", "newest": "Terbaru", "oldest": "Terlama", "highest": "Bintang tertinggi", "lowest": "Bintang terendah" },
+    "sort": {
+      "tooltip": "Urutkan",
+      "newest": "Terbaru",
+      "oldest": "Terlama",
+      "highest": "Bintang tertinggi",
+      "lowest": "Bintang terendah"
+    },
     "columns": {
       "status": "Status",
       "rating": "Bintang",
@@ -47,10 +58,14 @@
     "emptyFilteredDescription": "Tidak ada ulasan yang cocok dengan pencarian atau filter saat ini.",
     "loadError": "Ulasan tidak bisa dimuat.",
     "pagination": "{{from}}–{{to}} dari {{count}}",
-    "paginationLabels": { "of": "dari", "results": "hasil", "pages": "halaman" },
+    "paginationLabels": {"of": "dari", "results": "hasil", "pages": "halaman"},
     "prev": "Sebelumnya",
     "next": "Berikutnya",
-    "status": { "pending": "Menunggu", "approved": "Disetujui", "rejected": "Ditolak" },
+    "status": {
+      "pending": "Menunggu",
+      "approved": "Disetujui",
+      "rejected": "Ditolak"
+    },
     "requestStatus": {
       "scheduled": "Terjadwal",
       "sent": "Terkirim",
@@ -123,7 +138,11 @@
       "settings": "Pemicu: {{trigger}} + {{days}} hari. Tautan kedaluwarsa setelah {{ttl}} hari.",
       "rules_one": "{{count}} aturan region / sales channel.",
       "rules_other": "{{count}} aturan region / sales channel.",
-      "trigger": { "shipped": "dikirim", "delivered": "diterima", "completed": "selesai" },
+      "trigger": {
+        "shipped": "dikirim",
+        "delivered": "diterima",
+        "completed": "selesai"
+      },
       "disabled": "Permintaan ulasan dinonaktifkan di opsi plugin",
       "noLinkUrl": "review_requests.link_url belum diisi: tidak ada yang bisa dikirim",
       "scheduleButton": "Jadwalkan permintaan",
@@ -148,7 +167,11 @@
       "openOrder": "Buka pesanan",
       "sendNow": "Kirim sekarang",
       "resend": "Kirim tautan baru",
-      "sendResult": { "sent": "E-mail terkirim", "skipped": "Tidak dikirim: tidak ada yang bisa diulas atau alamat sudah berhenti langganan", "failed": "Pengiriman gagal, lihat error di permintaan" },
+      "sendResult": {
+        "sent": "E-mail terkirim",
+        "skipped": "Tidak dikirim: tidak ada yang bisa diulas atau alamat sudah berhenti langganan",
+        "failed": "Pengiriman gagal, lihat error di permintaan"
+      },
       "scheduleResult": {
         "scheduled": "Permintaan ulasan dijadwalkan",
         "exists": "Pesanan ini sudah punya permintaan ulasan",
@@ -180,7 +203,7 @@
         "sendRequest": "Kirim permintaan ulasan sekarang"
       }
     },
-    "credit": { "text": "Reviews & Wishlist — oleh Haus Kayu", "help": "Bantuan" }
+    "credit": {"text": "Reviews & Wishlist — oleh Haus Kayu", "help": "Bantuan"}
   },
   "extensions": {
     "settings": {
@@ -381,9 +404,9 @@
     "multiCurrencyNotice": "Beberapa mata uang terdeteksi. KPI utama dan grafik tren menampilkan {{currency}}; ubah filter Mata Uang atau buka Penjualan & Keuangan > Mata Uang.",
     "views": {
       "overview": "Ringkasan",
-      "live": "Live View",
       "sales": "Penjualan & Keuangan",
       "products": "Produk & Ukuran",
+      "engagement": "Ulasan & Wishlist",
       "traffic": "Trafik & Funnel",
       "customers": "Pelanggan & Kohort",
       "inventory": "Stok, Kirim & Ekspor"

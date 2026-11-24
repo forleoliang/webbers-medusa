@@ -3,8 +3,13 @@
     "label": "Reviews",
     "title": "Reviews",
     "description": "Verified-purchase reviews, moderation, store replies and review-request e-mails.",
-    "tabs": { "reviews": "Reviews", "requests": "Review requests" },
-    "summary": { "all": "All", "pending": "Pending", "approved": "Approved", "rejected": "Rejected" },
+    "tabs": {"reviews": "Reviews", "requests": "Review requests"},
+    "summary": {
+      "all": "All",
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
     "autoApproveOn": "Auto-approve is on",
     "search": "Search text, title, name or e-mail",
     "filters": {
@@ -20,7 +25,13 @@
       "clearProduct": "Show all products",
       "clearOrder": "Show all orders"
     },
-    "sort": { "tooltip": "Sort", "newest": "Newest first", "oldest": "Oldest first", "highest": "Highest rating", "lowest": "Lowest rating" },
+    "sort": {
+      "tooltip": "Sort",
+      "newest": "Newest first",
+      "oldest": "Oldest first",
+      "highest": "Highest rating",
+      "lowest": "Lowest rating"
+    },
     "columns": {
       "status": "Status",
       "rating": "Rating",
@@ -47,10 +58,14 @@
     "emptyFilteredDescription": "No reviews match the current search or filters.",
     "loadError": "Could not load the reviews.",
     "pagination": "{{from}}–{{to}} of {{count}}",
-    "paginationLabels": { "of": "of", "results": "results", "pages": "pages" },
+    "paginationLabels": {"of": "of", "results": "results", "pages": "pages"},
     "prev": "Prev",
     "next": "Next",
-    "status": { "pending": "Pending", "approved": "Approved", "rejected": "Rejected" },
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
     "requestStatus": {
       "scheduled": "Scheduled",
       "sent": "Sent",
@@ -123,7 +138,11 @@
       "settings": "Trigger: {{trigger}} + {{days}} day(s). Links expire after {{ttl}} days.",
       "rules_one": "{{count}} region / sales-channel rule.",
       "rules_other": "{{count}} region / sales-channel rules.",
-      "trigger": { "shipped": "shipped", "delivered": "delivered", "completed": "completed" },
+      "trigger": {
+        "shipped": "shipped",
+        "delivered": "delivered",
+        "completed": "completed"
+      },
       "disabled": "Review requests are disabled in the plugin options",
       "noLinkUrl": "review_requests.link_url is not set: nothing can be sent",
       "scheduleButton": "Schedule request",
@@ -148,7 +167,11 @@
       "openOrder": "Open order",
       "sendNow": "Send now",
       "resend": "Send a fresh link",
-      "sendResult": { "sent": "E-mail sent", "skipped": "Nothing sent: nothing left to review or the address opted out", "failed": "Sending failed, see the error on the request" },
+      "sendResult": {
+        "sent": "E-mail sent",
+        "skipped": "Nothing sent: nothing left to review or the address opted out",
+        "failed": "Sending failed, see the error on the request"
+      },
       "scheduleResult": {
         "scheduled": "Review request scheduled",
         "exists": "This order already has a review request",
@@ -180,7 +203,7 @@
         "sendRequest": "Send review request now"
       }
     },
-    "credit": { "text": "Reviews & Wishlist — by Haus Kayu", "help": "Help" }
+    "credit": {"text": "Reviews & Wishlist — by Haus Kayu", "help": "Help"}
   },
   "extensions": {
     "settings": {
@@ -381,9 +404,9 @@
     "multiCurrencyNotice": "Multiple currencies detected. Headline KPIs and trend chart reflect {{currency}}; switch Currency above or inspect Sales > Currencies.",
     "views": {
       "overview": "Overview",
-      "live": "Live View",
       "sales": "Sales & Finance",
       "products": "Products & Sizes",
+      "engagement": "Reviews & Wishlist",
       "traffic": "Traffic & Funnel",
       "customers": "Customers & Cohorts",
       "inventory": "Inventory & Reports"

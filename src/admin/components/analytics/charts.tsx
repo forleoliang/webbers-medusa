@@ -1,7 +1,8 @@
-import { Badge, Container, StatusBadge, Text } from "@medusajs/ui"
-import { useMemo, useState } from "react"
-import type { AnalyticsOverviewResponse } from "../../lib/api"
-import { formatMoney, formatNumber } from "./formatters"
+import {Badge, StatusBadge, Text} from "@medusajs/ui"
+import {AnalyticsCard} from "./primitives"
+import {useMemo, useState} from "react"
+import type {AnalyticsOverviewResponse} from "../../lib/api"
+import {formatMoney, formatNumber} from "./formatters"
 
 export function DeltaBadge({
   delta,
@@ -46,7 +47,8 @@ export function Sparkline({
     const span = max - min
     return values
       .map((v, i) => {
-        const x = values.length === 1 ? width : (i / (values.length - 1)) * width
+        const x =
+          values.length === 1 ? width : (i / (values.length - 1)) * width
         const norm = span > 0 ? (v - min) / span : 0
         const y = height - 3 - norm * (height - 6)
         return `${i === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`
@@ -57,7 +59,10 @@ export function Sparkline({
   if (values.length < 2) return null
 
   return (
-    <svg viewBox={`0 0 120 ${height}`} className="h-7 w-24 shrink-0 overflow-visible">
+    <svg
+      viewBox={`0 0 120 ${height}`}
+      className="h-7 w-24 shrink-0 overflow-visible"
+    >
       <path
         d={path}
         fill="none"
@@ -90,17 +95,22 @@ export function KpiCard({
   vsLabel?: string
   sparkValues?: number[]
   attention?: boolean
-  status?: { label: string; color: "green" | "orange" | "red" | "grey" | "blue" }
+  status?: {label: string; color: "green" | "orange" | "red" | "grey" | "blue"}
   icon?: React.ReactNode
 }) {
   return (
-    <Container
+    <AnalyticsCard
       className={`flex min-h-[132px] flex-col justify-between gap-y-3 p-6 ${
         attention ? "bg-ui-tag-orange-bg" : ""
       }`}
     >
       <div className="flex items-center justify-between gap-x-2">
-        <Text size="small" leading="compact" weight="plus" className="text-ui-fg-subtle">
+        <Text
+          size="small"
+          leading="compact"
+          weight="plus"
+          className="text-ui-fg-subtle"
+        >
           {label}
         </Text>
         {status ? (
@@ -121,15 +131,21 @@ export function KpiCard({
         >
           {value}
         </Text>
-        {sparkValues && sparkValues.length >= 2 ? <Sparkline values={sparkValues} /> : null}
+        {sparkValues && sparkValues.length >= 2 ? (
+          <Sparkline values={sparkValues} />
+        ) : null}
       </div>
 
       {sub ? (
-        <Text size="xsmall" leading="compact" className="tabular-nums text-ui-fg-muted">
+        <Text
+          size="xsmall"
+          leading="compact"
+          className="tabular-nums text-ui-fg-muted"
+        >
           {sub}
         </Text>
       ) : null}
-    </Container>
+    </AnalyticsCard>
   )
 }
 
@@ -152,7 +168,7 @@ export function ComboTrendChart({
 }) {
   const [hoverIdx, setHoverIdx] = useState<number | null>(null)
 
-  const { maxSales, maxOrders, ordersPolyline } = useMemo(() => {
+  const {maxSales, maxOrders, ordersPolyline} = useMemo(() => {
     const sVals = data.map((d) => d.net_sales)
     const oVals = data.map((d) => d.orders)
     const mSales = sVals.length ? Math.max(...sVals, 0) : 0
@@ -170,7 +186,7 @@ export function ComboTrendChart({
             })
             .join(" ")
         : ""
-    return { maxSales: mSales, maxOrders: mOrders, ordersPolyline: poly }
+    return {maxSales: mSales, maxOrders: mOrders, ordersPolyline: poly}
   }, [data])
 
   if (!data.length) {
@@ -235,8 +251,8 @@ export function ComboTrendChart({
           </div>
         )}
         <Text size="xsmall" className="tabular-nums text-ui-fg-muted">
-          Max: {formatMoney(maxSales, currencyCode, locale)} · {formatNumber(maxOrders, locale)}{" "}
-          {ordersLabel}
+          Max: {formatMoney(maxSales, currencyCode, locale)} ·{" "}
+          {formatNumber(maxOrders, locale)} {ordersLabel}
         </Text>
       </div>
 
@@ -246,7 +262,10 @@ export function ComboTrendChart({
       >
         <div className="flex h-full items-end gap-[3px]">
           {data.map((pt, idx) => {
-            const heightPct = pt.net_sales > 0 ? Math.max((pt.net_sales / scaleSales) * 100, 6) : 3
+            const heightPct =
+              pt.net_sales > 0
+                ? Math.max((pt.net_sales / scaleSales) * 100, 6)
+                : 3
             const isHovered = hoverIdx === idx
             return (
               <div
@@ -265,7 +284,7 @@ export function ComboTrendChart({
                         ? "bg-ui-border-strong"
                         : "bg-ui-bg-subtle"
                   }`}
-                  style={{ height: `${heightPct}%` }}
+                  style={{height: `${heightPct}%`}}
                 />
               </div>
             )
@@ -333,14 +352,14 @@ export function ShareBarRow({
           className={`h-2 rounded-full transition-all ${
             barTone === "interactive" ? "bg-ui-bg-interactive" : "bg-ui-fg-base"
           }`}
-          style={{ width: `${Math.min(100, Math.max(pct, pct > 0 ? 4 : 0))}%` }}
+          style={{width: `${Math.min(100, Math.max(pct, pct > 0 ? 4 : 0))}%`}}
         />
       </div>
     </div>
   )
 }
 
-export function EmptyState({ text }: { text: string }) {
+export function EmptyState({text}: {text: string}) {
   return (
     <div className="flex min-h-[140px] items-center justify-center px-6 py-8 text-center">
       <Text size="small" className="text-ui-fg-subtle">
