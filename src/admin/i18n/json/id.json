@@ -204,6 +204,10 @@
         "promotions_pricing": {
           "title": "Promosi & Daftar Harga",
           "subtitle": "Promosi gratis ongkir, perlindungan diskon daftar harga, dan pembuatan kode kupon unik."
+        },
+        "analytics_insights": {
+          "title": "Analitik & Wawasan Toko",
+          "subtitle": "KPI bisnis teragregasi PostgreSQL, tren GMV, peringkat SKU/ukuran, keranjang terbengkalai, dan funnel trafik."
         }
       },
       "features": {
@@ -262,6 +266,10 @@
         "uniqueCouponCodes": {
           "label": "Kode kupon unik",
           "description": "Buat kode sekali pakai massal dari promosi templat di halaman kampanye dengan unduhan CSV."
+        },
+        "storeAnalytics": {
+          "label": "Dasbor analitik toko",
+          "description": "KPI penjualan bersih real-time, tren pendapatan, peringkat SKU & ukuran filter, tingkat refund, keranjang terbengkalai, ulasan/wishlist, dan ekspor CSV."
         }
       }
     },
@@ -352,6 +360,113 @@
       "generated": "{{count}} kode dibuat dan CSV diunduh; unggah ke kupon di Klaviyo.",
       "error": "Kode kupon gagal dibuat",
       "downloadError": "CSV gagal diunduh"
+    }
+  },
+  "analytics": {
+    "navLabel": "Analitik Toko",
+    "title": "Analitik Toko",
+    "subtitle": "Pendapatan real-time PostgreSQL, performa SKU/ukuran filter, antrean operasional, keranjang terbengkalai, dan wawasan trafik.",
+    "refresh": "Muat ulang",
+    "exportCsv": "Ekspor CSV",
+    "exportSuccess": "CSV analitik berhasil diunduh",
+    "exportError": "Gagal mengekspor CSV analitik",
+    "loadError": "Tidak dapat memuat analitik toko.",
+    "empty": "Tidak ada data pada rentang yang dipilih.",
+    "view": "Lihat",
+    "vsPrevious": "Periode awal",
+    "disabledHeading": "Analitik toko dinonaktifkan",
+    "disabledDescription": "Aktifkan \"Dasbor analitik toko\" di Pengaturan Ekstensi untuk melihat laporan performa langsung.",
+    "multiCurrencyNotice": "Beberapa mata uang terdeteksi. KPI utama dan grafik tren menampilkan {{currency}}; ubah filter Mata Uang atau periksa rincian Mata Uang.",
+    "ranges": {
+      "7d": "7h",
+      "30d": "30h",
+      "90d": "90h",
+      "12m": "12b",
+      "all": "Semua"
+    },
+    "filters": {
+      "allChannels": "Semua saluran",
+      "allRegions": "Semua wilayah",
+      "autoCurrency": "Mata uang otomatis"
+    },
+    "kpis": {
+      "netSales": "Penjualan bersih",
+      "netSalesSub": "Kotor: {{gross}} · Refund: {{refunds}} ({{rate}}%)",
+      "orders": "Pesanan aktif",
+      "ordersSub": "Dibatalkan: {{canceled}} ({{rate}}%)",
+      "aov": "Rata-rata nilai pesanan",
+      "aovSub": "Pembeli berulang: {{repeat}} / {{total}} ({{rate}}%)",
+      "abandonedCarts": "Keranjang terbengkalai",
+      "abandonedCartsSub": "Ber-email: {{withEmail}} · Terkirim notif: {{notified}} · Potensi: {{value}}"
+    },
+    "ops": {
+      "pendingCapture": "Menunggu penagihan",
+      "awaitingFulfillment": "Menunggu pengiriman",
+      "lowStock": "SKU stok menipis (≤ 5)"
+    },
+    "chart": {
+      "title": "Tren pendapatan & pesanan",
+      "subtitle": "Performa antar periode berdasarkan hari atau bulan UTC."
+    },
+    "merchandising": {
+      "title": "Performa produk & ukuran filter",
+      "products": "Produk terlaris",
+      "skus": "SKU terlaris",
+      "sizes": "Ukuran filter"
+    },
+    "segments": {
+      "title": "Distribusi saluran & wilayah",
+      "channels": "Saluran",
+      "regions": "Wilayah",
+      "currencies": "Mata uang"
+    },
+    "columns": {
+      "product": "Produk",
+      "sku": "SKU",
+      "variant": "Varian / Ukuran",
+      "units": "Unit",
+      "orders": "Pesanan",
+      "revenue": "Pendapatan",
+      "name": "Nama",
+      "currency": "Mata uang"
+    },
+    "traffic": {
+      "title": "Trafik etalase & funnel",
+      "subtitle": "Tampilan halaman PostHog, langkah konversi, dan sumber akuisisi utama.",
+      "notConfigured": "Belum dikonfigurasi",
+      "hint": "Atur POSTHOG_PERSONAL_API_KEY dan POSTHOG_PROJECT_ID di lingkungan backend untuk menampilkan metrik funnel.",
+      "pageviews": "Tampilan halaman",
+      "visitors": "Pengunjung",
+      "sessions": "Sesi",
+      "funnelTitle": "Funnel konversi",
+      "sourcesTitle": "Sumber trafik utama",
+      "steps": {
+        "productViewed": "Melihat produk",
+        "addedToCart": "Tambah ke keranjang",
+        "checkoutStarted": "Memulai checkout",
+        "orderCompleted": "Pesanan selesai"
+      }
+    },
+    "engagement": {
+      "title": "Interaksi ulasan & wishlist",
+      "subtitle": "Rating ulasan pelanggan, konversi undangan, dan produk yang banyak disimpan.",
+      "manageReviews": "Kelola ulasan",
+      "reviewsHeading": "Ulasan terverifikasi",
+      "disabled": "Modul mati",
+      "approved": "{{count}} disetujui",
+      "pending": "{{count}} tertunda",
+      "requestConversion": "Konversi undangan: {{used}}/{{sent}} ({{rate}}%)",
+      "requestConversionHint": "Rasio permintaan ulasan terkirim yang menghasilkan ulasan dalam rentang dipilih.",
+      "wishlistHeading": "Wishlist",
+      "wishlistSummary": "{{items}} item · {{customers}} pelanggan / {{guests}} tamu"
+    },
+    "lowStock": {
+      "title": "Peringatan stok rendah",
+      "subtitle": "Varian terlacak dengan 5 unit tersedia atau kurang di seluruh lokasi stok.",
+      "empty": "Semua varian terlacak memiliki stok yang sehat (> 5 unit).",
+      "stocked": "Stok",
+      "reserved": "Direservasi",
+      "available": "Tersedia"
     }
   }
 }

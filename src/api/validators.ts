@@ -82,3 +82,11 @@ export type AdminTranslateReviewsType = z.infer<typeof AdminTranslateReviews>
 export const StoreWishlistAddItem = z.object({ product_id: id, variant_id: id.nullable().optional() })
 export const StoreWishlistMerge = z.object({ token: z.string().min(32).max(64) })
 export const StoreWishlistCounts = z.object({ product_id: z.union([id, z.array(id).max(100)]) })
+
+export const AdminAnalyticsQuery = z.object({
+  range: z.enum(["7d", "30d", "90d", "12m", "all"]).optional(),
+  channel_id: id.optional(),
+  region_id: id.optional(),
+  currency_code: z.string().min(3).max(10).optional(),
+})
+export type AdminAnalyticsQueryType = z.infer<typeof AdminAnalyticsQuery>

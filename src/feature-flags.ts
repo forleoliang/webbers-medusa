@@ -2,7 +2,7 @@
 // Pure constants only (no imports) so it can be shared by both the server build
 // and the admin (vite) build.
 
-export type FeatureCategory = 'reviews_wishlist' | 'customer_order' | 'promotions_pricing';
+export type FeatureCategory = 'reviews_wishlist' | 'customer_order' | 'promotions_pricing' | 'analytics_insights';
 
 export type WebbersFeatureKey =
   | 'reviews'
@@ -18,7 +18,8 @@ export type WebbersFeatureKey =
   | 'orderNotifications'
   | 'alwaysFreePromotion'
   | 'disallowPriceListDiscounts'
-  | 'uniqueCouponCodes';
+  | 'uniqueCouponCodes'
+  | 'storeAnalytics';
 
 export type WebbersFeatureDefinition = {
   key: WebbersFeatureKey;
@@ -128,6 +129,14 @@ export const WEBBERS_FEATURES: WebbersFeatureDefinition[] = [
     category: 'promotions_pricing',
     label: 'Unique coupon codes',
     description: 'Generate single-use codes from a template promotion on the campaign page, with a CSV download.',
+    defaultEnabled: true,
+  },
+  // --- Store Analytics & Insights ---
+  {
+    key: 'storeAnalytics',
+    category: 'analytics_insights',
+    label: 'Store analytics dashboard',
+    description: 'Real-time store KPIs, GMV trends, SKU/filter-size rankings, refund rates, abandoned carts, reviews/wishlist insights, and CSV export.',
     defaultEnabled: true,
   },
 ];

@@ -204,6 +204,10 @@
         "promotions_pricing": {
           "title": "促销与价格表",
           "subtitle": "免邮促销标记、价格表禁叠加折扣保护以及批量生成一次性优惠券。"
+        },
+        "analytics_insights": {
+          "title": "经营看板与数据分析",
+          "subtitle": "基于 PostgreSQL 实时聚合的 GMV 趋势、畅销 SKU/口径排行、退款率、弃单分析及转化漏斗。"
         }
       },
       "features": {
@@ -262,6 +266,10 @@
         "uniqueCouponCodes": {
           "label": "批量生成一次性优惠券",
           "description": "在营销活动详情页基于模板促销批量生成单次使用优惠码并导出 CSV（适配 Klaviyo 等）。"
+        },
+        "storeAnalytics": {
+          "label": "店铺经营看板",
+          "description": "实时统计净销售额、客单价、退款/取消率、畅销商品与口径规格排行、低库存预警、弃单与评价心愿单洞察，支持 CSV 导出。"
         }
       }
     },
@@ -352,6 +360,113 @@
       "generated": "已创建 {{count}} 个优惠码并自动下载 CSV，可直接导入 Klaviyo 等工具。",
       "error": "生成优惠码失败",
       "downloadError": "下载 CSV 失败"
+    }
+  },
+  "analytics": {
+    "navLabel": "经营看板",
+    "title": "店铺经营看板",
+    "subtitle": "基于 PostgreSQL 实时聚合的营收走势、商品与口径排行、库存/待处理队列、弃单及流量漏斗。",
+    "refresh": "刷新",
+    "exportCsv": "导出 CSV",
+    "exportSuccess": "经营报表 CSV 已下载",
+    "exportError": "导出经营报表 CSV 失败",
+    "loadError": "无法加载店铺经营数据。",
+    "empty": "所选时间范围内暂无数据。",
+    "view": "查看",
+    "vsPrevious": "无对比基准",
+    "disabledHeading": "店铺经营看板已停用",
+    "disabledDescription": "请在「扩展功能设置」中开启「店铺经营看板」开关以查看实时经营数据。",
+    "multiCurrencyNotice": "检测到多币种订单。顶部核心指标与趋势图当前按 {{currency}} 统计；可在上方切换币种或查看下方币种明细。",
+    "ranges": {
+      "7d": "7天",
+      "30d": "30天",
+      "90d": "90天",
+      "12m": "12个月",
+      "all": "全部"
+    },
+    "filters": {
+      "allChannels": "全部销售渠道",
+      "allRegions": "全部销售区域",
+      "autoCurrency": "自动币种"
+    },
+    "kpis": {
+      "netSales": "净销售额",
+      "netSalesSub": "毛销售额: {{gross}} · 退款: {{refunds}} ({{rate}}%)",
+      "orders": "有效订单数",
+      "ordersSub": "已取消: {{canceled}} ({{rate}}%)",
+      "aov": "平均客单价 (AOV)",
+      "aovSub": "复购客户: {{repeat}} / {{total}} ({{rate}}%)",
+      "abandonedCarts": "待挽回弃单",
+      "abandonedCartsSub": "含邮箱: {{withEmail}} · 已触达: {{notified}} · 潜在金额: {{value}}"
+    },
+    "ops": {
+      "pendingCapture": "待扣款订单",
+      "awaitingFulfillment": "待发货订单",
+      "lowStock": "低库存 SKU (≤ 5)"
+    },
+    "chart": {
+      "title": "销售与订单趋势",
+      "subtitle": "按日或按月统计的净销售额与订单量走势（UTC）。"
+    },
+    "merchandising": {
+      "title": "畅销商品与口径排行",
+      "products": "畅销商品",
+      "skus": "畅销 SKU",
+      "sizes": "滤镜口径排行"
+    },
+    "segments": {
+      "title": "渠道、区域与币种分布",
+      "channels": "销售渠道",
+      "regions": "区域",
+      "currencies": "币种"
+    },
+    "columns": {
+      "product": "商品",
+      "sku": "SKU",
+      "variant": "规格 / 口径",
+      "units": "销量",
+      "orders": "订单数",
+      "revenue": "销售额",
+      "name": "名称",
+      "currency": "币种"
+    },
+    "traffic": {
+      "title": "独立站流量与转化漏斗",
+      "subtitle": "来自 PostHog 的页面访问、购买转化步骤及主要流量来源。",
+      "notConfigured": "未配置",
+      "hint": "请在后端环境变量中配置 POSTHOG_PERSONAL_API_KEY 与 POSTHOG_PROJECT_ID 以展示独立站转化漏斗。",
+      "pageviews": "浏览量 (PV)",
+      "visitors": "访客数 (UV)",
+      "sessions": "会话数",
+      "funnelTitle": "购买转化漏斗",
+      "sourcesTitle": "主要流量来源",
+      "steps": {
+        "productViewed": "浏览商品",
+        "addedToCart": "加入购物车",
+        "checkoutStarted": "发起结账",
+        "orderCompleted": "完成下单"
+      }
+    },
+    "engagement": {
+      "title": "评价与心愿单互动",
+      "subtitle": "商品已购评价评分、邀评转化率及顾客收藏热门款。",
+      "manageReviews": "管理评价",
+      "reviewsHeading": "已购评价",
+      "disabled": "功能未开启",
+      "approved": "已通过 {{count}}",
+      "pending": "待审核 {{count}}",
+      "requestConversion": "邀评转化: {{used}}/{{sent}} ({{rate}}%)",
+      "requestConversionHint": "所选时间范围内已发送邀评邮件并成功提交评价的比例。",
+      "wishlistHeading": "心愿单",
+      "wishlistSummary": "{{items}} 件收藏 · {{customers}} 位注册用户 / {{guests}} 位访客"
+    },
+    "lowStock": {
+      "title": "低库存预警",
+      "subtitle": "启用了库存跟踪且可用库存 ≤ 5 件的商品规格。",
+      "empty": "所有启用库存跟踪的商品目前库存充足（> 5 件）。",
+      "stocked": "现货库存",
+      "reserved": "已预留",
+      "available": "可用库存"
     }
   }
 }

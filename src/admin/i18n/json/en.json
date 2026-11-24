@@ -204,6 +204,10 @@
         "promotions_pricing": {
           "title": "Promotions & Pricing",
           "subtitle": "Free-shipping promotions, price-list discount protection, and unique single-use coupon code batches."
+        },
+        "analytics_insights": {
+          "title": "Store Analytics & Insights",
+          "subtitle": "PostgreSQL-aggregated business KPIs, revenue trends, SKU/size rankings, abandoned carts, and traffic funnels."
         }
       },
       "features": {
@@ -262,6 +266,10 @@
         "uniqueCouponCodes": {
           "label": "Unique coupon codes",
           "description": "Generate single-use codes from a template promotion on the campaign page, with a CSV download."
+        },
+        "storeAnalytics": {
+          "label": "Store analytics dashboard",
+          "description": "Real-time store KPIs, GMV trends, SKU/filter-size rankings, refund rates, abandoned carts, reviews/wishlist insights, and CSV export."
         }
       }
     },
@@ -352,6 +360,113 @@
       "generated": "{{count}} codes created. The CSV was downloaded; upload it to the coupon in Klaviyo.",
       "error": "The codes could not be created",
       "downloadError": "The CSV could not be downloaded"
+    }
+  },
+  "analytics": {
+    "navLabel": "Store Analytics",
+    "title": "Store Analytics",
+    "subtitle": "Real-time PostgreSQL revenue, SKU/size performance, operational queues, abandoned carts, and traffic insights.",
+    "refresh": "Refresh",
+    "exportCsv": "Export CSV",
+    "exportSuccess": "Analytics CSV downloaded",
+    "exportError": "Failed to export analytics CSV",
+    "loadError": "Could not load store analytics.",
+    "empty": "No data in the selected range.",
+    "view": "View",
+    "vsPrevious": "First period",
+    "disabledHeading": "Store analytics disabled",
+    "disabledDescription": "Enable \"Store analytics dashboard\" in Store Extensions to view live performance reports.",
+    "multiCurrencyNotice": "Multiple currencies detected. Headline KPIs and trend chart reflect {{currency}}; switch Currency above or inspect the Currency breakdown.",
+    "ranges": {
+      "7d": "7d",
+      "30d": "30d",
+      "90d": "90d",
+      "12m": "12m",
+      "all": "All"
+    },
+    "filters": {
+      "allChannels": "All channels",
+      "allRegions": "All regions",
+      "autoCurrency": "Auto currency"
+    },
+    "kpis": {
+      "netSales": "Net sales",
+      "netSalesSub": "Gross: {{gross}} · Refunds: {{refunds}} ({{rate}}%)",
+      "orders": "Standing orders",
+      "ordersSub": "Canceled: {{canceled}} ({{rate}}%)",
+      "aov": "Average order value",
+      "aovSub": "Repeat buyers: {{repeat}} / {{total}} ({{rate}}%)",
+      "abandonedCarts": "Abandoned carts",
+      "abandonedCartsSub": "With email: {{withEmail}} · Notified: {{notified}} · Potential: {{value}}"
+    },
+    "ops": {
+      "pendingCapture": "Pending payment capture",
+      "awaitingFulfillment": "Awaiting fulfillment",
+      "lowStock": "Low stock SKUs (≤ 5)"
+    },
+    "chart": {
+      "title": "Revenue & order trend",
+      "subtitle": "Period-over-period performance across UTC days or months."
+    },
+    "merchandising": {
+      "title": "Product & filter size performance",
+      "products": "Top products",
+      "skus": "Top SKUs",
+      "sizes": "Filter sizes"
+    },
+    "segments": {
+      "title": "Channel & region mix",
+      "channels": "Channels",
+      "regions": "Regions",
+      "currencies": "Currencies"
+    },
+    "columns": {
+      "product": "Product",
+      "sku": "SKU",
+      "variant": "Variant / Size",
+      "units": "Units",
+      "orders": "Orders",
+      "revenue": "Revenue",
+      "name": "Name",
+      "currency": "Currency"
+    },
+    "traffic": {
+      "title": "Storefront traffic & funnel",
+      "subtitle": "PostHog pageviews, conversion steps, and top acquisition sources.",
+      "notConfigured": "Not configured",
+      "hint": "Set POSTHOG_PERSONAL_API_KEY and POSTHOG_PROJECT_ID in the backend environment to view live storefront funnel metrics.",
+      "pageviews": "Pageviews",
+      "visitors": "Visitors",
+      "sessions": "Sessions",
+      "funnelTitle": "Conversion funnel",
+      "sourcesTitle": "Top traffic sources",
+      "steps": {
+        "productViewed": "Product viewed",
+        "addedToCart": "Added to cart",
+        "checkoutStarted": "Checkout started",
+        "orderCompleted": "Order completed"
+      }
+    },
+    "engagement": {
+      "title": "Reviews & wishlist engagement",
+      "subtitle": "Customer feedback ratings, invitation conversion, and wishlisted demand.",
+      "manageReviews": "Manage reviews",
+      "reviewsHeading": "Verified reviews",
+      "disabled": "Module off",
+      "approved": "{{count}} approved",
+      "pending": "{{count}} pending",
+      "requestConversion": "Invite conv: {{used}}/{{sent}} ({{rate}}%)",
+      "requestConversionHint": "Review requests converted into submitted reviews within the selected range.",
+      "wishlistHeading": "Wishlists",
+      "wishlistSummary": "{{items}} items · {{customers}} customer / {{guests}} guest"
+    },
+    "lowStock": {
+      "title": "Low stock alerts",
+      "subtitle": "Tracked variants with 5 or fewer available units across inventory locations.",
+      "empty": "All tracked variants have healthy inventory levels (> 5 units).",
+      "stocked": "Stocked",
+      "reserved": "Reserved",
+      "available": "Available"
     }
   }
 }

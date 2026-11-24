@@ -17,6 +17,7 @@ const CATEGORIES: FeatureCategory[] = [
   "reviews_wishlist",
   "customer_order",
   "promotions_pricing",
+  "analytics_insights",
 ]
 
 const StoreExtensionsSettingsPage = () => {

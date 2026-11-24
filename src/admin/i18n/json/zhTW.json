@@ -204,6 +204,10 @@
         "promotions_pricing": {
           "title": "促銷與價格表",
           "subtitle": "免運促銷開關、價格表禁止折扣覆蓋保護及一次性優惠碼批次產生。"
+        },
+        "analytics_insights": {
+          "title": "經營看板與數據分析",
+          "subtitle": "基於 PostgreSQL 即時彙總的 GMV 趨勢、熱銷 SKU/口徑排行、退款率、棄單分析與轉換漏斗。"
         }
       },
       "features": {
@@ -262,6 +266,10 @@
         "uniqueCouponCodes": {
           "label": "批次產生一次性優惠碼",
           "description": "依行銷活動中的範本促銷批次產生單次使用優惠碼並下載 CSV。"
+        },
+        "storeAnalytics": {
+          "label": "商店經營看板",
+          "description": "即時統計淨銷售額、客單價、退款/取消率、熱銷商品與口徑規格排行、低庫存預警、棄單及評價願望清單洞察，支援匯出 CSV。"
         }
       }
     },
@@ -352,6 +360,113 @@
       "generated": "已建立 {{count}} 組優惠碼並下載 CSV，可直接上傳至 Klaviyo 等工具。",
       "error": "產生優惠碼失敗",
       "downloadError": "下載 CSV 失敗"
+    }
+  },
+  "analytics": {
+    "navLabel": "經營看板",
+    "title": "商店經營看板",
+    "subtitle": "基於 PostgreSQL 即時彙總的營收走勢、商品與口徑排行、庫存/待處理佇列、棄單及流量漏斗。",
+    "refresh": "重新整理",
+    "exportCsv": "匯出 CSV",
+    "exportSuccess": "經營報表 CSV 已下載",
+    "exportError": "匯出經營報表 CSV 失敗",
+    "loadError": "無法載入商店經營數據。",
+    "empty": "所選時間範圍內暫無數據。",
+    "view": "查看",
+    "vsPrevious": "無對比基準",
+    "disabledHeading": "商店經營看板已停用",
+    "disabledDescription": "請於「擴充功能設定」開啟「商店經營看板」開關以查看即時經營數據。",
+    "multiCurrencyNotice": "偵測到多幣別訂單。上方核心指標與趨勢圖目前以 {{currency}} 統計；可於上方切換幣別或查看下方幣別明細。",
+    "ranges": {
+      "7d": "7天",
+      "30d": "30天",
+      "90d": "90天",
+      "12m": "12個月",
+      "all": "全部"
+    },
+    "filters": {
+      "allChannels": "全部銷售通路",
+      "allRegions": "全部銷售區域",
+      "autoCurrency": "自動幣別"
+    },
+    "kpis": {
+      "netSales": "淨銷售額",
+      "netSalesSub": "毛銷售額: {{gross}} · 退款: {{refunds}} ({{rate}}%)",
+      "orders": "有效訂單數",
+      "ordersSub": "已取消: {{canceled}} ({{rate}}%)",
+      "aov": "平均客單價 (AOV)",
+      "aovSub": "回購顧客: {{repeat}} / {{total}} ({{rate}}%)",
+      "abandonedCarts": "待挽回棄單",
+      "abandonedCartsSub": "含信箱: {{withEmail}} · 已通知: {{notified}} · 潛在金額: {{value}}"
+    },
+    "ops": {
+      "pendingCapture": "待請款訂單",
+      "awaitingFulfillment": "待出貨訂單",
+      "lowStock": "低庫存 SKU (≤ 5)"
+    },
+    "chart": {
+      "title": "銷售與訂單趨勢",
+      "subtitle": "依日或依月統計之淨銷售額與訂單量走勢（UTC）。"
+    },
+    "merchandising": {
+      "title": "熱銷商品與口徑排行",
+      "products": "熱銷商品",
+      "skus": "熱銷 SKU",
+      "sizes": "濾鏡口徑排行"
+    },
+    "segments": {
+      "title": "通路、區域與幣別分佈",
+      "channels": "銷售通路",
+      "regions": "區域",
+      "currencies": "幣別"
+    },
+    "columns": {
+      "product": "商品",
+      "sku": "SKU",
+      "variant": "規格 / 口徑",
+      "units": "銷量",
+      "orders": "訂單數",
+      "revenue": "銷售額",
+      "name": "名稱",
+      "currency": "幣別"
+    },
+    "traffic": {
+      "title": "商店流量與轉換漏斗",
+      "subtitle": "來自 PostHog 的瀏覽數據、結帳轉換步驟與主要流量來源。",
+      "notConfigured": "未設定",
+      "hint": "請於後端環境變數設定 POSTHOG_PERSONAL_API_KEY 與 POSTHOG_PROJECT_ID 以檢視商店轉換漏斗。",
+      "pageviews": "瀏覽量 (PV)",
+      "visitors": "訪客數 (UV)",
+      "sessions": "工作階段",
+      "funnelTitle": "購買轉換漏斗",
+      "sourcesTitle": "主要流量來源",
+      "steps": {
+        "productViewed": "瀏覽商品",
+        "addedToCart": "加入購物車",
+        "checkoutStarted": "開始結帳",
+        "orderCompleted": "完成訂單"
+      }
+    },
+    "engagement": {
+      "title": "評價與願望清單互動",
+      "subtitle": "已購評價評分、邀評轉換率與顧客收藏熱門商品。",
+      "manageReviews": "管理評價",
+      "reviewsHeading": "已購評價",
+      "disabled": "功能未開啟",
+      "approved": "已核准 {{count}}",
+      "pending": "待審核 {{count}}",
+      "requestConversion": "邀評轉換: {{used}}/{{sent}} ({{rate}}%)",
+      "requestConversionHint": "所選時間範圍內已寄送邀評信並成功提交評價之比例。",
+      "wishlistHeading": "願望清單",
+      "wishlistSummary": "{{items}} 項收藏 · {{customers}} 位會員 / {{guests}} 位訪客"
+    },
+    "lowStock": {
+      "title": "低庫存預警",
+      "subtitle": "啟用庫存追蹤且可用數量 ≤ 5 件的商品規格。",
+      "empty": "所有追蹤商品目前庫存皆充足（> 5 件）。",
+      "stocked": "現貨庫存",
+      "reserved": "已預留",
+      "available": "可用庫存"
     }
   }
 }

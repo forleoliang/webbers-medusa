@@ -150,3 +150,181 @@ export const STATUS_COLOR: Record<string, "grey" | "blue" | "orange" | "green" |
   failed: "red",
   opted_out: "grey",
 }
+
+export type AnalyticsRange = "7d" | "30d" | "90d" | "12m" | "all"
+
+export type AnalyticsFilters = {
+  range: AnalyticsRange
+  channel_id?: string
+  region_id?: string
+  currency_code?: string
+}
+
+export type AnalyticsOverviewResponse = {
+  range: AnalyticsRange
+  granularity: "day" | "month"
+  currency_code: string
+  multi_currency_warning: boolean
+  filters: {
+    channels: { id: string; name: string }[]
+    regions: { id: string; name: string; currency_code: string }[]
+    currencies: string[]
+  }
+  kpis: {
+    net_sales: number
+    net_sales_delta: number | null
+    gross_sales: number
+    gross_sales_delta: number | null
+    refunds: number
+    refunds_delta: number | null
+    refund_rate: number
+    refund_rate_delta: number | null
+    orders_count: number
+    orders_delta: number | null
+    canceled_orders: number
+    cancellation_rate: number
+    cancellation_rate_delta: number | null
+    aov: number
+    aov_delta: number | null
+    repeat_buyers: number
+    total_customers: number
+    repeat_rate: number
+    repeat_rate_delta: number | null
+  }
+  operations: {
+    pending_capture_count: number
+    pending_capture_amount: number
+    awaiting_fulfillment_count: number
+    low_stock_count: number
+  }
+  abandoned_carts: {
+    total_carts: number
+    with_email: number
+    notified: number
+    potential_value: number
+  }
+  timeseries: {
+    bucket: string
+    orders: number
+    gross_sales: number
+    refunds: number
+    net_sales: number
+  }[]
+  currency_breakdown: {
+    currency_code: string
+    standing_orders: number
+    canceled_orders: number
+    gross_revenue: number
+    refunded_amount: number
+    net_revenue: number
+  }[]
+  top_products: {
+    product_id: string
+    title: string
+    units: number
+    revenue: number
+    orders: number
+  }[]
+  top_skus: {
+    sku: string
+    product_title: string
+    variant_title: string
+    units: number
+    revenue: number
+    orders: number
+  }[]
+  top_sizes: {
+    variant_title: string
+    units: number
+    revenue: number
+    orders: number
+    share_pct: number
+  }[]
+  channel_breakdown: {
+    channel_id: string
+    name: string
+    orders: number
+    net_revenue: number
+    aov: number
+  }[]
+  region_breakdown: {
+    region_id: string
+    name: string
+    currency_code: string
+    orders: number
+    net_revenue: number
+    aov: number
+  }[]
+  low_stock: {
+    variant_id: string
+    product_id: string
+    product_title: string
+    variant_title: string
+    sku: string | null
+    stocked_quantity: number
+    reserved_quantity: number
+    available_quantity: number
+  }[]
+  reviews: {
+    enabled: boolean
+    approved_total: number
+    pending_count: number
+    rejected_count: number
+    window_new: number
+    avg_rating: number
+    requests_sent: number
+    requests_used: number
+    request_conversion_rate: number
+  }
+  wishlist: {
+    enabled: boolean
+    total_saved_items: number
+    window_saved_items: number
+    customer_wishlists: number
+    guest_wishlists: number
+    top_products: { product_id: string; title: string; saves: number }[]
+  }
+}
+
+export type AnalyticsTrafficResponse = {
+  configured: boolean
+  range: string
+  pageviews?: number
+  visitors?: number
+  sessions?: number
+  funnel?: {
+    product_viewed?: number
+    added_to_cart?: number
+    checkout_started?: number
+    order_completed?: number
+  }
+  sources?: { source: string; visits: number }[]
+}
+
+export const ANALYTICS_KEY = ["webbers-analytics"]
+
+export const getAnalyticsOverview = (f: AnalyticsFilters) =>
+  sdk.client.fetch<AnalyticsOverviewResponse>("/admin/analytics/overview", {
+    query: clean({
+      range: f.range,
+      channel_id: f.channel_id,
+      region_id: f.region_id,
+      currency_code: f.currency_code,
+    }),
+  })
+
+export const getAnalyticsTraffic = (range: AnalyticsRange) => {
+  const trafficRange = range === "7d" ? "30d" : range
+  return sdk.client.fetch<AnalyticsTrafficResponse>("/admin/analytics/traffic", {
+    query: { range: trafficRange },
+  })
+}
+
+export const analyticsExportUrl = (f: AnalyticsFilters) => {
+  const params = new URLSearchParams()
+  params.set("range", f.range)
+  if (f.channel_id) params.set("channel_id", f.channel_id)
+  if (f.region_id) params.set("region_id", f.region_id)
+  if (f.currency_code) params.set("currency_code", f.currency_code)
+  return backendUrl(`/admin/analytics/export?${params.toString()}`)
+}
