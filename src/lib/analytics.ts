@@ -37,12 +37,28 @@ export function parseAnalyticsRange(value?: string | null): AnalyticsRange {
   if (value && (VALID_RANGES as readonly string[]).includes(value)) {
     return value as AnalyticsRange
   }
-  return "30d"
+  return "all"
 }
 
 export function mapRangeToTrafficRange(range: AnalyticsRange): "30d" | "90d" | "12m" | "all" {
   if (range === "7d") return "30d"
   return range
+}
+
+const POSTHOG_INTERVAL_MAP: Record<AnalyticsRange, string> = {
+  "7d": "7 day",
+  "30d": "30 day",
+  "90d": "90 day",
+  "12m": "12 month",
+  all: "12 month",
+}
+
+export function mapRangeToPosthogInterval(range: AnalyticsRange): string {
+  return POSTHOG_INTERVAL_MAP[range] ?? "12 month"
+}
+
+export function isRefreshRequested(value: unknown): boolean {
+  return value === true || value === "true" || value === "1" || value === 1
 }
 
 export function resolveRangeBounds(range: AnalyticsRange, now: Date = new Date()): RangeBounds {

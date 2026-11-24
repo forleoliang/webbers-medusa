@@ -1,7 +1,7 @@
 {
   "name": "@webbers/webbers-medusa",
   "displayName": "Webbers QoL + Verified Reviews & Wishlist Plugin",
-  "version": "1.6.0-xft.1",
+  "version": "1.6.0-xft.2",
   "description": "Unified Medusa v2 plugin combining Webbers QoL admin tools, verified-purchase reviews with translations & Kiyoh sync, review requests, and customer/guest wishlists",
   "author": "Webbers B.V. <development@webbers.com> & Haus Kayu <dev@hauskayu.com>",
   "license": "MIT",

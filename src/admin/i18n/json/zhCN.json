@@ -364,8 +364,9 @@
   },
   "analytics": {
     "navLabel": "经营看板",
-    "title": "店铺经营看板",
-    "subtitle": "基于 PostgreSQL 实时聚合的营收走势、商品与口径排行、库存/待处理队列、弃单及流量漏斗。",
+    "title": "店铺数据中心",
+    "subtitle": "基于 PostgreSQL 与 PostHog 实时聚合的 6 视图电商经营分析系统（含 60 秒缓存保护）。",
+    "updatedAt": "更新于 {{time}}",
     "refresh": "刷新",
     "exportCsv": "导出 CSV",
     "exportSuccess": "经营报表 CSV 已下载",
@@ -373,52 +374,88 @@
     "loadError": "无法加载店铺经营数据。",
     "empty": "所选时间范围内暂无数据。",
     "view": "查看",
-    "vsPrevious": "无对比基准",
+    "viewDetails": "查看详情",
+    "vsPrevious": "较上周期",
+    "allTimeBaseline": "全部时间",
     "disabledHeading": "店铺经营看板已停用",
     "disabledDescription": "请在「扩展功能设置」中开启「店铺经营看板」开关以查看实时经营数据。",
-    "multiCurrencyNotice": "检测到多币种订单。顶部核心指标与趋势图当前按 {{currency}} 统计；可在上方切换币种或查看下方币种明细。",
+    "multiCurrencyNotice": "检测到多币种订单。顶部核心指标与趋势图当前按 {{currency}} 统计；可在上方切换币种或查看「销售分析 > 币种」。",
+    "views": {
+      "overview": "经营总览",
+      "sales": "销售分析",
+      "products": "商品与口径",
+      "traffic": "流量与漏斗",
+      "customers": "客户分析",
+      "inventory": "库存与履约"
+    },
     "ranges": {
-      "7d": "7天",
-      "30d": "30天",
-      "90d": "90天",
-      "12m": "12个月",
-      "all": "全部"
+      "all": "全部时间",
+      "12m": "近 12 个月",
+      "90d": "近 90 天",
+      "30d": "近 30 天",
+      "7d": "近 7 天"
     },
     "filters": {
-      "allChannels": "全部销售渠道",
-      "allRegions": "全部销售区域",
+      "allChannels": "全部渠道",
+      "allRegions": "全部市场",
       "autoCurrency": "自动币种"
+    },
+    "live": {
+      "badge": "实时 30 分钟",
+      "title": "独立站当前活跃动态",
+      "visitors": "当前访客",
+      "activeCarts": "活跃购物车",
+      "recentAtc": "加购事件 (30m)",
+      "recentCheckout": "发起结账 (30m)",
+      "visitorsWindowSub": "近 30 分钟活跃: {{count}}",
+      "sessionsWindowSub": "近 30 分钟会话: {{count}}",
+      "pageviewsWindowSub": "近 30 分钟浏览: {{count}}"
     },
     "kpis": {
       "netSales": "净销售额",
-      "netSalesSub": "毛销售额: {{gross}} · 退款: {{refunds}} ({{rate}}%)",
+      "grossSub": "毛销售额: {{gross}}",
+      "refunds": "退款额",
+      "refundsSub": "退款率: {{rate}}%",
+      "refundsCanceledSub": "退款率: {{rate}}% · 已取消单退款: {{canceled}}",
       "orders": "有效订单数",
       "ordersSub": "已取消: {{canceled}} ({{rate}}%)",
       "aov": "平均客单价 (AOV)",
-      "aovSub": "复购客户: {{repeat}} / {{total}} ({{rate}}%)",
+      "aovSub": "复购: {{repeat}} / {{total}} ({{rate}}%)",
+      "canceledRefundLabel": "已取消订单退款额: {{amount}}",
+      "conversionRate": "全站下单转化率",
+      "conversionSub": "{{orders}} 笔订单 / {{sessions}} 次会话",
       "abandonedCarts": "待挽回弃单",
-      "abandonedCartsSub": "含邮箱: {{withEmail}} · 已触达: {{notified}} · 潜在金额: {{value}}"
+      "abandonedCartsSub": "含邮箱: {{withEmail}} · 已触达: {{notified}} · 潜在: {{value}}"
     },
     "ops": {
-      "pendingCapture": "待扣款订单",
-      "awaitingFulfillment": "待发货订单",
-      "lowStock": "低库存 SKU (≤ 5)"
+      "pendingCapture": "待捕获金额",
+      "needsAction": "待处理",
+      "clear": "已清",
+      "ordersPendingSub": "当前 · {{count}} 张订单待扣款",
+      "awaitingFulfillment": "待履约订单",
+      "currentStateHint": "当前未完全发货订单",
+      "lowStock": "低库存 SKU (≤ 5)",
+      "trackedVariantsSub": "共 {{count}} 个启用库存跟踪"
     },
     "chart": {
       "title": "销售与订单趋势",
-      "subtitle": "按日或按月统计的净销售额与订单量走势（UTC）。"
+      "subtitle": "按日或按月统计的净销售额与订单量柱状走势（UTC）。"
     },
     "merchandising": {
-      "title": "畅销商品与口径排行",
-      "products": "畅销商品",
-      "skus": "畅销 SKU",
-      "sizes": "滤镜口径排行"
+      "products": "畅销商品排行",
+      "skus": "畅销 SKU 排行",
+      "sizes": "滤镜口径销售排行",
+      "sizesSubtitle": "按规格口径（如 49mm / 67mm / 77mm / 82mm）统计销量占比与收入。",
+      "viewedTitle": "热门浏览商品 (PostHog)",
+      "viewedSubtitle": "所选时间窗口内前台 view_item 商品曝光排行。"
     },
     "segments": {
-      "title": "渠道、区域与币种分布",
-      "channels": "销售渠道",
-      "regions": "区域",
-      "currencies": "币种"
+      "channelsTitle": "按销售渠道拆分",
+      "regionsTitle": "按销售市场拆分",
+      "countriesTitle": "按收货国家/地区统计",
+      "promotionsTitle": "按折扣码 / 促销效果统计",
+      "automaticPromo": "自动促销",
+      "currenciesTitle": "多币种汇总明细"
     },
     "columns": {
       "product": "商品",
@@ -428,23 +465,76 @@
       "orders": "订单数",
       "revenue": "销售额",
       "name": "名称",
-      "currency": "币种"
+      "currency": "币种",
+      "aov": "客单价",
+      "country": "国家/地区",
+      "promoCode": "优惠代码",
+      "discount": "让利折扣",
+      "canceled": "已取消",
+      "gross": "毛销售额",
+      "views": "浏览量",
+      "visitors": "访客数",
+      "device": "设备类型",
+      "path": "落地路径",
+      "campaign": "广告活动",
+      "sourceMedium": "来源 / 媒介",
+      "customer": "客户",
+      "spent": "累计消费",
+      "lastOrder": "最近下单"
     },
     "traffic": {
-      "title": "独立站流量与转化漏斗",
-      "subtitle": "来自 PostHog 的页面访问、购买转化步骤及主要流量来源。",
       "notConfigured": "未配置",
-      "hint": "请在后端环境变量中配置 POSTHOG_PERSONAL_API_KEY 与 POSTHOG_PROJECT_ID 以展示独立站转化漏斗。",
+      "hint": "请在服务器环境变量中配置 POSTHOG_PERSONAL_API_KEY 与 POSTHOG_PROJECT_ID 以展示独立站流量与漏斗。",
       "pageviews": "浏览量 (PV)",
-      "visitors": "访客数 (UV)",
+      "visitors": "独立访客 (UV)",
       "sessions": "会话数",
+      "visitorsPvSub": "{{visitors}} 访客 · {{pageviews}} 次浏览",
       "funnelTitle": "购买转化漏斗",
+      "funnelHint": "百分比为上一步到当前步骤的人数转化率。",
+      "peopleCount": "{{people}} 人（{{count}} 次）",
       "sourcesTitle": "主要流量来源",
+      "sourcesHint": "按来源域名汇总页面浏览量。",
+      "countriesTitle": "访客国家/地区分布",
+      "devicesTitle": "访问设备分布",
+      "landingPagesTitle": "热门入口页面",
+      "utmTitle": "UTM 广告活动归因",
+      "utmEmpty": "所选时间窗口内暂无带 UTM 参数的访问会话。",
       "steps": {
-        "productViewed": "浏览商品",
-        "addedToCart": "加入购物车",
-        "checkoutStarted": "发起结账",
-        "orderCompleted": "完成下单"
+        "view_item": "查看商品",
+        "add_to_cart": "加入购物车",
+        "begin_checkout": "开始结账",
+        "purchase": "完成购买"
+      }
+    },
+    "customers": {
+      "totalAllTime": "客户总数",
+      "newCustomers": "新增客户",
+      "buyers": "下单客户",
+      "repeatCustomers": "复购客户",
+      "repeatSub": "窗口内下单 ≥ 2 笔",
+      "repeatRate": "复购率",
+      "avgOrdersPerCustomer": "人均订单数",
+      "avgCustomerValue": "平均客户价值",
+      "repeatListTitle": "复购客户明细",
+      "noRepeatYet": "所选窗口内还没有客户下过第二单。",
+      "topListTitle": "高价值客户排行"
+    },
+    "inventory": {
+      "trackedVariants": "追踪库存规格",
+      "totalStocked": "现货总库存",
+      "totalReserved": "已预留库存",
+      "outOfStock": "已缺货 SKU (≤ 0)",
+      "avgShipHours": "平均发货耗时",
+      "avgDeliverSub": "平均送达: {{hours}} 小时",
+      "noFulfillmentTiming": "暂无已发货时间记录",
+      "fulfillmentTitle": "订单履约进度分布",
+      "fulfillmentSubtitle": "所选时间窗口内有效订单按当前履约阶段的分布。",
+      "stages": {
+        "awaiting": "待发货",
+        "partiallyFulfilled": "部分履约",
+        "fulfilled": "已打包履约",
+        "shipped": "已发出",
+        "delivered": "已送达"
       }
     },
     "engagement": {
@@ -467,6 +557,11 @@
       "stocked": "现货库存",
       "reserved": "已预留",
       "available": "可用库存"
+    },
+    "footnotes": {
+      "accounting": "销售额 = 未取消订单总额 − 其退款（退款额另列，勿重复扣减）；客单价 = 净销售额 ÷ 有效订单数；待处理与库存指标反映当前实时状态。",
+      "customers": "复购客户 = 所选窗口内下过 2 笔及以上有效订单的注册客户；复购率 = 复购客户 ÷ 下单客户；平均客户价值 = 客户累计消费 ÷ 下单客户。",
+      "guestOrders": "另有 {{count}} 张游客订单未关联客户，未计入客户指标。"
     }
   }
 }

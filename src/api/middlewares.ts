@@ -21,6 +21,7 @@ import { PostAdminEditNote } from "./admin/note/validators"
 import { PatchAdminUpdatePriceListExt } from "./admin/price-lists/[id]/ext/validators"
 import { PostWebbersSettings } from "./admin/webbers-medusa/settings/validators"
 import {
+  AdminAnalyticsAcquisitionQuery,
   AdminAnalyticsQuery,
   AdminBatchReviews,
   AdminListReviewRequests,
@@ -338,6 +339,14 @@ export default defineMiddlewares({
       middlewares: [
         featureGuard("storeAnalytics"),
         validateAndTransformQuery(AdminAnalyticsQuery, {}),
+      ],
+    },
+    {
+      matcher: "/admin/analytics/acquisition",
+      methods: ["GET"] as MiddlewareVerb[],
+      middlewares: [
+        featureGuard("storeAnalytics"),
+        validateAndTransformQuery(AdminAnalyticsAcquisitionQuery, {}),
       ],
     },
   ],

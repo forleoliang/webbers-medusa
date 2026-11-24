@@ -1,6 +1,14 @@
 import {
+  clearAnalyticsCache,
+  getCached,
+  MAX_ANALYTICS_CACHE_ENTRIES,
+  setCached,
+} from "../analytics-cache"
+import {
   buildAnalyticsCsv,
   generateTimeBuckets,
+  isRefreshRequested,
+  mapRangeToPosthogInterval,
   mapRangeToTrafficRange,
   parseAnalyticsRange,
   pctDelta,
@@ -11,14 +19,18 @@ import {
 } from "../analytics"
 
 describe("analytics helpers", () => {
-  test("parseAnalyticsRange accepts valid values and defaults to 30d", () => {
+  afterEach(() => {
+    clearAnalyticsCache()
+  })
+
+  test("parseAnalyticsRange accepts valid values and defaults to all", () => {
     expect(parseAnalyticsRange("7d")).toBe("7d")
     expect(parseAnalyticsRange("30d")).toBe("30d")
     expect(parseAnalyticsRange("90d")).toBe("90d")
     expect(parseAnalyticsRange("12m")).toBe("12m")
     expect(parseAnalyticsRange("all")).toBe("all")
-    expect(parseAnalyticsRange("invalid")).toBe("30d")
-    expect(parseAnalyticsRange(undefined)).toBe("30d")
+    expect(parseAnalyticsRange("invalid")).toBe("all")
+    expect(parseAnalyticsRange(undefined)).toBe("all")
   })
 
   test("mapRangeToTrafficRange maps 7d to 30d and keeps others", () => {
@@ -27,6 +39,31 @@ describe("analytics helpers", () => {
     expect(mapRangeToTrafficRange("90d")).toBe("90d")
     expect(mapRangeToTrafficRange("12m")).toBe("12m")
     expect(mapRangeToTrafficRange("all")).toBe("all")
+  })
+
+  test("mapRangeToPosthogInterval maps whitelisted ranges cleanly", () => {
+    expect(mapRangeToPosthogInterval("7d")).toBe("7 day")
+    expect(mapRangeToPosthogInterval("30d")).toBe("30 day")
+    expect(mapRangeToPosthogInterval("90d")).toBe("90 day")
+    expect(mapRangeToPosthogInterval("12m")).toBe("12 month")
+    expect(mapRangeToPosthogInterval("all")).toBe("12 month")
+    expect(isRefreshRequested("1")).toBe(true)
+    expect(isRefreshRequested(true)).toBe(true)
+    expect(isRefreshRequested("0")).toBe(false)
+  })
+
+  test("analytics-cache supports hit, expiry, and bounded eviction", () => {
+    setCached("k1", { v: 1 }, 1000, 100)
+    expect(getCached<{ v: number }>("k1", 500)?.value).toEqual({ v: 1 })
+    expect(getCached<{ v: number }>("k1", 1100)).toBeNull()
+
+    for (let i = 0; i < MAX_ANALYTICS_CACHE_ENTRIES + 5; i++) {
+      setCached(`item-${i}`, i, 60_000, 1000 + i)
+    }
+    expect(getCached("item-0", 2000)).toBeNull()
+    expect(getCached(`item-${MAX_ANALYTICS_CACHE_ENTRIES + 4}`, 2000)?.value).toBe(
+      MAX_ANALYTICS_CACHE_ENTRIES + 4
+    )
   })
 
   test("resolveRangeBounds computes exact UTC day and month windows with previous period", () => {

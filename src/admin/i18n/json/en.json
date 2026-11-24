@@ -365,7 +365,8 @@
   "analytics": {
     "navLabel": "Store Analytics",
     "title": "Store Analytics",
-    "subtitle": "Real-time PostgreSQL revenue, SKU/size performance, operational queues, abandoned carts, and traffic insights.",
+    "subtitle": "Shopify-style 6-view business center backed by PostgreSQL & PostHog with 60s caching.",
+    "updatedAt": "Updated {{time}}",
     "refresh": "Refresh",
     "exportCsv": "Export CSV",
     "exportSuccess": "Analytics CSV downloaded",
@@ -373,52 +374,88 @@
     "loadError": "Could not load store analytics.",
     "empty": "No data in the selected range.",
     "view": "View",
-    "vsPrevious": "First period",
+    "viewDetails": "Details",
+    "vsPrevious": "vs previous",
+    "allTimeBaseline": "All time",
     "disabledHeading": "Store analytics disabled",
     "disabledDescription": "Enable \"Store analytics dashboard\" in Store Extensions to view live performance reports.",
-    "multiCurrencyNotice": "Multiple currencies detected. Headline KPIs and trend chart reflect {{currency}}; switch Currency above or inspect the Currency breakdown.",
+    "multiCurrencyNotice": "Multiple currencies detected. Headline KPIs and trend chart reflect {{currency}}; switch Currency above or inspect Sales > Currencies.",
+    "views": {
+      "overview": "Overview",
+      "sales": "Sales",
+      "products": "Products & Sizes",
+      "traffic": "Traffic & Funnel",
+      "customers": "Customers",
+      "inventory": "Inventory & Fulfillment"
+    },
     "ranges": {
-      "7d": "7d",
-      "30d": "30d",
-      "90d": "90d",
-      "12m": "12m",
-      "all": "All"
+      "all": "All time",
+      "12m": "Last 12m",
+      "90d": "Last 90d",
+      "30d": "Last 30d",
+      "7d": "Last 7d"
     },
     "filters": {
       "allChannels": "All channels",
-      "allRegions": "All regions",
+      "allRegions": "All markets",
       "autoCurrency": "Auto currency"
+    },
+    "live": {
+      "badge": "Live 30m",
+      "title": "Realtime storefront activity",
+      "visitors": "Active visitors",
+      "activeCarts": "Active carts",
+      "recentAtc": "Add to cart (30m)",
+      "recentCheckout": "Checkouts (30m)",
+      "visitorsWindowSub": "Last 30m: {{count}} active",
+      "sessionsWindowSub": "Last 30m: {{count}} active",
+      "pageviewsWindowSub": "Last 30m: {{count}} views"
     },
     "kpis": {
       "netSales": "Net sales",
-      "netSalesSub": "Gross: {{gross}} · Refunds: {{refunds}} ({{rate}}%)",
+      "grossSub": "Gross: {{gross}}",
+      "refunds": "Refunds",
+      "refundsSub": "Refund rate: {{rate}}%",
+      "refundsCanceledSub": "Refund rate: {{rate}}% · Canceled orders: {{canceled}}",
       "orders": "Standing orders",
       "ordersSub": "Canceled: {{canceled}} ({{rate}}%)",
       "aov": "Average order value",
-      "aovSub": "Repeat buyers: {{repeat}} / {{total}} ({{rate}}%)",
+      "aovSub": "Repeat: {{repeat}} / {{total}} ({{rate}}%)",
+      "canceledRefundLabel": "Canceled order refunds: {{amount}}",
+      "conversionRate": "Store conversion",
+      "conversionSub": "{{orders}} orders / {{sessions}} sessions",
       "abandonedCarts": "Abandoned carts",
-      "abandonedCartsSub": "With email: {{withEmail}} · Notified: {{notified}} · Potential: {{value}}"
+      "abandonedCartsSub": "Email: {{withEmail}} · Sent: {{notified}} · Value: {{value}}"
     },
     "ops": {
       "pendingCapture": "Pending payment capture",
+      "needsAction": "Action needed",
+      "clear": "Clear",
+      "ordersPendingSub": "Current · {{count}} order(s) pending capture",
       "awaitingFulfillment": "Awaiting fulfillment",
-      "lowStock": "Low stock SKUs (≤ 5)"
+      "currentStateHint": "Current unfulfilled backlog",
+      "lowStock": "Low stock SKUs (≤ 5)",
+      "trackedVariantsSub": "{{count}} tracked variants"
     },
     "chart": {
-      "title": "Revenue & order trend",
-      "subtitle": "Period-over-period performance across UTC days or months."
+      "title": "Sales & order trend",
+      "subtitle": "Daily or monthly net revenue and standing order volume (UTC)."
     },
     "merchandising": {
-      "title": "Product & filter size performance",
       "products": "Top products",
       "skus": "Top SKUs",
-      "sizes": "Filter sizes"
+      "sizes": "Filter sizes breakdown",
+      "sizesSubtitle": "Sales share by lens filter diameter / variant option.",
+      "viewedTitle": "Most viewed products (PostHog)",
+      "viewedSubtitle": "Storefront view_item event volume within the selected period."
     },
     "segments": {
-      "title": "Channel & region mix",
-      "channels": "Channels",
-      "regions": "Regions",
-      "currencies": "Currencies"
+      "channelsTitle": "Sales by channel",
+      "regionsTitle": "Sales by market",
+      "countriesTitle": "Sales by shipping country",
+      "promotionsTitle": "Sales by discount / promotion",
+      "automaticPromo": "Auto",
+      "currenciesTitle": "Currency breakdown"
     },
     "columns": {
       "product": "Product",
@@ -426,25 +463,78 @@
       "variant": "Variant / Size",
       "units": "Units",
       "orders": "Orders",
-      "revenue": "Revenue",
+      "revenue": "Net sales",
       "name": "Name",
-      "currency": "Currency"
+      "currency": "Currency",
+      "aov": "AOV",
+      "country": "Country",
+      "promoCode": "Code",
+      "discount": "Discount",
+      "canceled": "Canceled",
+      "gross": "Gross",
+      "views": "Views",
+      "visitors": "Visitors",
+      "device": "Device",
+      "path": "Path",
+      "campaign": "Campaign",
+      "sourceMedium": "Source / Medium",
+      "customer": "Customer",
+      "spent": "Net spent",
+      "lastOrder": "Last order"
     },
     "traffic": {
-      "title": "Storefront traffic & funnel",
-      "subtitle": "PostHog pageviews, conversion steps, and top acquisition sources.",
       "notConfigured": "Not configured",
       "hint": "Set POSTHOG_PERSONAL_API_KEY and POSTHOG_PROJECT_ID in the backend environment to view live storefront funnel metrics.",
       "pageviews": "Pageviews",
       "visitors": "Visitors",
       "sessions": "Sessions",
+      "visitorsPvSub": "{{visitors}} visitors · {{pageviews}} pageviews",
       "funnelTitle": "Conversion funnel",
+      "funnelHint": "Step percentages represent person-to-person conversion from the previous step.",
+      "peopleCount": "{{people}} people ({{count}} events)",
       "sourcesTitle": "Top traffic sources",
+      "sourcesHint": "Pageviews grouped by referring domain.",
+      "countriesTitle": "Visitors by country",
+      "devicesTitle": "Visitors by device",
+      "landingPagesTitle": "Top landing pages",
+      "utmTitle": "UTM campaigns",
+      "utmEmpty": "No UTM-tagged sessions recorded in this period.",
       "steps": {
-        "productViewed": "Product viewed",
-        "addedToCart": "Added to cart",
-        "checkoutStarted": "Checkout started",
-        "orderCompleted": "Order completed"
+        "view_item": "Product viewed",
+        "add_to_cart": "Added to cart",
+        "begin_checkout": "Checkout started",
+        "purchase": "Order completed"
+      }
+    },
+    "customers": {
+      "totalAllTime": "Total customers",
+      "newCustomers": "New customers",
+      "buyers": "Active buyers",
+      "repeatCustomers": "Repeat customers",
+      "repeatSub": "2+ standing orders in range",
+      "repeatRate": "Repeat customer rate",
+      "avgOrdersPerCustomer": "Avg orders / buyer",
+      "avgCustomerValue": "Avg customer value",
+      "repeatListTitle": "Repeat customers",
+      "noRepeatYet": "No customer has placed a second order in this range yet.",
+      "topListTitle": "Top customers by net spend"
+    },
+    "inventory": {
+      "trackedVariants": "Tracked variants",
+      "totalStocked": "Total stocked",
+      "totalReserved": "Reserved units",
+      "outOfStock": "Out of stock (≤ 0)",
+      "avgShipHours": "Avg time to ship",
+      "avgDeliverSub": "Avg deliver: {{hours}}h",
+      "noFulfillmentTiming": "No completed shipments yet",
+      "fulfillmentTitle": "Fulfillment pipeline",
+      "fulfillmentSubtitle": "Standing orders in the selected window grouped by fulfillment stage.",
+      "stages": {
+        "awaiting": "Awaiting fulfillment",
+        "partiallyFulfilled": "Partially fulfilled",
+        "fulfilled": "Fulfilled",
+        "shipped": "Shipped",
+        "delivered": "Delivered"
       }
     },
     "engagement": {
@@ -467,6 +557,11 @@
       "stocked": "Stocked",
       "reserved": "Reserved",
       "available": "Available"
+    },
+    "footnotes": {
+      "accounting": "Net sales = standing order totals minus refunds (canceled and draft orders are excluded; pending capture, awaiting fulfillment, and low stock reflect current live queues).",
+      "customers": "Repeat customers = registered customers with 2+ standing orders in the selected window; repeat rate = repeat customers / buyers; avg customer value = cumulative customer spend / buyers.",
+      "guestOrders": "{{count}} guest order(s) without a linked customer account are excluded from customer metrics."
     }
   }
 }

@@ -160,11 +160,22 @@ export type AnalyticsFilters = {
   currency_code?: string
 }
 
+export type AnalyticsCustomerRow = {
+  customer_id: string
+  name: string
+  email: string | null
+  order_count: number
+  net_spent: number
+  last_order_at: string | null
+}
+
 export type AnalyticsOverviewResponse = {
   range: AnalyticsRange
   granularity: "day" | "month"
   currency_code: string
   multi_currency_warning: boolean
+  cached?: boolean
+  cached_at?: string
   filters: {
     channels: { id: string; name: string }[]
     regions: { id: string; name: string; currency_code: string }[]
@@ -176,6 +187,7 @@ export type AnalyticsOverviewResponse = {
     gross_sales: number
     gross_sales_delta: number | null
     refunds: number
+    canceled_refunds: number
     refunds_delta: number | null
     refund_rate: number
     refund_rate_delta: number | null
@@ -191,6 +203,18 @@ export type AnalyticsOverviewResponse = {
     repeat_rate: number
     repeat_rate_delta: number | null
   }
+  customers: {
+    total_customers_all_time: number
+    new_customers: number | null
+    buyers: number
+    repeat_customers: number
+    repeat_rate: number
+    avg_orders_per_customer: number
+    avg_customer_value: number
+    guest_orders: number
+    repeat_rows: AnalyticsCustomerRow[]
+    top_customers: AnalyticsCustomerRow[]
+  }
   operations: {
     pending_capture_count: number
     pending_capture_amount: number
@@ -202,6 +226,7 @@ export type AnalyticsOverviewResponse = {
     with_email: number
     notified: number
     potential_value: number
+    active_carts_30m: number
   }
   timeseries: {
     bucket: string
@@ -245,6 +270,7 @@ export type AnalyticsOverviewResponse = {
     name: string
     orders: number
     net_revenue: number
+    refunds: number
     aov: number
   }[]
   region_breakdown: {
@@ -253,8 +279,31 @@ export type AnalyticsOverviewResponse = {
     currency_code: string
     orders: number
     net_revenue: number
+    refunds: number
     aov: number
   }[]
+  country_breakdown: {
+    country_code: string
+    orders: number
+    net_revenue: number
+    aov: number
+  }[]
+  promotion_breakdown: {
+    promotion_id: string
+    code: string
+    is_automatic: boolean
+    orders: number
+    discount_amount: number
+    net_revenue: number
+  }[]
+  inventory_summary: {
+    tracked_variants: number
+    total_stocked: number
+    total_reserved: number
+    total_available: number
+    low_stock_count: number
+    out_of_stock_count: number
+  }
   low_stock: {
     variant_id: string
     product_id: string
@@ -265,6 +314,15 @@ export type AnalyticsOverviewResponse = {
     reserved_quantity: number
     available_quantity: number
   }[]
+  fulfillment_summary: {
+    awaiting_fulfillment: number
+    partially_fulfilled: number
+    fulfilled: number
+    shipped: number
+    delivered: number
+    avg_hours_to_ship: number | null
+    avg_hours_to_deliver: number | null
+  }
   reviews: {
     enabled: boolean
     approved_total: number
@@ -286,39 +344,84 @@ export type AnalyticsOverviewResponse = {
   }
 }
 
-export type AnalyticsTrafficResponse = {
+export type AnalyticsAcquisitionResponse = {
   configured: boolean
   range: string
-  pageviews?: number
-  visitors?: number
-  sessions?: number
-  funnel?: {
-    product_viewed?: number
-    added_to_cart?: number
-    checkout_started?: number
-    order_completed?: number
+  cached?: boolean
+  cached_at?: string
+  error?: string
+  summary?: {
+    pageviews: number
+    visitors: number
+    sessions: number
   }
-  sources?: { source: string; visits: number }[]
+  live?: {
+    window_minutes: number
+    active_visitors: number
+    active_sessions: number
+    active_pageviews: number
+    recent_add_to_cart: number
+    recent_checkout: number
+  }
+  funnel?: {
+    event: string
+    count: number
+    people: number
+  }[]
+  sources?: {
+    domain: string
+    count: number
+  }[]
+  countries?: {
+    country: string
+    visitors: number
+    pageviews: number
+  }[]
+  devices?: {
+    device: string
+    visitors: number
+    sessions: number
+  }[]
+  landing_pages?: {
+    path: string
+    pageviews: number
+    visitors: number
+  }[]
+  utm_campaigns?: {
+    source: string
+    medium: string
+    campaign: string
+    sessions: number
+    visitors: number
+  }[]
+  product_views?: {
+    key: string
+    name: string
+    views: number
+    people: number
+  }[]
 }
 
 export const ANALYTICS_KEY = ["webbers-analytics"]
 
-export const getAnalyticsOverview = (f: AnalyticsFilters) =>
+export const getAnalyticsOverview = (f: AnalyticsFilters, refresh?: boolean) =>
   sdk.client.fetch<AnalyticsOverviewResponse>("/admin/analytics/overview", {
     query: clean({
       range: f.range,
       channel_id: f.channel_id,
       region_id: f.region_id,
       currency_code: f.currency_code,
+      refresh: refresh ? "1" : undefined,
     }),
   })
 
-export const getAnalyticsTraffic = (range: AnalyticsRange) => {
-  const trafficRange = range === "7d" ? "30d" : range
-  return sdk.client.fetch<AnalyticsTrafficResponse>("/admin/analytics/traffic", {
-    query: { range: trafficRange },
+export const getAnalyticsAcquisition = (range: AnalyticsRange, refresh?: boolean) =>
+  sdk.client.fetch<AnalyticsAcquisitionResponse>("/admin/analytics/acquisition", {
+    query: clean({
+      range,
+      refresh: refresh ? "1" : undefined,
+    }),
   })
-}
 
 export const analyticsExportUrl = (f: AnalyticsFilters) => {
   const params = new URLSearchParams()

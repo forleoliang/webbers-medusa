@@ -88,5 +88,12 @@ export const AdminAnalyticsQuery = z.object({
   channel_id: id.optional(),
   region_id: id.optional(),
   currency_code: z.string().min(3).max(10).optional(),
+  refresh: z.union([z.boolean(), z.string()]).optional(),
 })
 export type AdminAnalyticsQueryType = z.infer<typeof AdminAnalyticsQuery>
+
+export const AdminAnalyticsAcquisitionQuery = z.object({
+  range: z.enum(["7d", "30d", "90d", "12m", "all"]).optional(),
+  refresh: z.union([z.boolean(), z.string()]).optional(),
+})
+export type AdminAnalyticsAcquisitionQueryType = z.infer<typeof AdminAnalyticsAcquisitionQuery>

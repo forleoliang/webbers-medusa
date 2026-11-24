@@ -364,8 +364,9 @@
   },
   "analytics": {
     "navLabel": "經營看板",
-    "title": "商店經營看板",
-    "subtitle": "基於 PostgreSQL 即時彙總的營收走勢、商品與口徑排行、庫存/待處理佇列、棄單及流量漏斗。",
+    "title": "商店數據中心",
+    "subtitle": "基於 PostgreSQL 與 PostHog 即時彙總的 6 視圖電商經營分析系統（含 60 秒快取保護）。",
+    "updatedAt": "更新於 {{time}}",
     "refresh": "重新整理",
     "exportCsv": "匯出 CSV",
     "exportSuccess": "經營報表 CSV 已下載",
@@ -373,52 +374,88 @@
     "loadError": "無法載入商店經營數據。",
     "empty": "所選時間範圍內暫無數據。",
     "view": "查看",
-    "vsPrevious": "無對比基準",
+    "viewDetails": "查看詳情",
+    "vsPrevious": "較上週期",
+    "allTimeBaseline": "全部時間",
     "disabledHeading": "商店經營看板已停用",
     "disabledDescription": "請於「擴充功能設定」開啟「商店經營看板」開關以查看即時經營數據。",
-    "multiCurrencyNotice": "偵測到多幣別訂單。上方核心指標與趨勢圖目前以 {{currency}} 統計；可於上方切換幣別或查看下方幣別明細。",
+    "multiCurrencyNotice": "偵測到多幣別訂單。上方核心指標與趨勢圖目前以 {{currency}} 統計；可於上方切換幣別或查看「銷售分析 > 幣別」。",
+    "views": {
+      "overview": "經營總覽",
+      "sales": "銷售分析",
+      "products": "商品與口徑",
+      "traffic": "流量與漏斗",
+      "customers": "顧客分析",
+      "inventory": "庫存與履約"
+    },
     "ranges": {
-      "7d": "7天",
-      "30d": "30天",
-      "90d": "90天",
-      "12m": "12個月",
-      "all": "全部"
+      "all": "全部時間",
+      "12m": "近 12 個月",
+      "90d": "近 90 天",
+      "30d": "近 30 天",
+      "7d": "近 7 天"
     },
     "filters": {
-      "allChannels": "全部銷售通路",
-      "allRegions": "全部銷售區域",
+      "allChannels": "全部通路",
+      "allRegions": "全部市場",
       "autoCurrency": "自動幣別"
+    },
+    "live": {
+      "badge": "即時 30 分鐘",
+      "title": "商店目前活躍動態",
+      "visitors": "目前訪客",
+      "activeCarts": "活躍購物車",
+      "recentAtc": "加購事件 (30m)",
+      "recentCheckout": "開始結帳 (30m)",
+      "visitorsWindowSub": "近 30 分鐘活躍: {{count}}",
+      "sessionsWindowSub": "近 30 分鐘工作階段: {{count}}",
+      "pageviewsWindowSub": "近 30 分鐘瀏覽: {{count}}"
     },
     "kpis": {
       "netSales": "淨銷售額",
-      "netSalesSub": "毛銷售額: {{gross}} · 退款: {{refunds}} ({{rate}}%)",
+      "grossSub": "毛銷售額: {{gross}}",
+      "refunds": "退款額",
+      "refundsSub": "退款率: {{rate}}%",
+      "refundsCanceledSub": "退款率: {{rate}}% · 已取消單退款: {{canceled}}",
       "orders": "有效訂單數",
       "ordersSub": "已取消: {{canceled}} ({{rate}}%)",
       "aov": "平均客單價 (AOV)",
-      "aovSub": "回購顧客: {{repeat}} / {{total}} ({{rate}}%)",
+      "aovSub": "回購: {{repeat}} / {{total}} ({{rate}}%)",
+      "canceledRefundLabel": "已取消訂單退款額: {{amount}}",
+      "conversionRate": "全站下單轉換率",
+      "conversionSub": "{{orders}} 筆訂單 / {{sessions}} 次工作階段",
       "abandonedCarts": "待挽回棄單",
-      "abandonedCartsSub": "含信箱: {{withEmail}} · 已通知: {{notified}} · 潛在金額: {{value}}"
+      "abandonedCartsSub": "含信箱: {{withEmail}} · 已通知: {{notified}} · 潛在: {{value}}"
     },
     "ops": {
-      "pendingCapture": "待請款訂單",
+      "pendingCapture": "待請款金額",
+      "needsAction": "待處理",
+      "clear": "已清",
+      "ordersPendingSub": "目前 · {{count}} 張訂單待請款",
       "awaitingFulfillment": "待出貨訂單",
-      "lowStock": "低庫存 SKU (≤ 5)"
+      "currentStateHint": "目前未完全出貨訂單",
+      "lowStock": "低庫存 SKU (≤ 5)",
+      "trackedVariantsSub": "共 {{count}} 個啟用庫存追蹤"
     },
     "chart": {
       "title": "銷售與訂單趨勢",
-      "subtitle": "依日或依月統計之淨銷售額與訂單量走勢（UTC）。"
+      "subtitle": "依日或依月統計之淨銷售額與訂單量柱狀走勢（UTC）。"
     },
     "merchandising": {
-      "title": "熱銷商品與口徑排行",
-      "products": "熱銷商品",
-      "skus": "熱銷 SKU",
-      "sizes": "濾鏡口徑排行"
+      "products": "熱銷商品排行",
+      "skus": "熱銷 SKU 排行",
+      "sizes": "濾鏡口徑銷售排行",
+      "sizesSubtitle": "依規格口徑（如 49mm / 67mm / 77mm / 82mm）統計銷量佔比與營收。",
+      "viewedTitle": "熱門瀏覽商品 (PostHog)",
+      "viewedSubtitle": "所選時間範圍內前台 view_item 商品瀏覽排行。"
     },
     "segments": {
-      "title": "通路、區域與幣別分佈",
-      "channels": "銷售通路",
-      "regions": "區域",
-      "currencies": "幣別"
+      "channelsTitle": "依銷售通路拆分",
+      "regionsTitle": "依銷售市場拆分",
+      "countriesTitle": "依收件國家/地區統計",
+      "promotionsTitle": "依優惠碼 / 促銷成效統計",
+      "automaticPromo": "自動促銷",
+      "currenciesTitle": "多幣別彙總明細"
     },
     "columns": {
       "product": "商品",
@@ -428,23 +465,76 @@
       "orders": "訂單數",
       "revenue": "銷售額",
       "name": "名稱",
-      "currency": "幣別"
+      "currency": "幣別",
+      "aov": "客單價",
+      "country": "國家/地區",
+      "promoCode": "優惠碼",
+      "discount": "折扣金額",
+      "canceled": "已取消",
+      "gross": "毛銷售額",
+      "views": "瀏覽量",
+      "visitors": "訪客數",
+      "device": "裝置類型",
+      "path": "落地路徑",
+      "campaign": "廣告活動",
+      "sourceMedium": "來源 / 媒介",
+      "customer": "顧客",
+      "spent": "累計消費",
+      "lastOrder": "最近下單"
     },
     "traffic": {
-      "title": "商店流量與轉換漏斗",
-      "subtitle": "來自 PostHog 的瀏覽數據、結帳轉換步驟與主要流量來源。",
       "notConfigured": "未設定",
-      "hint": "請於後端環境變數設定 POSTHOG_PERSONAL_API_KEY 與 POSTHOG_PROJECT_ID 以檢視商店轉換漏斗。",
+      "hint": "請於後端環境變數設定 POSTHOG_PERSONAL_API_KEY 與 POSTHOG_PROJECT_ID 以檢視商店流量與轉換漏斗。",
       "pageviews": "瀏覽量 (PV)",
-      "visitors": "訪客數 (UV)",
+      "visitors": "獨立訪客 (UV)",
       "sessions": "工作階段",
+      "visitorsPvSub": "{{visitors}} 訪客 · {{pageviews}} 次瀏覽",
       "funnelTitle": "購買轉換漏斗",
+      "funnelHint": "百分比為上一步到目前步驟的人數轉換率。",
+      "peopleCount": "{{people}} 人（{{count}} 次）",
       "sourcesTitle": "主要流量來源",
+      "sourcesHint": "依來源網域彙總頁面瀏覽量。",
+      "countriesTitle": "訪客國家/地區分佈",
+      "devicesTitle": "訪客裝置分佈",
+      "landingPagesTitle": "熱門入口頁面",
+      "utmTitle": "UTM 廣告活動歸因",
+      "utmEmpty": "所選時間範圍內暫無含 UTM 參數之造訪紀錄。",
       "steps": {
-        "productViewed": "瀏覽商品",
-        "addedToCart": "加入購物車",
-        "checkoutStarted": "開始結帳",
-        "orderCompleted": "完成訂單"
+        "view_item": "瀏覽商品",
+        "add_to_cart": "加入購物車",
+        "begin_checkout": "開始結帳",
+        "purchase": "完成購買"
+      }
+    },
+    "customers": {
+      "totalAllTime": "顧客總數",
+      "newCustomers": "新增顧客",
+      "buyers": "下單顧客",
+      "repeatCustomers": "回購顧客",
+      "repeatSub": "區間內下單 ≥ 2 筆",
+      "repeatRate": "回購率",
+      "avgOrdersPerCustomer": "人均訂單數",
+      "avgCustomerValue": "平均顧客價值",
+      "repeatListTitle": "回購顧客明細",
+      "noRepeatYet": "所選區間內尚未有顧客下第二筆訂單。",
+      "topListTitle": "高價值顧客排行"
+    },
+    "inventory": {
+      "trackedVariants": "追蹤庫存規格",
+      "totalStocked": "現貨總庫存",
+      "totalReserved": "已預留庫存",
+      "outOfStock": "已缺貨 SKU (≤ 0)",
+      "avgShipHours": "平均出貨耗時",
+      "avgDeliverSub": "平均送達: {{hours}} 小時",
+      "noFulfillmentTiming": "暫無出貨時間紀錄",
+      "fulfillmentTitle": "訂單履約進度分佈",
+      "fulfillmentSubtitle": "所選時間範圍內有效訂單依目前履約階段分佈。",
+      "stages": {
+        "awaiting": "待出貨",
+        "partiallyFulfilled": "部分履約",
+        "fulfilled": "已打包履約",
+        "shipped": "已寄出",
+        "delivered": "已送達"
       }
     },
     "engagement": {
@@ -467,6 +557,11 @@
       "stocked": "現貨庫存",
       "reserved": "已預留",
       "available": "可用庫存"
+    },
+    "footnotes": {
+      "accounting": "銷售額 = 未取消訂單總額 − 其退款（退款額另列，勿重複扣減）；客單價 = 淨銷售額 ÷ 有效訂單數；待處理與庫存指標反映目前即時狀態。",
+      "customers": "回購顧客 = 所選區間內下過 2 筆及以上有效訂單的註冊顧客；回購率 = 回購顧客 ÷ 下單顧客；平均顧客價值 = 顧客累計消費 ÷ 下單顧客。",
+      "guestOrders": "另有 {{count}} 筆訪客訂單未關聯顧客帳號，未計入顧客指標。"
     }
   }
 }
