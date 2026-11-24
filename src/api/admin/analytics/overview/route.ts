@@ -8,7 +8,7 @@ import {
   toInt,
   toNum,
 } from "../../../../lib/analytics"
-import { getCached, setCached } from "../../../../lib/analytics-cache"
+import { getStaleCached, runSingleFlight, setCached } from "../../../../lib/analytics-cache"
 import {
   buildCartWhereClause,
   buildLiveOrderFilterClause,
@@ -24,6 +24,9 @@ import CustomQueryService from "../../../../modules/custom-query/service"
 import { WEBBERS_SETTINGS_MODULE } from "../../../../modules/webbers-settings"
 import WebbersSettingsService from "../../../../modules/webbers-settings/service"
 import type { AdminAnalyticsQueryType } from "../../../validators"
+
+const OVERVIEW_FRESH_TTL_MS = 3 * 60_000
+const OVERVIEW_STALE_GRACE_MS = 10 * 60_000
 
 export async function GET(req: MedusaRequest, res: MedusaResponse) {
   const query = (req.validatedQuery || req.query || {}) as AdminAnalyticsQueryType
@@ -49,13 +52,7 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
     regionId || "all"
   }:${requestedCurrency || "auto"}`
 
-  if (!forceRefresh) {
-    const hit = getCached<Record<string, unknown>>(cacheKey)
-    if (hit) {
-      return res.json({ ...hit.value, cached: true, cached_at: hit.cachedAt })
-    }
-  }
-
+  const refresh = async (): Promise<{ payload: Record<string, unknown>; cachedAt: string }> => {
   const customQuery = req.scope.resolve<CustomQueryService>(CUSTOM_QUERY)
   const settingsService = req.scope.resolve<WebbersSettingsService>(WEBBERS_SETTINGS_MODULE)
 
@@ -1439,6 +1436,22 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
     wishlist: wishlistSummary,
   }
 
-  const entry = setCached(cacheKey, payload)
-  return res.json({ ...payload, cached: false, cached_at: entry.cachedAt })
+  const entry = setCached(cacheKey, payload, OVERVIEW_FRESH_TTL_MS)
+  return { payload, cachedAt: entry.cachedAt }
+  }
+
+  if (!forceRefresh) {
+    const hit = getStaleCached<Record<string, unknown>>(cacheKey, OVERVIEW_STALE_GRACE_MS)
+    if (hit && !hit.isStale) {
+      return res.json({ ...hit.entry.value, cached: true, cached_at: hit.entry.cachedAt })
+    }
+    if (hit && hit.isStale) {
+      void runSingleFlight(cacheKey, refresh).catch(() => {})
+      return res.json({ ...hit.entry.value, cached: true, stale: true, cached_at: hit.entry.cachedAt })
+    }
+  }
+
+  const flightKey = forceRefresh ? `${cacheKey}:force` : cacheKey
+  const result = await runSingleFlight(flightKey, refresh)
+  return res.json({ ...result.payload, cached: false, cached_at: result.cachedAt })
 }

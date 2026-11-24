@@ -1,7 +1,11 @@
 import type { MedusaContainer } from "@medusajs/framework/types"
 import { MedusaError, Modules } from "@medusajs/framework/utils"
 
-type CacheLike = { get<T>(key: string): Promise<T | null>; set(key: string, data: unknown, ttl?: number): Promise<void> }
+type LegacyCacheLike = { get<T>(key: string): Promise<T | null>; set(key: string, data: unknown, ttl?: number): Promise<void> }
+type CachingServiceLike = {
+  get(input: { key: string }): Promise<unknown>
+  set(input: { key: string; data: unknown; ttl?: number; tags?: string[] }): Promise<void>
+}
 
 type Bucket = { count: number; reset: number }
 const memory = new Map<string, Bucket>()
@@ -13,10 +17,26 @@ function sweep(now: number) {
   for (const [k, b] of memory) if (b.reset <= now) memory.delete(k)
 }
 
-function cacheOf(container: MedusaContainer): CacheLike | null {
+function cacheOf(container: MedusaContainer): LegacyCacheLike | null {
   try {
-    const c = container.resolve(Modules.CACHE) as Partial<CacheLike> | undefined
-    return c && typeof c.get === "function" && typeof c.set === "function" ? (c as CacheLike) : null
+    const c = container.resolve(Modules.CACHING) as Partial<CachingServiceLike> | undefined
+    if (c && typeof c.get === "function" && typeof c.set === "function") {
+      return {
+        get: async <T>(key: string) => {
+          const val = await c.get!({ key })
+          return (val === undefined ? null : val) as T | null
+        },
+        set: async (key: string, data: unknown, ttl?: number) => {
+          await c.set!({ key, data, ttl, tags: [] })
+        },
+      }
+    }
+  } catch {
+    // Fall back to legacy Modules.CACHE or in-memory rate limiting.
+  }
+  try {
+    const c = container.resolve(Modules.CACHE) as Partial<LegacyCacheLike> | undefined
+    return c && typeof c.get === "function" && typeof c.set === "function" ? (c as LegacyCacheLike) : null
   } catch {
     return null
   }
