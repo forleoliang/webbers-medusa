@@ -1,7 +1,9 @@
 import {
   clearAnalyticsCache,
   getCached,
+  getStaleCached,
   MAX_ANALYTICS_CACHE_ENTRIES,
+  runSingleFlight,
   setCached,
 } from "../analytics-cache"
 import {
@@ -91,6 +93,42 @@ describe("analytics helpers", () => {
     expect(getCached(`item-${MAX_ANALYTICS_CACHE_ENTRIES + 4}`, 2000)?.value).toBe(
       MAX_ANALYTICS_CACHE_ENTRIES + 4
     )
+  })
+
+  test("getStaleCached differentiates fresh, stale-within-grace, and expired", () => {
+    setCached("swr", { ok: true }, 1000, 100)
+    expect(getStaleCached("swr", 5000, 500)).toMatchObject({ isStale: false, entry: { value: { ok: true } } })
+    expect(getStaleCached("swr", 5000, 2000)).toMatchObject({ isStale: true, entry: { value: { ok: true } } })
+    expect(getStaleCached("swr", 5000, 6200)).toBeNull()
+    expect(getStaleCached("swr", 5000, 2000)).toBeNull()
+  })
+
+  test("runSingleFlight deduplicates concurrent calls and clears on settlement", async () => {
+    let calls = 0
+    let resolveFn!: (v: number) => void
+    const fn = () => {
+      calls += 1
+      return new Promise<number>((r) => {
+        resolveFn = r
+      })
+    }
+    const p1 = runSingleFlight("sf-key", fn)
+    const p2 = runSingleFlight("sf-key", fn)
+    expect(calls).toBe(1)
+    resolveFn(42)
+    expect(await Promise.all([p1, p2])).toEqual([42, 42])
+
+    const p3 = runSingleFlight("sf-key", async () => {
+      calls += 1
+      throw new Error("boom")
+    })
+    await expect(p3).rejects.toThrow("boom")
+    const p4 = await runSingleFlight("sf-key", async () => {
+      calls += 1
+      return 99
+    })
+    expect(p4).toBe(99)
+    expect(calls).toBe(3)
   })
 
   test("resolveRangeBounds computes exact UTC day and month windows", () => {

@@ -8,6 +8,7 @@ export type CacheEntry<T> = {
 }
 
 const store = new Map<string, CacheEntry<unknown>>()
+const inFlight = new Map<string, Promise<unknown>>()
 
 export function getCached<T>(key: string, now = Date.now()): CacheEntry<T> | null {
   const entry = store.get(key)
@@ -17,6 +18,37 @@ export function getCached<T>(key: string, now = Date.now()): CacheEntry<T> | nul
     return null
   }
   return entry as CacheEntry<T>
+}
+
+export function getStaleCached<T>(
+  key: string,
+  staleGraceMs: number,
+  now = Date.now()
+): { entry: CacheEntry<T>; isStale: boolean } | null {
+  const entry = store.get(key)
+  if (!entry) return null
+  if (now < entry.expiresAt) {
+    return { entry: entry as CacheEntry<T>, isStale: false }
+  }
+  if (now < entry.expiresAt + Math.max(0, staleGraceMs)) {
+    return { entry: entry as CacheEntry<T>, isStale: true }
+  }
+  store.delete(key)
+  return null
+}
+
+export function runSingleFlight<T>(key: string, fn: () => Promise<T>): Promise<T> {
+  const existing = inFlight.get(key)
+  if (existing) {
+    return existing as Promise<T>
+  }
+  const promise = (async () => fn())().finally(() => {
+    if (inFlight.get(key) === promise) {
+      inFlight.delete(key)
+    }
+  })
+  inFlight.set(key, promise)
+  return promise
 }
 
 export function setCached<T>(
@@ -45,4 +77,5 @@ export function setCached<T>(
 
 export function clearAnalyticsCache(): void {
   store.clear()
+  inFlight.clear()
 }

@@ -9,11 +9,15 @@ import {
   parseIsoDateOnly,
   toInt,
 } from "../../../../lib/analytics"
-import { getCached, setCached } from "../../../../lib/analytics-cache"
+import { getStaleCached, runSingleFlight, setCached } from "../../../../lib/analytics-cache"
 import type { AdminAnalyticsAcquisitionQueryType } from "../../../validators"
 
 const OWNER_DISTINCT_ID = "01a191b1-2856-7a78-a25b-de3f4f3b008f"
 const OWNER_PERSON_ID = "9309e250-3e82-5033-8215-86b2ad7d4db2"
+const POSTHOG_QUERY_TIMEOUT_MS = 12_000
+const POSTHOG_CONCURRENCY = 4
+const ACQUISITION_FRESH_TTL_MS = 5 * 60_000
+const ACQUISITION_STALE_GRACE_MS = 15 * 60_000
 
 const BASE_FILTER = [
   "properties.$host in ('xtfilters.com', 'www.xtfilters.com')",
@@ -30,6 +34,7 @@ async function hogql(host: string, projectId: string, apiKey: string, query: str
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ query: { kind: "HogQLQuery", query } }),
+    signal: AbortSignal.timeout(POSTHOG_QUERY_TIMEOUT_MS),
   })
   const data = (await res.json().catch(() => ({}))) as {
     results?: any[][]
@@ -42,104 +47,114 @@ async function hogql(host: string, projectId: string, apiKey: string, query: str
   return Array.isArray(data.results) ? data.results : []
 }
 
+async function runSettledWithConcurrency<T>(
+  tasks: Array<() => Promise<T>>,
+  concurrency: number
+): Promise<PromiseSettledResult<T>[]> {
+  const results = new Array<PromiseSettledResult<T>>(tasks.length)
+  let nextIndex = 0
+  const workerCount = Math.max(1, Math.min(concurrency, tasks.length))
+
+  await Promise.all(
+    Array.from({ length: workerCount }, async () => {
+      while (nextIndex < tasks.length) {
+        const idx = nextIndex++
+        try {
+          const value = await tasks[idx]()
+          results[idx] = { status: "fulfilled", value }
+        } catch (reason) {
+          results[idx] = { status: "rejected", reason }
+        }
+      }
+    })
+  )
+
+  return results
+}
+
 function settledRows(r: PromiseSettledResult<any[][]>): any[][] {
   return r.status === "fulfilled" ? r.value : []
 }
 
-export async function GET(req: MedusaRequest, res: MedusaResponse) {
-  const query = (req.validatedQuery || req.query || {}) as AdminAnalyticsAcquisitionQueryType
-  const range = parseAnalyticsRange(query.range)
-  const validFrom = parseIsoDateOnly(query.from)
-  const validTo = parseIsoDateOnly(query.to)
-  const forceRefresh = isRefreshRequested(query.refresh)
+type AcquisitionFetchResult =
+  | { ok: true; payload: Record<string, unknown>; cachedAt: string }
+  | { ok: false; errorPayload: Record<string, unknown> }
 
-  const apiKey = process.env.POSTHOG_PERSONAL_API_KEY
-  if (!apiKey) {
-    return res.json({
-      configured: false,
-      range,
-      cached_at: new Date().toISOString(),
-    })
-  }
+async function fetchAndCacheAcquisition(params: {
+  cacheKey: string
+  host: string
+  projectId: string
+  apiKey: string
+  range: string
+  timeFilter: string
+}): Promise<AcquisitionFetchResult> {
+  const { cacheKey, host, projectId, apiKey, range, timeFilter } = params
+  const run = (q: string) => () => hogql(host, projectId, apiKey, q)
 
-  let timeFilter = `timestamp > now() - interval ${mapRangeToPosthogInterval(range)}`
-  let customTag = ""
-  if (range === "custom" && validFrom && validTo) {
-    const [fromStr, toStr] = validFrom <= validTo ? [validFrom, validTo] : [validTo, validFrom]
-    timeFilter = `timestamp >= toDateTime('${fromStr} 00:00:00') and timestamp <= toDateTime('${toStr} 23:59:59')`
-    customTag = `:${fromStr}:${toStr}`
-  }
-
-  const cacheKey = `acquisition:${range}${customTag}`
-  if (!forceRefresh) {
-    const hit = getCached<Record<string, unknown>>(cacheKey)
-    if (hit) {
-      return res.json({ ...hit.value, cached: true, cached_at: hit.cachedAt })
-    }
-  }
-
-  const host = (process.env.POSTHOG_HOST || "https://us.posthog.com").replace(/\/$/, "")
-  const projectId = process.env.POSTHOG_PROJECT_ID || "696001"
-  const run = (q: string) => hogql(host, projectId, apiKey, q)
-
-  const results = await Promise.allSettled([
-    // 0: summary
-    run(
-      `select count() as pageviews, count(distinct person_id) as visitors, count(distinct properties.$session_id) as sessions from events where ${BASE_FILTER} and event = '$pageview' and ${timeFilter}`
-    ),
-    // 1: funnel
-    run(
-      `select event, count() as c, count(distinct person_id) as people from events where ${BASE_FILTER} and event in ('view_item','add_to_cart','begin_checkout','purchase') and ${timeFilter} group by event`
-    ),
-    // 2: sources (domain + utm_medium for channel grouping)
-    run(
-      `select if(properties.$referring_domain = '$direct' or properties.$referring_domain is null or properties.$referring_domain = '', 'direct', properties.$referring_domain) as ref, coalesce(nullIf(properties.utm_medium, ''), '') as med, count() as c, count(distinct properties.$session_id) as sessions, count(distinct person_id) as visitors from events where ${BASE_FILTER} and event = '$pageview' and ${timeFilter} group by ref, med order by c desc limit 40`
-    ),
-    // 3: live 30m summary
-    run(
-      `select count(distinct person_id) as visitors, count(distinct properties.$session_id) as sessions, countIf(event = '$pageview') as pageviews, countIf(event = 'add_to_cart') as add_to_cart, countIf(event = 'begin_checkout') as checkout from events where ${BASE_FILTER} and timestamp > now() - interval 30 minute`
-    ),
-    // 4: countries
-    run(
-      `select coalesce(nullIf(properties.$geoip_country_code, ''), 'Unknown') as country, count(distinct person_id) as visitors, count() as pageviews from events where ${BASE_FILTER} and event = '$pageview' and ${timeFilter} group by country order by visitors desc, pageviews desc limit 10`
-    ),
-    // 5: devices
-    run(
-      `select coalesce(nullIf(properties.$device_type, ''), 'Unknown') as device, count(distinct person_id) as visitors, count(distinct properties.$session_id) as sessions from events where ${BASE_FILTER} and event = '$pageview' and ${timeFilter} group by device order by visitors desc limit 6`
-    ),
-    // 6: landing pages
-    run(
-      `select coalesce(nullIf(properties.$pathname, ''), '/') as path, count() as pageviews, count(distinct person_id) as visitors from events where ${BASE_FILTER} and event = '$pageview' and ${timeFilter} group by path order by pageviews desc limit 10`
-    ),
-    // 7: utm campaigns
-    run(
-      `select coalesce(nullIf(properties.utm_source, ''), '(none)') as source, coalesce(nullIf(properties.utm_medium, ''), '(none)') as medium, coalesce(nullIf(properties.utm_campaign, ''), '(none)') as campaign, count(distinct properties.$session_id) as sessions, count(distinct person_id) as visitors from events where ${BASE_FILTER} and (properties.utm_source is not null or properties.utm_campaign is not null) and ${timeFilter} group by source, medium, campaign order by sessions desc limit 10`
-    ),
-    // 8: product views
-    run(
-      `select coalesce(properties.item_id, properties.product_id, properties.item_name, properties.$pathname, 'unknown') as key, coalesce(properties.item_name, properties.title, properties.$pathname, 'unknown') as name, count() as views, count(distinct person_id) as people from events where ${BASE_FILTER} and event = 'view_item' and ${timeFilter} group by key, name order by views desc limit 20`
-    ),
-    // 9: exit pages
-    run(
-      `select exit_path, count() as exits from (select properties.$session_id as sid, argMax(coalesce(nullIf(properties.$pathname, ''), '/'), timestamp) as exit_path from events where ${BASE_FILTER} and event = '$pageview' and ${timeFilter} and properties.$session_id is not null group by sid) group by exit_path order by exits desc limit 10`
-    ),
-    // 10: live 30m locations
-    run(
-      `select coalesce(nullIf(properties.$geoip_country_code, ''), 'Unknown') as country, coalesce(nullIf(properties.$geoip_city_name, ''), '') as city, count(distinct person_id) as visitors, count() as pageviews from events where ${BASE_FILTER} and timestamp > now() - interval 30 minute group by country, city order by visitors desc, pageviews desc limit 8`
-    ),
-    // 11: live 30m active pages
-    run(
-      `select coalesce(nullIf(properties.$pathname, ''), '/') as path, count() as views, count(distinct person_id) as visitors from events where ${BASE_FILTER} and event = '$pageview' and timestamp > now() - interval 30 minute group by path order by views desc limit 8`
-    ),
-  ])
+  const results = await runSettledWithConcurrency(
+    [
+      // 0: summary
+      run(
+        `select count() as pageviews, count(distinct person_id) as visitors, count(distinct properties.$session_id) as sessions from events where ${BASE_FILTER} and event = '$pageview' and ${timeFilter}`
+      ),
+      // 1: funnel
+      run(
+        `select event, count() as c, count(distinct person_id) as people from events where ${BASE_FILTER} and event in ('view_item','add_to_cart','begin_checkout','purchase') and ${timeFilter} group by event`
+      ),
+      // 2: sources (domain + utm_medium for channel grouping)
+      run(
+        `select if(properties.$referring_domain = '$direct' or properties.$referring_domain is null or properties.$referring_domain = '', 'direct', properties.$referring_domain) as ref, coalesce(nullIf(properties.utm_medium, ''), '') as med, count() as c, count(distinct properties.$session_id) as sessions, count(distinct person_id) as visitors from events where ${BASE_FILTER} and event = '$pageview' and ${timeFilter} group by ref, med order by c desc limit 40`
+      ),
+      // 3: live 30m summary
+      run(
+        `select count(distinct person_id) as visitors, count(distinct properties.$session_id) as sessions, countIf(event = '$pageview') as pageviews, countIf(event = 'add_to_cart') as add_to_cart, countIf(event = 'begin_checkout') as checkout from events where ${BASE_FILTER} and timestamp > now() - interval 30 minute`
+      ),
+      // 4: countries
+      run(
+        `select coalesce(nullIf(properties.$geoip_country_code, ''), 'Unknown') as country, count(distinct person_id) as visitors, count() as pageviews from events where ${BASE_FILTER} and event = '$pageview' and ${timeFilter} group by country order by visitors desc, pageviews desc limit 10`
+      ),
+      // 5: devices
+      run(
+        `select coalesce(nullIf(properties.$device_type, ''), 'Unknown') as device, count(distinct person_id) as visitors, count(distinct properties.$session_id) as sessions from events where ${BASE_FILTER} and event = '$pageview' and ${timeFilter} group by device order by visitors desc limit 6`
+      ),
+      // 6: landing pages
+      run(
+        `select coalesce(nullIf(properties.$pathname, ''), '/') as path, count() as pageviews, count(distinct person_id) as visitors from events where ${BASE_FILTER} and event = '$pageview' and ${timeFilter} group by path order by pageviews desc limit 10`
+      ),
+      // 7: utm campaigns
+      run(
+        `select coalesce(nullIf(properties.utm_source, ''), '(none)') as source, coalesce(nullIf(properties.utm_medium, ''), '(none)') as medium, coalesce(nullIf(properties.utm_campaign, ''), '(none)') as campaign, count(distinct properties.$session_id) as sessions, count(distinct person_id) as visitors from events where ${BASE_FILTER} and (properties.utm_source is not null or properties.utm_campaign is not null) and ${timeFilter} group by source, medium, campaign order by sessions desc limit 10`
+      ),
+      // 8: product views
+      run(
+        `select coalesce(properties.item_id, properties.product_id, properties.item_name, properties.$pathname, 'unknown') as key, coalesce(properties.item_name, properties.title, properties.$pathname, 'unknown') as name, count() as views, count(distinct person_id) as people from events where ${BASE_FILTER} and event = 'view_item' and ${timeFilter} group by key, name order by views desc limit 20`
+      ),
+      // 9: exit pages
+      run(
+        `select exit_path, count() as exits from (select properties.$session_id as sid, argMax(coalesce(nullIf(properties.$pathname, ''), '/'), timestamp) as exit_path from events where ${BASE_FILTER} and event = '$pageview' and ${timeFilter} and properties.$session_id is not null group by sid) group by exit_path order by exits desc limit 10`
+      ),
+      // 10: live 30m locations
+      run(
+        `select coalesce(nullIf(properties.$geoip_country_code, ''), 'Unknown') as country, coalesce(nullIf(properties.$geoip_city_name, ''), '') as city, count(distinct person_id) as visitors, count() as pageviews from events where ${BASE_FILTER} and timestamp > now() - interval 30 minute group by country, city order by visitors desc, pageviews desc limit 8`
+      ),
+      // 11: live 30m active pages
+      run(
+        `select coalesce(nullIf(properties.$pathname, ''), '/') as path, count() as views, count(distinct person_id) as visitors from events where ${BASE_FILTER} and event = '$pageview' and timestamp > now() - interval 30 minute group by path order by views desc limit 8`
+      ),
+    ],
+    POSTHOG_CONCURRENCY
+  )
 
   if (results[0].status === "rejected") {
-    return res.json({
-      configured: true,
-      range,
-      cached_at: new Date().toISOString(),
-      error: results[0].reason instanceof Error ? results[0].reason.message : "PostHog query failed",
-    })
+    return {
+      ok: false,
+      errorPayload: {
+        configured: true,
+        range,
+        cached_at: new Date().toISOString(),
+        error: results[0].reason instanceof Error ? results[0].reason.message : "PostHog query failed",
+      },
+    }
   }
 
   const summaryRow = settledRows(results[0])[0] || []
@@ -260,6 +275,54 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
     }),
   }
 
-  const entry = setCached(cacheKey, payload)
-  return res.json({ ...payload, cached: false, cached_at: entry.cachedAt })
+  const entry = setCached(cacheKey, payload, ACQUISITION_FRESH_TTL_MS)
+  return { ok: true, payload, cachedAt: entry.cachedAt }
+}
+
+export async function GET(req: MedusaRequest, res: MedusaResponse) {
+  const query = (req.validatedQuery || req.query || {}) as AdminAnalyticsAcquisitionQueryType
+  const range = parseAnalyticsRange(query.range)
+  const validFrom = parseIsoDateOnly(query.from)
+  const validTo = parseIsoDateOnly(query.to)
+  const forceRefresh = isRefreshRequested(query.refresh)
+
+  const apiKey = process.env.POSTHOG_PERSONAL_API_KEY
+  if (!apiKey) {
+    return res.json({
+      configured: false,
+      range,
+      cached_at: new Date().toISOString(),
+    })
+  }
+
+  let timeFilter = `timestamp > now() - interval ${mapRangeToPosthogInterval(range)}`
+  let customTag = ""
+  if (range === "custom" && validFrom && validTo) {
+    const [fromStr, toStr] = validFrom <= validTo ? [validFrom, validTo] : [validTo, validFrom]
+    timeFilter = `timestamp >= toDateTime('${fromStr} 00:00:00') and timestamp <= toDateTime('${toStr} 23:59:59')`
+    customTag = `:${fromStr}:${toStr}`
+  }
+
+  const cacheKey = `acquisition:${range}${customTag}`
+  const host = (process.env.POSTHOG_HOST || "https://us.posthog.com").replace(/\/$/, "")
+  const projectId = process.env.POSTHOG_PROJECT_ID || "696001"
+  const refresh = () => fetchAndCacheAcquisition({ cacheKey, host, projectId, apiKey, range, timeFilter })
+
+  if (!forceRefresh) {
+    const hit = getStaleCached<Record<string, unknown>>(cacheKey, ACQUISITION_STALE_GRACE_MS)
+    if (hit && !hit.isStale) {
+      return res.json({ ...hit.entry.value, cached: true, cached_at: hit.entry.cachedAt })
+    }
+    if (hit && hit.isStale) {
+      void runSingleFlight(cacheKey, refresh).catch(() => {})
+      return res.json({ ...hit.entry.value, cached: true, stale: true, cached_at: hit.entry.cachedAt })
+    }
+  }
+
+  const flightKey = forceRefresh ? `${cacheKey}:force` : cacheKey
+  const result = await runSingleFlight(flightKey, refresh)
+  if (!result.ok) {
+    return res.json(result.errorPayload)
+  }
+  return res.json({ ...result.payload, cached: false, cached_at: result.cachedAt })
 }
