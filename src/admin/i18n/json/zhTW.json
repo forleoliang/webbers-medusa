@@ -1,0 +1,358 @@
+{
+  "reviews": {
+    "label": "評價管理",
+    "title": "評價管理",
+    "description": "已購驗證評價、審核、商店回覆以及邀評郵件管理。",
+    "tabs": { "reviews": "評價列表", "requests": "邀評郵件" },
+    "summary": { "all": "全部", "pending": "待審核", "approved": "已通過", "rejected": "已拒絕" },
+    "autoApproveOn": "自動通過已開啟",
+    "search": "搜尋評價內容、標題、姓名或電子郵件",
+    "filters": {
+      "tooltip": "篩選",
+      "rating": "評分",
+      "photos": "圖片",
+      "anyRating": "全部星級",
+      "stars_one": "{{count}} 星",
+      "stars_other": "{{count}} 星",
+      "withOrWithoutPhotos": "是否含圖",
+      "withPhotos": "僅顯示含圖",
+      "clearAll": "清除篩選",
+      "clearProduct": "顯示全部商品",
+      "clearOrder": "顯示全部訂單"
+    },
+    "sort": { "tooltip": "排序", "newest": "最新優先", "oldest": "最舊優先", "highest": "評分最高", "lowest": "評分最低" },
+    "columns": {
+      "status": "狀態",
+      "rating": "評分",
+      "review": "評價內容",
+      "product": "商品",
+      "customer": "顧客",
+      "date": "時間",
+      "recipient": "收件人",
+      "order": "訂單",
+      "trigger": "觸發條件",
+      "timeline": "時間軸",
+      "actions": "操作"
+    },
+    "selected_one": "已選 {{count}} 項",
+    "selected_other": "已選 {{count}} 項",
+    "selectPage": "全選本頁",
+    "replied": "已回覆",
+    "verified": "已購驗證",
+    "source": "來源：{{source}}",
+    "empty": "沒有符合條件的評價。",
+    "emptyHeading": "尚無評價",
+    "emptyDescription": "訂單完成評價後，已購驗證評價會顯示於此。",
+    "emptyFilteredHeading": "無符合結果",
+    "emptyFilteredDescription": "目前的搜尋或篩選條件沒有符合的評價。",
+    "loadError": "無法載入評價列表。",
+    "pagination": "第 {{from}}–{{to}} 筆，共 {{count}} 筆",
+    "paginationLabels": { "of": "共", "results": "筆", "pages": "頁" },
+    "prev": "上一頁",
+    "next": "下一頁",
+    "status": { "pending": "待審核", "approved": "已通過", "rejected": "已拒絕" },
+    "requestStatus": {
+      "scheduled": "已排程",
+      "sent": "已發送",
+      "used": "已使用",
+      "expired": "已過期",
+      "skipped": "已略過",
+      "failed": "發送失敗",
+      "opted_out": "已退訂"
+    },
+    "actions": {
+      "view": "檢視",
+      "approve": "通過",
+      "reject": "拒絕",
+      "delete": "刪除",
+      "cancel": "取消",
+      "close": "關閉",
+      "clearSelection": "清除選取",
+      "saveReply": "儲存回覆",
+      "removeReply": "移除回覆"
+    },
+    "confirmDelete": {
+      "title": "確定刪除評價？",
+      "body_one": "評價與圖片將被永久刪除。若想保留紀錄請選擇拒絕。",
+      "body_other": "所選 {{count}} 筆評價與圖片將被永久刪除。若想保留紀錄請選擇拒絕。"
+    },
+    "toast": {
+      "approved": "評價已通過並公開",
+      "rejected": "評價已拒絕",
+      "deleted": "評價已刪除",
+      "approvedMany_one": "已通過 {{count}} 筆評價",
+      "approvedMany_other": "已通過 {{count}} 筆評價",
+      "rejectedMany_one": "已拒絕 {{count}} 筆評價",
+      "rejectedMany_other": "已拒絕 {{count}} 筆評價",
+      "deletedMany_one": "已刪除 {{count}} 筆評價",
+      "deletedMany_other": "已刪除 {{count}} 筆評價",
+      "replied": "回覆已儲存",
+      "replyRemoved": "回覆已移除",
+      "translated": "評價已翻譯"
+    },
+    "drawer": {
+      "title": "評價詳情",
+      "photos_one": "{{count}} 張圖片",
+      "photos_other": "{{count}} 張圖片",
+      "private": "尚未公開",
+      "deletedPhoto": "評價拒絕時圖片已刪除",
+      "photosHint": "待審核評價的圖片為私有檔案；核准後公開，拒絕後刪除。",
+      "rejectedWith": "拒絕原因：{{reason}}",
+      "moderatedAt": "審核於 {{date}}",
+      "moderation": "審核操作",
+      "rejectReason": "拒絕原因（僅內部可見，選填）",
+      "reply": "商店回覆",
+      "replyHint": "評價通過審核後將公開顯示於評價下方。",
+      "translations": "多語系翻譯",
+      "translate": "立即翻譯",
+      "translationNotConfigured": "請於環境變數或外掛設定中配置 GOOGLE_TRANSLATE_API_KEY 與目標語言以啟用自動翻譯。",
+      "translationStatus": {
+        "missing": "尚未翻譯",
+        "current": "已是最新",
+        "outdated": "待更新"
+      },
+      "translationTitle": "標題",
+      "translationBody": "內文"
+    },
+    "featureDisabled": {
+      "title": "評價功能已停用",
+      "description": "商品評價功能目前已在「商店擴充」設定中關閉。",
+      "action": "前往商店擴充設定"
+    },
+    "requests": {
+      "settings": "觸發條件：{{trigger}} + {{days}} 天；邀請連結將於 {{ttl}} 天後失效。",
+      "rules_one": "{{count}} 條地區 / 銷售通路覆蓋規則。",
+      "rules_other": "{{count}} 條地區 / 銷售通路覆蓋規則。",
+      "trigger": { "shipped": "已出貨", "delivered": "已送達", "completed": "已完成" },
+      "disabled": "外掛設定中已停用邀評郵件功能",
+      "noLinkUrl": "尚未設定 review_requests.link_url：無法發送郵件",
+      "scheduleButton": "排程邀評",
+      "modalTitle": "建立邀評郵件任務",
+      "modalDescription": "為符合條件的訂單建立邀評排程，或選擇立即發送郵件。",
+      "orderIdLabel": "訂單 ID",
+      "orderIdHint": "請輸入完整的 Medusa 訂單 ID（例如 order_01J...）。",
+      "orderIdPlaceholder": "訂單 ID（order_…）",
+      "statusFilter": "狀態",
+      "schedule": "加入排程",
+      "scheduleAndSend": "排程並立即發送",
+      "allStatuses": "全部狀態",
+      "empty": "尚無邀評紀錄。訂單達到觸發狀態時將自動建立。",
+      "emptyHeading": "尚無邀評紀錄",
+      "emptyDescription": "當訂單達到觸發狀態時系統會自動建立邀評任務。",
+      "emptyFilteredHeading": "無符合結果",
+      "emptyFilteredDescription": "目前篩選狀態下沒有邀評紀錄。",
+      "scheduledAt": "排程於 {{date}}",
+      "sentAt": "發送於 {{date}}",
+      "expiresAt": "到期於 {{date}}",
+      "usedAt": "使用於 {{date}}",
+      "openOrder": "開啟訂單",
+      "sendNow": "立即發送",
+      "resend": "重新發送連結",
+      "sendResult": { "sent": "郵件已發送", "skipped": "未發送：無待評價商品或該信箱已退訂", "failed": "發送失敗，請檢視該紀錄錯誤訊息" },
+      "scheduleResult": {
+        "scheduled": "已建立邀評排程",
+        "exists": "此訂單已有邀評任務",
+        "disabled": "邀評郵件功能已停用",
+        "no_order": "找不到訂單",
+        "no_email": "該訂單缺少電子郵件",
+        "not_eligible": "此訂單尚未達到觸發狀態，無可評價商品",
+        "opted_out": "此電子郵件已退訂邀評通知"
+      }
+    },
+    "widget": {
+      "product": {
+        "title": "商品評價",
+        "pending_one": "{{count}} 筆待審",
+        "pending_other": "{{count}} 筆待審",
+        "count_one": "{{count}} 筆已通過評價",
+        "count_other": "{{count}} 筆已通過評價",
+        "none": "尚無已通過評價。",
+        "wishlisted_one": "已有 {{count}} 人加入願望清單",
+        "wishlisted_other": "已有 {{count}} 人加入願望清單",
+        "open": "檢視評價 ({{count}})"
+      },
+      "order": {
+        "title": "訂單評價",
+        "none": "此訂單尚無評價。",
+        "open": "於評價管理開啟",
+        "request": "邀評郵件狀態",
+        "noRequest": "尚未排程：訂單達到觸發狀態時將自動建立。",
+        "sendRequest": "立即發送邀評郵件"
+      }
+    },
+    "credit": { "text": "Reviews & Wishlist — by Haus Kayu", "help": "說明" }
+  },
+  "extensions": {
+    "settings": {
+      "label": "商店擴充",
+      "title": "商店擴充",
+      "description": "統一啟用或停用評價、願望清單與管理後台增強功能。停用後將隱藏對應介面並封鎖其 API 端點。",
+      "enabledCount": "已啟用 {{enabled}} / {{total}} 項",
+      "optIn": "按需開啟",
+      "apiReady": "API 已就緒 ({{languages}})",
+      "apiKeyNotSet": "未設定 API 金鑰",
+      "toastSaved": "設定已儲存",
+      "toastFailed": "儲存設定失敗",
+      "categories": {
+        "reviews_wishlist": {
+          "title": "評價與願望清單",
+          "subtitle": "已購驗證評價、自動邀評郵件、多語系機器翻譯、外部評價同步以及願望清單。"
+        },
+        "customer_order": {
+          "title": "顧客與訂單工具",
+          "subtitle": "管理員內部備註、GDPR 個資匿名化、訪客訂單合併、信箱變更及訂單優惠/通知明細。"
+        },
+        "promotions_pricing": {
+          "title": "促銷與價格表",
+          "subtitle": "免運促銷開關、價格表禁止折扣覆蓋保護及一次性優惠碼批次產生。"
+        }
+      },
+      "features": {
+        "reviews": {
+          "label": "商品評價",
+          "description": "已購驗證評價、評分統計、後台審核清單與商品/訂單側邊欄評價元件。"
+        },
+        "reviewRequests": {
+          "label": "邀評郵件",
+          "description": "售後自動邀評郵件、免登入評價連結與後台邀評排程管理。"
+        },
+        "reviewTranslations": {
+          "label": "評價多語系翻譯",
+          "description": "透過 Google Translate API 按需翻譯評價標題與內容。"
+        },
+        "kiyohSync": {
+          "label": "Kiyoh 外部評價同步",
+          "description": "每日定時匯入 Kiyoh 外部評價並依訂單號關聯至對應商品。"
+        },
+        "wishlist": {
+          "label": "顧客與訪客願望清單",
+          "description": "商店前台願望清單、登入自動合併、分享連結及收藏次數統計。"
+        },
+        "notes": {
+          "label": "內部備註",
+          "description": "於顧客詳情與訂單詳情頁紀錄管理員文字備註。"
+        },
+        "anonymizeCustomer": {
+          "label": "顧客資料匿名化 (AVG/GDPR)",
+          "description": "於顧客詳情頁永久清除顧客、訂單、購物車、評價與願望清單之個人資料（僅限超級管理員）。"
+        },
+        "transferGuestOrders": {
+          "label": "合併訪客訂單",
+          "description": "自動尋找同信箱之未歸屬訪客訂單並合併至已註冊顧客帳號。"
+        },
+        "editCustomerEmail": {
+          "label": "變更顧客信箱",
+          "description": "從顧客詳情頁直接修改已註冊顧客的電子郵件。"
+        },
+        "orderDiscountBreakdown": {
+          "label": "訂單優惠明細",
+          "description": "於訂單側邊欄摘要列出各優惠碼折抵金額與比例。"
+        },
+        "orderNotifications": {
+          "label": "訂單通知紀錄",
+          "description": "於訂單側邊欄顯示已寄送的系統交易郵件清單。"
+        },
+        "alwaysFreePromotion": {
+          "label": "免運費促銷標記",
+          "description": "於促銷詳情頁提供免運費切換開關（供商店前台判別）。"
+        },
+        "disallowPriceListDiscounts": {
+          "label": "價格表禁止疊加折扣",
+          "description": "控制優惠碼是否可覆蓋該價格表內的商品售價。"
+        },
+        "uniqueCouponCodes": {
+          "label": "批次產生一次性優惠碼",
+          "description": "依行銷活動中的範本促銷批次產生單次使用優惠碼並下載 CSV。"
+        }
+      }
+    },
+    "note": {
+      "customerTitle": "顧客備註",
+      "orderTitle": "訂單備註",
+      "genericTitle": "備註",
+      "save": "儲存備註",
+      "toastSaved": "備註已更新",
+      "toastFailed": "儲存備註失敗"
+    },
+    "customerEmail": {
+      "title": "顧客電子郵件",
+      "label": "電子郵件",
+      "save": "儲存信箱",
+      "toastSaved": "信箱已更新",
+      "toastFailed": "更新信箱失敗"
+    },
+    "anonymize": {
+      "title": "AVG / GDPR 資料匿名化",
+      "description": "永久清除此顧客的所有個人資料（AVG/GDPR 合規請求）。此動作無法復原。",
+      "action": "匿名化顧客",
+      "confirmTitle": "確定要匿名化此顧客？",
+      "confirmDescription": "此動作將永久移除該顧客於顧客、訂單、購物車、評價、邀評與願望清單中的所有個資（姓名、地址、電話、電子郵件等），且無法復原。",
+      "cancel": "取消",
+      "confirm": "確認匿名化",
+      "confirmLoading": "處理中...",
+      "toastSuccess": "顧客資料已匿名化",
+      "toastFailed": "匿名化失敗"
+    },
+    "mergeGuestOrders": {
+      "title": "訪客訂單",
+      "description_one": "找到 {{count}} 筆屬於 {{email}} 的未歸屬訪客訂單，可合併至此顧客帳號。",
+      "description_other": "找到 {{count}} 筆屬於 {{email}} 的未歸屬訪客訂單，可合併至此顧客帳號。",
+      "action": "合併訪客訂單",
+      "toastSuccess_one": "已將 {{count}} 筆訪客訂單移轉至此顧客",
+      "toastSuccess_other": "已將 {{count}} 筆訪客訂單移轉至此顧客",
+      "toastFailed": "合併訪客訂單失敗"
+    },
+    "discountBreakdown": {
+      "title": "優惠折扣明細"
+    },
+    "orderNotifications": {
+      "title": "通知紀錄",
+      "empty": "尚無寄送紀錄",
+      "templates": {
+        "order-invoice": "發票郵件",
+        "order-placed": "訂單確認信",
+        "order-shipped": "出貨通知信",
+        "abandoned-cart": "棄購提醒信",
+        "review-request": "邀評通知信"
+      }
+    },
+    "priceListExt": {
+      "title": "禁止疊加折扣",
+      "description": "開啟後，折扣碼將無法覆蓋此價格表的價格。",
+      "toastSaved": "價格表設定已更新",
+      "toastFailed": "更新價格表設定失敗"
+    },
+    "alwaysFree": {
+      "title": "免運費",
+      "description": "將此促銷標記為在支援的前端商店中提供免運費。",
+      "confirmTitle": "變更免運費狀態？",
+      "confirmDescription": "確定要切換此促銷的免運費狀態嗎？",
+      "confirm": "確認",
+      "cancel": "取消",
+      "toastSaved": "免運費設定已更新",
+      "toastFailed": "更新免運費設定失敗"
+    },
+    "couponCodes": {
+      "title": "批次產生一次性優惠碼",
+      "subtitle": "依據此行銷活動中的範本促銷批次產生單次使用優惠碼（例如用於 Klaviyo 自動化流程）。",
+      "noTemplates": "請先將附帶優惠碼的促銷新增至此行銷活動作為折扣與條件範本，並建議將範本保持草稿狀態以免範本碼本身被兌換。",
+      "template": "範本促銷",
+      "templatePlaceholder": "選擇促銷範本",
+      "quantity": "產生數量（單次最多 {{max}} 組）",
+      "prefix": "前綴（選填）",
+      "prefixHint": "留空或輸入 2 至 12 位英數字，例如 {{example}}。",
+      "submit": "產生優惠碼",
+      "draft": "草稿",
+      "createdAt": "建立時間",
+      "batchPrefix": "前綴",
+      "total": "優惠碼數",
+      "used": "已使用",
+      "remaining": "尚未使用",
+      "download": "下載 CSV",
+      "empty": "此行銷活動尚未產生任何優惠碼。",
+      "generated": "已建立 {{count}} 組優惠碼並下載 CSV，可直接上傳至 Klaviyo 等工具。",
+      "error": "產生優惠碼失敗",
+      "downloadError": "下載 CSV 失敗"
+    }
+  }
+}

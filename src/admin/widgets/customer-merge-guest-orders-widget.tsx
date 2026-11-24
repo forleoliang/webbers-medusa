@@ -2,6 +2,7 @@ import { defineWidgetConfig } from "@medusajs/admin-sdk"
 import type { AdminCustomer, DetailWidgetProps } from "@medusajs/framework/types"
 import { Badge, Button, Container, Heading, Text, toast } from "@medusajs/ui"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useTranslation } from "react-i18next"
 import { sdk } from "../lib/sdk"
 import { useFeatureEnabled } from "../lib/use-feature-flags"
 
@@ -9,6 +10,7 @@ type GuestOrdersResponse = { count: number; email: string }
 type MergeResponse = { transferred_count: number }
 
 const CustomerMergeGuestOrdersWidget = ({ data }: DetailWidgetProps<AdminCustomer>) => {
+  const { t } = useTranslation()
   const queryClient = useQueryClient()
   const featureEnabled = useFeatureEnabled("transferGuestOrders")
 
@@ -25,10 +27,10 @@ const CustomerMergeGuestOrdersWidget = ({ data }: DetailWidgetProps<AdminCustome
       }),
     onSuccess: async (result) => {
       await queryClient.invalidateQueries()
-      toast.success(`${result.transferred_count} guest order(s) moved to this customer`)
+      toast.success(t("extensions.mergeGuestOrders.toastSuccess", { count: result.transferred_count }))
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Failed to merge guest orders")
+      toast.error(error.message || t("extensions.mergeGuestOrders.toastFailed"))
     },
   })
 
@@ -40,14 +42,14 @@ const CustomerMergeGuestOrdersWidget = ({ data }: DetailWidgetProps<AdminCustome
   return (
     <Container className="divide-y p-0">
       <div className="flex items-center justify-between px-6 py-4">
-        <Heading level="h2">Guest Orders</Heading>
+        <Heading level="h2">{t("extensions.mergeGuestOrders.title")}</Heading>
         <Badge size="2xsmall" color="orange">
           {count}
         </Badge>
       </div>
       <div className="flex flex-col gap-y-3 px-6 py-4">
         <Text size="small" leading="compact" className="text-ui-fg-subtle">
-          {count} unassigned guest order(s) found for {guestData?.email}. Merge them into this customer account.
+          {t("extensions.mergeGuestOrders.description", { count, email: guestData?.email ?? "" })}
         </Text>
         <div>
           <Button
@@ -57,7 +59,7 @@ const CustomerMergeGuestOrdersWidget = ({ data }: DetailWidgetProps<AdminCustome
             disabled={mergeMutation.isPending}
             onClick={() => mergeMutation.mutate()}
           >
-            Merge guest orders
+            {t("extensions.mergeGuestOrders.action")}
           </Button>
         </div>
       </div>

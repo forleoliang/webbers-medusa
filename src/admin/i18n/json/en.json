@@ -181,5 +181,178 @@
       }
     },
     "credit": { "text": "Reviews & Wishlist — by Haus Kayu", "help": "Help" }
+  },
+  "extensions": {
+    "settings": {
+      "label": "Store Extensions",
+      "title": "Store Extensions",
+      "description": "Enable or disable modules across Reviews, Wishlist, and QoL admin tools. Disabling a feature hides its Admin UI and blocks its API routes.",
+      "enabledCount": "{{enabled}} / {{total}} enabled",
+      "optIn": "Opt-in",
+      "apiReady": "API ready ({{languages}})",
+      "apiKeyNotSet": "API key not set",
+      "toastSaved": "Settings saved",
+      "toastFailed": "Failed to save settings",
+      "categories": {
+        "reviews_wishlist": {
+          "title": "Reviews & Wishlist",
+          "subtitle": "Verified-purchase reviews, email invitations, machine translations, external sync, and wishlists."
+        },
+        "customer_order": {
+          "title": "Customer & Order Tools",
+          "subtitle": "Admin productivity notes, GDPR anonymization, guest order merging, email editing, and order insights."
+        },
+        "promotions_pricing": {
+          "title": "Promotions & Pricing",
+          "subtitle": "Free-shipping promotions, price-list discount protection, and unique single-use coupon code batches."
+        }
+      },
+      "features": {
+        "reviews": {
+          "label": "Product reviews",
+          "description": "Verified-purchase reviews, ratings, Admin moderation table, and Product/Order review widgets."
+        },
+        "reviewRequests": {
+          "label": "Review request emails",
+          "description": "Automated post-purchase review invitations, magic links, and Admin request management."
+        },
+        "reviewTranslations": {
+          "label": "Review translations",
+          "description": "On-demand Google Translate machine translations for review titles and bodies."
+        },
+        "kiyohSync": {
+          "label": "Kiyoh review sync",
+          "description": "Scheduled daily import of external Kiyoh reviews matched to Medusa orders."
+        },
+        "wishlist": {
+          "label": "Customer & guest wishlist",
+          "description": "Storefront wishlists, guest-to-customer merge, share links, and saved counts."
+        },
+        "notes": {
+          "label": "Notes",
+          "description": "Free-text notes on customer and order detail pages."
+        },
+        "anonymizeCustomer": {
+          "label": "Anonymize customer",
+          "description": "AVG/GDPR data scrub action on the customer page across orders, carts, reviews, and wishlists (superadmin only)."
+        },
+        "transferGuestOrders": {
+          "label": "Transfer guest orders",
+          "description": "Merge unassigned guest orders into a customer account."
+        },
+        "editCustomerEmail": {
+          "label": "Edit customer email",
+          "description": "Change a registered customer's email from the customer page."
+        },
+        "orderDiscountBreakdown": {
+          "label": "Order discount breakdown",
+          "description": "Summary of discount codes applied to an order."
+        },
+        "orderNotifications": {
+          "label": "Order notifications",
+          "description": "List of transactional emails sent for an order."
+        },
+        "alwaysFreePromotion": {
+          "label": "Always-free promotion",
+          "description": "Free-shipping toggle on the promotion page (widget only)."
+        },
+        "disallowPriceListDiscounts": {
+          "label": "Disallow price-list discounts",
+          "description": "Toggle on a price list to stop discount codes from overriding its prices."
+        },
+        "uniqueCouponCodes": {
+          "label": "Unique coupon codes",
+          "description": "Generate single-use codes from a template promotion on the campaign page, with a CSV download."
+        }
+      }
+    },
+    "note": {
+      "customerTitle": "Customer Note",
+      "orderTitle": "Order Note",
+      "genericTitle": "Note",
+      "save": "Save note",
+      "toastSaved": "Note updated successfully",
+      "toastFailed": "Failed to save note"
+    },
+    "customerEmail": {
+      "title": "Customer Email",
+      "label": "Email",
+      "save": "Save email",
+      "toastSaved": "Email updated",
+      "toastFailed": "Error updating email"
+    },
+    "anonymize": {
+      "title": "AVG / GDPR",
+      "description": "Permanently removes all personal data for this customer (AVG/GDPR request). This action cannot be undone.",
+      "action": "Anonymize customer",
+      "confirmTitle": "Anonymize customer?",
+      "confirmDescription": "This will permanently remove all personal data (name, address, phone, email, reviews, review requests, and wishlists) across customer, order, cart, and configured extension records. This action cannot be undone.",
+      "cancel": "Cancel",
+      "confirm": "Anonymize",
+      "confirmLoading": "Anonymizing...",
+      "toastSuccess": "Customer anonymized",
+      "toastFailed": "Error anonymizing customer"
+    },
+    "mergeGuestOrders": {
+      "title": "Guest Orders",
+      "description_one": "{{count}} unassigned guest order found for {{email}}. Merge it into this customer account.",
+      "description_other": "{{count}} unassigned guest orders found for {{email}}. Merge them into this customer account.",
+      "action": "Merge guest orders",
+      "toastSuccess_one": "{{count}} guest order moved to this customer",
+      "toastSuccess_other": "{{count}} guest orders moved to this customer",
+      "toastFailed": "Failed to merge guest orders"
+    },
+    "discountBreakdown": {
+      "title": "Discount breakdown"
+    },
+    "orderNotifications": {
+      "title": "Notifications",
+      "empty": "No notifications sent",
+      "templates": {
+        "order-invoice": "Invoice email",
+        "order-placed": "Order confirmation",
+        "order-shipped": "Shipping notification",
+        "abandoned-cart": "Abandoned cart reminder",
+        "review-request": "Review request email"
+      }
+    },
+    "priceListExt": {
+      "title": "Disallow discounts",
+      "description": "Discounts can't override this price list when this toggle is enabled.",
+      "toastSaved": "Price list setting updated",
+      "toastFailed": "Failed to update price list setting"
+    },
+    "alwaysFree": {
+      "title": "Free shipping",
+      "description": "Marks this promotion as providing free shipping in supported storefronts.",
+      "confirmTitle": "Change free shipping?",
+      "confirmDescription": "Are you sure you want to change the free shipping status?",
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "toastSaved": "Free shipping setting updated",
+      "toastFailed": "Failed to update free shipping setting"
+    },
+    "couponCodes": {
+      "title": "Unique coupon codes",
+      "subtitle": "Generate single-use codes from a promotion in this campaign, for example for a Klaviyo flow.",
+      "noTemplates": "First add a promotion with a code to this campaign. It serves as the template for the discount and its conditions. Keep the template as a draft so nobody can redeem the template code itself.",
+      "template": "Template promotion",
+      "templatePlaceholder": "Choose a promotion",
+      "quantity": "Number of codes (maximum {{max}} at a time)",
+      "prefix": "Prefix (optional)",
+      "prefixHint": "Empty or 2 to 12 letters or digits. A code looks like {{example}}.",
+      "submit": "Generate codes",
+      "draft": "draft",
+      "createdAt": "Created",
+      "batchPrefix": "Prefix",
+      "total": "Codes",
+      "used": "Used",
+      "remaining": "Unused",
+      "download": "Download CSV",
+      "empty": "No codes have been generated for this campaign yet.",
+      "generated": "{{count}} codes created. The CSV was downloaded; upload it to the coupon in Klaviyo.",
+      "error": "The codes could not be created",
+      "downloadError": "The CSV could not be downloaded"
+    }
   }
 }

@@ -2,6 +2,7 @@ import { defineWidgetConfig } from "@medusajs/admin-sdk"
 import type { AdminPromotion, DetailWidgetProps } from "@medusajs/framework/types"
 import { Container, Heading, Skeleton, Switch, Text, toast, usePrompt } from "@medusajs/ui"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useTranslation } from "react-i18next"
 import { sdk } from "../lib/sdk"
 import { useFeatureEnabled } from "../lib/use-feature-flags"
 
@@ -13,6 +14,7 @@ type AdminPromotionAlwaysFree = AdminPromotion & {
 }
 
 const PromotionAlwaysFreeWidget = ({ data: promotion }: DetailWidgetProps<AdminPromotion>) => {
+  const { t } = useTranslation()
   const dialog = usePrompt()
   const enabled = useFeatureEnabled("alwaysFreePromotion")
   const queryClient = useQueryClient()
@@ -38,10 +40,10 @@ const PromotionAlwaysFreeWidget = ({ data: promotion }: DetailWidgetProps<AdminP
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey })
       await queryClient.invalidateQueries({ queryKey: ["promotion", promotion.id] })
-      toast.success("Free shipping setting updated")
+      toast.success(t("extensions.alwaysFree.toastSaved"))
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Failed to update free shipping setting")
+      toast.error(error.message || t("extensions.alwaysFree.toastFailed"))
     },
   })
 
@@ -51,11 +53,11 @@ const PromotionAlwaysFreeWidget = ({ data: promotion }: DetailWidgetProps<AdminP
 
   const handleChange = async () => {
     const confirmed = await dialog({
-      title: "Change free shipping?",
-      description: "Are you sure you want to change the free shipping status?",
+      title: t("extensions.alwaysFree.confirmTitle"),
+      description: t("extensions.alwaysFree.confirmDescription"),
       variant: "confirmation",
-      confirmText: "Confirm",
-      cancelText: "Cancel",
+      confirmText: t("extensions.alwaysFree.confirm"),
+      cancelText: t("extensions.alwaysFree.cancel"),
     })
 
     if (confirmed) {
@@ -66,7 +68,7 @@ const PromotionAlwaysFreeWidget = ({ data: promotion }: DetailWidgetProps<AdminP
   return (
     <Container className="divide-y p-0">
       <div className="flex items-center justify-between px-6 py-4">
-        <Heading level="h2">Free shipping</Heading>
+        <Heading level="h2">{t("extensions.alwaysFree.title")}</Heading>
         {isLoading ? (
           <Skeleton className="h-5 w-9 rounded-full" />
         ) : (
@@ -80,7 +82,7 @@ const PromotionAlwaysFreeWidget = ({ data: promotion }: DetailWidgetProps<AdminP
       </div>
       <div className="px-6 py-4">
         <Text size="small" leading="compact" className="text-ui-fg-subtle">
-          Marks this promotion as providing free shipping in supported storefronts.
+          {t("extensions.alwaysFree.description")}
         </Text>
       </div>
     </Container>

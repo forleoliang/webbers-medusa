@@ -2,6 +2,8 @@ import { defineWidgetConfig } from "@medusajs/admin-sdk"
 import type { AdminOrder, DetailWidgetProps } from "@medusajs/framework/types"
 import { Container, Heading, Skeleton, Text } from "@medusajs/ui"
 import { useQuery } from "@tanstack/react-query"
+import { useTranslation } from "react-i18next"
+import { toIntlLocale } from "../lib/api"
 import { sdk } from "../lib/sdk"
 import { useFeatureEnabled } from "../lib/use-feature-flags"
 
@@ -41,14 +43,15 @@ const buildDiscountCodeBreakdown = (
     .sort((a, b) => b.total - a.total)
 }
 
-const formatAmount = (amount: number, currencyCode: string) =>
-  new Intl.NumberFormat([], {
+const formatAmount = (amount: number, currencyCode: string, locale: string) =>
+  new Intl.NumberFormat(locale, {
     style: "currency",
     currencyDisplay: "narrowSymbol",
     currency: currencyCode,
   }).format(amount)
 
 const OrderDiscountBreakdownWidget = ({ data: order }: DetailWidgetProps<AdminOrder>) => {
+  const { t, i18n } = useTranslation()
   const enabled = useFeatureEnabled("orderDiscountBreakdown")
 
   const { data, isLoading } = useQuery({
@@ -71,10 +74,12 @@ const OrderDiscountBreakdownWidget = ({ data: order }: DetailWidgetProps<AdminOr
     return null
   }
 
+  const locale = toIntlLocale(i18n.language)
+
   return (
     <Container className="divide-y p-0">
       <div className="flex items-center justify-between px-6 py-4">
-        <Heading level="h2">Discount breakdown</Heading>
+        <Heading level="h2">{t("extensions.discountBreakdown.title")}</Heading>
       </div>
 
       {isLoading ? (
@@ -91,7 +96,7 @@ const OrderDiscountBreakdownWidget = ({ data: order }: DetailWidgetProps<AdminOr
                 {typeof percentage === "number" ? ` (${percentage}%)` : ""}
               </Text>
               <Text size="small" leading="compact" family="mono" className="text-ui-fg-base tabular-nums">
-                {formatAmount(total, order.currency_code)}
+                {formatAmount(total, order.currency_code, locale)}
               </Text>
             </div>
           ))}

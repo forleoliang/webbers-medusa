@@ -119,10 +119,24 @@ export const backendUrl = (path: string) => `${(import.meta.env.VITE_BACKEND_URL
 /** Photo for moderation: pending ones are private and streamed through the Admin session. */
 export const photoUrl = (reviewId: string, imageId: string) => backendUrl(`/admin/reviews/${reviewId}/images/${imageId}`)
 
-export const lang = (l: string) => (l.startsWith("id") ? "id" : "en")
+export function toIntlLocale(l: string): string {
+  const normalized = (l || "").toLowerCase()
+  if (normalized === "zhcn" || normalized === "zh-cn" || normalized === "zh-hans" || normalized === "zh") {
+    return "zh-CN"
+  }
+  if (normalized === "zhtw" || normalized === "zh-tw" || normalized === "zh-hant" || normalized === "zh-hk") {
+    return "zh-TW"
+  }
+  if (normalized.startsWith("id")) return "id-ID"
+  if (normalized.startsWith("nl")) return "nl-NL"
+  return "en-US"
+}
+
+export const lang = (l: string) => toIntlLocale(l)
+
 export function formatDateTime(iso: string | null | undefined, l: string) {
   if (!iso) return "–"
-  return new Intl.DateTimeFormat(l === "id" ? "id-ID" : "en-US", { dateStyle: "medium", timeStyle: "short" }).format(new Date(iso))
+  return new Intl.DateTimeFormat(toIntlLocale(l), { dateStyle: "medium", timeStyle: "short" }).format(new Date(iso))
 }
 export const STATUS_COLOR: Record<string, "grey" | "blue" | "orange" | "green" | "red" | "purple"> = {
   pending: "orange",

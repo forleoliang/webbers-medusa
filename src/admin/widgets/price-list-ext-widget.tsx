@@ -2,6 +2,7 @@ import { defineWidgetConfig } from "@medusajs/admin-sdk"
 import type { AdminPriceList, DetailWidgetProps, MetadataType } from "@medusajs/framework/types"
 import { Container, Heading, Skeleton, Switch, Text, toast } from "@medusajs/ui"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useTranslation } from "react-i18next"
 import { sdk } from "../lib/sdk"
 import { useFeatureEnabled } from "../lib/use-feature-flags"
 
@@ -10,6 +11,7 @@ type PriceListExtResponse = {
 }
 
 const PriceListExtWidget = ({ data }: DetailWidgetProps<AdminPriceList>) => {
+  const { t } = useTranslation()
   const { id } = data
   const enabled = useFeatureEnabled("disallowPriceListDiscounts")
   const queryClient = useQueryClient()
@@ -34,10 +36,10 @@ const PriceListExtWidget = ({ data }: DetailWidgetProps<AdminPriceList>) => {
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey })
-      toast.success("Price list setting updated")
+      toast.success(t("extensions.priceListExt.toastSaved"))
     },
     onError: (err: Error) => {
-      toast.error(err.message || "Failed to update price list setting")
+      toast.error(err.message || t("extensions.priceListExt.toastFailed"))
     },
   })
 
@@ -57,7 +59,7 @@ const PriceListExtWidget = ({ data }: DetailWidgetProps<AdminPriceList>) => {
   return (
     <Container className="divide-y p-0">
       <div className="flex items-center justify-between px-6 py-4">
-        <Heading level="h2">Disallow discounts</Heading>
+        <Heading level="h2">{t("extensions.priceListExt.title")}</Heading>
         {isLoading ? (
           <Skeleton className="h-5 w-9 rounded-full" />
         ) : (
@@ -70,7 +72,7 @@ const PriceListExtWidget = ({ data }: DetailWidgetProps<AdminPriceList>) => {
       </div>
       <div className="px-6 py-4">
         <Text size="small" leading="compact" className="text-ui-fg-subtle">
-          Discounts can&apos;t override this price list when this toggle is enabled.
+          {t("extensions.priceListExt.description")}
         </Text>
       </div>
     </Container>

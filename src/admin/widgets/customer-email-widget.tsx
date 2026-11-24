@@ -3,10 +3,12 @@ import type { AdminCustomer, DetailWidgetProps } from "@medusajs/framework/types
 import { Button, Container, Heading, Input, Label, toast } from "@medusajs/ui"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useEffect, useState } from "react"
+import { useTranslation } from "react-i18next"
 import { sdk } from "../lib/sdk"
 import { useFeatureEnabled } from "../lib/use-feature-flags"
 
 const CustomerEmailWidget = ({ data }: DetailWidgetProps<AdminCustomer>) => {
+  const { t } = useTranslation()
   const [email, setEmail] = useState(data.email ?? "")
   const queryClient = useQueryClient()
   const enabled = useFeatureEnabled("editCustomerEmail")
@@ -24,10 +26,10 @@ const CustomerEmailWidget = ({ data }: DetailWidgetProps<AdminCustomer>) => {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["customers"] })
       await queryClient.invalidateQueries({ queryKey: ["customer", data.id] })
-      toast.success("Email updated")
+      toast.success(t("extensions.customerEmail.toastSaved"))
     },
     onError: (e: Error) => {
-      toast.error(e.message || "Error updating email")
+      toast.error(e.message || t("extensions.customerEmail.toastFailed"))
     },
   })
 
@@ -41,7 +43,7 @@ const CustomerEmailWidget = ({ data }: DetailWidgetProps<AdminCustomer>) => {
   return (
     <Container className="divide-y p-0">
       <div className="flex items-center justify-between px-6 py-4">
-        <Heading level="h2">Customer Email</Heading>
+        <Heading level="h2">{t("extensions.customerEmail.title")}</Heading>
       </div>
       <form
         onSubmit={(e) => {
@@ -52,7 +54,7 @@ const CustomerEmailWidget = ({ data }: DetailWidgetProps<AdminCustomer>) => {
       >
         <div className="flex flex-col gap-y-1.5">
           <Label size="small" weight="plus" htmlFor={`customer-email-${data.id}`}>
-            Email
+            {t("extensions.customerEmail.label")}
           </Label>
           <Input
             id={`customer-email-${data.id}`}
@@ -71,7 +73,7 @@ const CustomerEmailWidget = ({ data }: DetailWidgetProps<AdminCustomer>) => {
             disabled={!isDirty || mutation.isPending}
             isLoading={mutation.isPending}
           >
-            Save email
+            {t("extensions.customerEmail.save")}
           </Button>
         </div>
       </form>

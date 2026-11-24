@@ -926,7 +926,8 @@ const RequestsTab = () => {
 }
 
 export const config = defineRouteConfig({
-  label: "Reviews",
+  label: "reviews.label",
+  translationNs: "translation",
   icon: Star,
 })
 

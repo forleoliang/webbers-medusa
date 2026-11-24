@@ -1,0 +1,358 @@
+{
+  "reviews": {
+    "label": "评价管理",
+    "title": "评价管理",
+    "description": "已购验证评价、审核、商家回复以及邀评邮件管理。",
+    "tabs": { "reviews": "评价列表", "requests": "邀评邮件" },
+    "summary": { "all": "全部", "pending": "待审核", "approved": "已通过", "rejected": "已拒绝" },
+    "autoApproveOn": "自动通过已开启",
+    "search": "搜索评价正文、标题、姓名或邮箱",
+    "filters": {
+      "tooltip": "筛选",
+      "rating": "评分",
+      "photos": "晒图",
+      "anyRating": "全部星级",
+      "stars_one": "{{count}} 星",
+      "stars_other": "{{count}} 星",
+      "withOrWithoutPhotos": "含图与否",
+      "withPhotos": "仅看含图",
+      "clearAll": "清除筛选",
+      "clearProduct": "显示全部商品",
+      "clearOrder": "显示全部订单"
+    },
+    "sort": { "tooltip": "排序", "newest": "最新优先", "oldest": "最早优先", "highest": "评分最高", "lowest": "评分最低" },
+    "columns": {
+      "status": "状态",
+      "rating": "评分",
+      "review": "评价内容",
+      "product": "商品",
+      "customer": "客户",
+      "date": "时间",
+      "recipient": "收件人",
+      "order": "订单",
+      "trigger": "触发时机",
+      "timeline": "时间线",
+      "actions": "操作"
+    },
+    "selected_one": "已选 {{count}} 项",
+    "selected_other": "已选 {{count}} 项",
+    "selectPage": "全选本页",
+    "replied": "已回复",
+    "verified": "已购验证",
+    "source": "来源：{{source}}",
+    "empty": "没有匹配的评价。",
+    "emptyHeading": "暂无评价",
+    "emptyDescription": "订单完成评价后，已购验证评价会显示在此处。",
+    "emptyFilteredHeading": "无匹配结果",
+    "emptyFilteredDescription": "当前搜索或筛选条件下没有匹配的评价。",
+    "loadError": "加载评价列表失败。",
+    "pagination": "第 {{from}}–{{to}} 条，共 {{count}} 条",
+    "paginationLabels": { "of": "共", "results": "条", "pages": "页" },
+    "prev": "上一页",
+    "next": "下一页",
+    "status": { "pending": "待审核", "approved": "已通过", "rejected": "已拒绝" },
+    "requestStatus": {
+      "scheduled": "已排期",
+      "sent": "已发送",
+      "used": "已评价",
+      "expired": "已过期",
+      "skipped": "已跳过",
+      "failed": "发送失败",
+      "opted_out": "已退订"
+    },
+    "actions": {
+      "view": "查看",
+      "approve": "通过",
+      "reject": "拒绝",
+      "delete": "删除",
+      "cancel": "取消",
+      "close": "关闭",
+      "clearSelection": "取消选择",
+      "saveReply": "保存回复",
+      "removeReply": "删除回复"
+    },
+    "confirmDelete": {
+      "title": "确认删除评价？",
+      "body_one": "该评价及其图片将被永久删除。如需保留记录，请选择拒绝。",
+      "body_other": "所选 {{count}} 条评价及其图片将被永久删除。如需保留记录，请选择拒绝。"
+    },
+    "toast": {
+      "approved": "评价已通过并发布",
+      "rejected": "评价已拒绝",
+      "deleted": "评价已删除",
+      "approvedMany_one": "已通过 {{count}} 条评价",
+      "approvedMany_other": "已通过 {{count}} 条评价",
+      "rejectedMany_one": "已拒绝 {{count}} 条评价",
+      "rejectedMany_other": "已拒绝 {{count}} 条评价",
+      "deletedMany_one": "已删除 {{count}} 条评价",
+      "deletedMany_other": "已删除 {{count}} 条评价",
+      "replied": "回复已保存",
+      "replyRemoved": "回复已删除",
+      "translated": "评价已翻译"
+    },
+    "drawer": {
+      "title": "评价详情",
+      "photos_one": "{{count}} 张图片",
+      "photos_other": "{{count}} 张图片",
+      "private": "尚未公开",
+      "deletedPhoto": "评价被拒绝时图片已删除",
+      "photosHint": "待审核评价的图片为私有文件；通过审核后公开，拒绝后删除。",
+      "rejectedWith": "拒绝原因：{{reason}}",
+      "moderatedAt": "审核于 {{date}}",
+      "moderation": "审核操作",
+      "rejectReason": "拒绝原因（仅内部可见，可选）",
+      "reply": "商家回复",
+      "replyHint": "评价通过审核后，回复将公开展示在评价下方。",
+      "translations": "多语言翻译",
+      "translate": "立即翻译",
+      "translationNotConfigured": "请在环境变量或插件配置中设置 GOOGLE_TRANSLATE_API_KEY 与目标语言后启用自动翻译。",
+      "translationStatus": {
+        "missing": "未翻译",
+        "current": "已是最新",
+        "outdated": "待更新"
+      },
+      "translationTitle": "标题",
+      "translationBody": "正文"
+    },
+    "featureDisabled": {
+      "title": "评价功能已关闭",
+      "description": "商品评价功能当前已在「商店扩展」设置中停用。",
+      "action": "前往商店扩展设置"
+    },
+    "requests": {
+      "settings": "触发条件：{{trigger}} + {{days}} 天；邀请链接 {{ttl}} 天后过期。",
+      "rules_one": "{{count}} 条地区 / 销售渠道覆盖规则。",
+      "rules_other": "{{count}} 条地区 / 销售渠道覆盖规则。",
+      "trigger": { "shipped": "已发货", "delivered": "已签收", "completed": "已完成" },
+      "disabled": "插件配置中已禁用邀评邮件功能",
+      "noLinkUrl": "未配置 review_requests.link_url：无法发送邮件",
+      "scheduleButton": "手动排期邀评",
+      "modalTitle": "创建邀评邮件任务",
+      "modalDescription": "为符合条件的订单创建邀评任务，可选择立即发送或按排期自动发送。",
+      "orderIdLabel": "订单 ID",
+      "orderIdHint": "输入完整的 Medusa 订单 ID（例如 order_01J...）。",
+      "orderIdPlaceholder": "订单 ID（order_…）",
+      "statusFilter": "状态",
+      "schedule": "加入排期",
+      "scheduleAndSend": "排期并立即发送",
+      "allStatuses": "全部状态",
+      "empty": "暂无邀评记录。当订单到达触发状态时将自动生成。",
+      "emptyHeading": "暂无邀评记录",
+      "emptyDescription": "当订单达到触发状态时系统会自动创建邀评任务。",
+      "emptyFilteredHeading": "无匹配结果",
+      "emptyFilteredDescription": "当前状态筛选下没有邀评记录。",
+      "scheduledAt": "排期于 {{date}}",
+      "sentAt": "发送于 {{date}}",
+      "expiresAt": "过期于 {{date}}",
+      "usedAt": "使用于 {{date}}",
+      "openOrder": "查看订单",
+      "sendNow": "立即发送",
+      "resend": "重新发送链接",
+      "sendResult": { "sent": "邮件已发送", "skipped": "未发送：暂无可评价商品或该邮箱已退订", "failed": "发送失败，请查看该记录错误信息" },
+      "scheduleResult": {
+        "scheduled": "已创建邀评排期",
+        "exists": "该订单已存在邀评任务",
+        "disabled": "邀评邮件功能已禁用",
+        "no_order": "未找到该订单",
+        "no_email": "该订单缺少邮箱地址",
+        "not_eligible": "该订单暂未到达触发状态，无可评价商品",
+        "opted_out": "该邮箱已退订邀评邮件"
+      }
+    },
+    "widget": {
+      "product": {
+        "title": "商品评价",
+        "pending_one": "{{count}} 条待审",
+        "pending_other": "{{count}} 条待审",
+        "count_one": "{{count}} 条已通过评价",
+        "count_other": "{{count}} 条已通过评价",
+        "none": "暂无已通过评价。",
+        "wishlisted_one": "{{count}} 位用户已收藏",
+        "wishlisted_other": "{{count}} 位用户已收藏",
+        "open": "查看评价 ({{count}})"
+      },
+      "order": {
+        "title": "订单评价",
+        "none": "该订单暂无评价。",
+        "open": "在评价管理中查看",
+        "request": "邀评邮件状态",
+        "noRequest": "尚未排期：订单到达触发状态后将自动生成。",
+        "sendRequest": "立即发送邀评邮件"
+      }
+    },
+    "credit": { "text": "Reviews & Wishlist — by Haus Kayu", "help": "帮助" }
+  },
+  "extensions": {
+    "settings": {
+      "label": "商店扩展",
+      "title": "商店扩展",
+      "description": "统一启用或停用商品评价、心愿单及后台增强功能。关闭功能后，其后台界面将被隐藏且对应接口将被拦截。",
+      "enabledCount": "已启用 {{enabled}} / {{total}} 项",
+      "optIn": "按需开启",
+      "apiReady": "API 已就绪 ({{languages}})",
+      "apiKeyNotSet": "未配置 API 密钥",
+      "toastSaved": "设置已保存",
+      "toastFailed": "保存设置失败",
+      "categories": {
+        "reviews_wishlist": {
+          "title": "评价与心愿单",
+          "subtitle": "已购验证评价、自动邀评邮件、多语言机器翻译、外部评价同步以及客户/游客心愿单。"
+        },
+        "customer_order": {
+          "title": "客户与订单工具",
+          "subtitle": "客户/订单内部备注、GDPR 数据脱敏、游客订单合并、邮箱修改及订单优惠/邮件记录。"
+        },
+        "promotions_pricing": {
+          "title": "促销与价格表",
+          "subtitle": "免邮促销标记、价格表禁叠加折扣保护以及批量生成一次性优惠券。"
+        }
+      },
+      "features": {
+        "reviews": {
+          "label": "商品评价",
+          "description": "已购验证评价、评分统计、后台评价审核表以及商品/订单侧边栏评价组件。"
+        },
+        "reviewRequests": {
+          "label": "邀评邮件",
+          "description": "订单售后自动邀评邮件、免登录评价链接及后台邀评队列管理。"
+        },
+        "reviewTranslations": {
+          "label": "评价多语言翻译",
+          "description": "通过 Google Translate API 按需翻译评价标题与正文。"
+        },
+        "kiyohSync": {
+          "label": "Kiyoh 外部评价同步",
+          "description": "每日定时从 Kiyoh 拉取外部评价并按订单号自动关联至商品。"
+        },
+        "wishlist": {
+          "label": "客户与游客心愿单",
+          "description": "前台心愿单、登录后自动合并、分享链接及商品收藏数量统计。"
+        },
+        "notes": {
+          "label": "内部备注",
+          "description": "在客户详情与订单详情页添加内部文本备注。"
+        },
+        "anonymizeCustomer": {
+          "label": "客户数据脱敏 (AVG/GDPR)",
+          "description": "在客户详情页一键永久匿名化客户、订单、购物车、评价与心愿单中的个人隐私数据（仅限超级管理员）。"
+        },
+        "transferGuestOrders": {
+          "label": "合并游客订单",
+          "description": "检测同邮箱的未归属游客订单并一键关联到当前注册客户账号。"
+        },
+        "editCustomerEmail": {
+          "label": "修改客户邮箱",
+          "description": "直接在客户详情页修改已注册客户的登录邮箱与关联邮箱。"
+        },
+        "orderDiscountBreakdown": {
+          "label": "订单优惠明细",
+          "description": "在订单侧边栏按优惠券代码汇总展示折扣金额与比例。"
+        },
+        "orderNotifications": {
+          "label": "订单邮件发送记录",
+          "description": "在订单侧边栏展示已发送给客户的通知邮件模板与时间。"
+        },
+        "alwaysFreePromotion": {
+          "label": "免邮促销开关",
+          "description": "在促销详情页提供免邮标记开关（用于前端免邮标识与逻辑配合）。"
+        },
+        "disallowPriceListDiscounts": {
+          "label": "价格表禁止叠加折扣",
+          "description": "在价格表详情页控制是否允许通用折扣码覆盖该价格表价格。"
+        },
+        "uniqueCouponCodes": {
+          "label": "批量生成一次性优惠券",
+          "description": "在营销活动详情页基于模板促销批量生成单次使用优惠码并导出 CSV（适配 Klaviyo 等）。"
+        }
+      }
+    },
+    "note": {
+      "customerTitle": "客户备注",
+      "orderTitle": "订单备注",
+      "genericTitle": "备注",
+      "save": "保存备注",
+      "toastSaved": "备注已更新",
+      "toastFailed": "保存备注失败"
+    },
+    "customerEmail": {
+      "title": "客户邮箱",
+      "label": "邮箱地址",
+      "save": "保存邮箱",
+      "toastSaved": "邮箱已更新",
+      "toastFailed": "更新邮箱失败"
+    },
+    "anonymize": {
+      "title": "AVG / GDPR 数据脱敏",
+      "description": "永久清除该客户的所有个人身份信息（响应 AVG/GDPR 合规请求）。此操作不可撤销。",
+      "action": "匿名化客户",
+      "confirmTitle": "确定要匿名化该客户吗？",
+      "confirmDescription": "此操作将永久擦除该客户在客户表、订单、购物车、评价、邀评记录及心愿单中的姓名、地址、电话和邮箱等个人隐私信息，且不可恢复。",
+      "cancel": "取消",
+      "confirm": "确认匿名化",
+      "confirmLoading": "处理中...",
+      "toastSuccess": "客户数据已匿名化",
+      "toastFailed": "匿名化失败"
+    },
+    "mergeGuestOrders": {
+      "title": "游客订单",
+      "description_one": "发现 {{count}} 笔属于 {{email}} 的未归属游客订单，可合并至该客户账号。",
+      "description_other": "发现 {{count}} 笔属于 {{email}} 的未归属游客订单，可合并至该客户账号。",
+      "action": "合并游客订单",
+      "toastSuccess_one": "已将 {{count}} 笔游客订单关联至此客户",
+      "toastSuccess_other": "已将 {{count}} 笔游客订单关联至此客户",
+      "toastFailed": "合并游客订单失败"
+    },
+    "discountBreakdown": {
+      "title": "优惠折扣明细"
+    },
+    "orderNotifications": {
+      "title": "通知记录",
+      "empty": "暂无已发送的通知邮件",
+      "templates": {
+        "order-invoice": "发票邮件",
+        "order-placed": "订单确认邮件",
+        "order-shipped": "发货通知邮件",
+        "abandoned-cart": "弃购召回邮件",
+        "review-request": "邀评邮件"
+      }
+    },
+    "priceListExt": {
+      "title": "禁止叠加折扣",
+      "description": "开启后，通用折扣码无法覆盖该价格表内的商品价格。",
+      "toastSaved": "价格表设置已更新",
+      "toastFailed": "更新价格表设置失败"
+    },
+    "alwaysFree": {
+      "title": "免运费促销",
+      "description": "将该促销标记为在支持的前端商城中提供免运费权益。",
+      "confirmTitle": "更改免运费状态？",
+      "confirmDescription": "确定要切换该促销的免运费状态吗？",
+      "confirm": "确认",
+      "cancel": "取消",
+      "toastSaved": "免运费设置已更新",
+      "toastFailed": "更新免运费设置失败"
+    },
+    "couponCodes": {
+      "title": "批量生成一次性优惠码",
+      "subtitle": "基于当前营销活动中的模板促销批量生成单次使用优惠码（如用于 Klaviyo 自动化流程）。",
+      "noTemplates": "请先为当前营销活动添加一个带优惠码的促销作为折扣和规则模板。建议将模板促销保持为草稿状态，防止模板码本身被直接兑换。",
+      "template": "模板促销",
+      "templatePlaceholder": "选择促销模板",
+      "quantity": "生成数量（单次最多 {{max}} 个）",
+      "prefix": "前缀（可选）",
+      "prefixHint": "留空或输入 2 至 12 位大写字母/数字，生成格式如 {{example}}。",
+      "submit": "生成优惠码",
+      "draft": "草稿",
+      "createdAt": "创建时间",
+      "batchPrefix": "前缀",
+      "total": "总数量",
+      "used": "已使用",
+      "remaining": "未使用",
+      "download": "下载 CSV",
+      "empty": "该营销活动尚未生成任何批次的优惠码。",
+      "generated": "已创建 {{count}} 个优惠码并自动下载 CSV，可直接导入 Klaviyo 等工具。",
+      "error": "生成优惠码失败",
+      "downloadError": "下载 CSV 失败"
+    }
+  }
+}

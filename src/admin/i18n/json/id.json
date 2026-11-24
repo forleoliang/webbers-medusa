@@ -116,8 +116,8 @@
     },
     "featureDisabled": {
       "title": "Ulasan dinonaktifkan",
-      "description": "Fitur Ulasan produk sedang dimatikan di pengaturan Store Extensions.",
-      "action": "Buka Store Extensions"
+      "description": "Fitur Ulasan produk sedang dimatikan di pengaturan Ekstensi Toko.",
+      "action": "Buka Ekstensi Toko"
     },
     "requests": {
       "settings": "Pemicu: {{trigger}} + {{days}} hari. Tautan kedaluwarsa setelah {{ttl}} hari.",
@@ -181,5 +181,178 @@
       }
     },
     "credit": { "text": "Reviews & Wishlist — oleh Haus Kayu", "help": "Bantuan" }
+  },
+  "extensions": {
+    "settings": {
+      "label": "Ekstensi Toko",
+      "title": "Ekstensi Toko",
+      "description": "Aktifkan atau nonaktifkan modul Ulasan, Wishlist, dan alat admin QoL. Menonaktifkan fitur akan menyembunyikan UI Admin dan memblokir endpoint API-nya.",
+      "enabledCount": "{{enabled}} / {{total}} aktif",
+      "optIn": "Opsional",
+      "apiReady": "API siap ({{languages}})",
+      "apiKeyNotSet": "Kunci API belum diatur",
+      "toastSaved": "Pengaturan disimpan",
+      "toastFailed": "Gagal menyimpan pengaturan",
+      "categories": {
+        "reviews_wishlist": {
+          "title": "Ulasan & Wishlist",
+          "subtitle": "Ulasan pembeli terverifikasi, undangan email, terjemahan mesin, sinkronisasi eksternal, dan wishlist."
+        },
+        "customer_order": {
+          "title": "Alat Pelanggan & Pesanan",
+          "subtitle": "Catatan admin, anonimisasi GDPR, penggabungan pesanan tamu, edit email, dan detail pesanan."
+        },
+        "promotions_pricing": {
+          "title": "Promosi & Daftar Harga",
+          "subtitle": "Promosi gratis ongkir, perlindungan diskon daftar harga, dan pembuatan kode kupon unik."
+        }
+      },
+      "features": {
+        "reviews": {
+          "label": "Ulasan produk",
+          "description": "Ulasan pembeli terverifikasi, rating, tabel moderasi Admin, serta widget Produk/Pesanan."
+        },
+        "reviewRequests": {
+          "label": "Email permintaan ulasan",
+          "description": "Undangan ulasan otomatis setelah pembelian, tautan ajaib, dan manajemen antrean Admin."
+        },
+        "reviewTranslations": {
+          "label": "Terjemahan ulasan",
+          "description": "Terjemahan mesin judul dan isi ulasan melalui Google Translate API."
+        },
+        "kiyohSync": {
+          "label": "Sinkronisasi ulasan Kiyoh",
+          "description": "Impor harian terjadwal ulasan eksternal Kiyoh yang dicocokkan dengan pesanan Medusa."
+        },
+        "wishlist": {
+          "label": "Wishlist pelanggan & tamu",
+          "description": "Wishlist etalase, penggabungan akun tamu, tautan berbagi, dan jumlah tersimpan."
+        },
+        "notes": {
+          "label": "Catatan",
+          "description": "Catatan teks bebas pada halaman detail pelanggan dan pesanan."
+        },
+        "anonymizeCustomer": {
+          "label": "Anonimkan pelanggan",
+          "description": "Pembersihan data AVG/GDPR di halaman pelanggan meliputi pesanan, keranjang, ulasan, dan wishlist (khusus superadmin)."
+        },
+        "transferGuestOrders": {
+          "label": "Transfer pesanan tamu",
+          "description": "Gabungkan pesanan tamu yang belum tertaut ke akun pelanggan terdaftar."
+        },
+        "editCustomerEmail": {
+          "label": "Ubah email pelanggan",
+          "description": "Ubah alamat email pelanggan terdaftar langsung dari halaman pelanggan."
+        },
+        "orderDiscountBreakdown": {
+          "label": "Rincian diskon pesanan",
+          "description": "Ringkasan kode diskon yang diterapkan pada suatu pesanan."
+        },
+        "orderNotifications": {
+          "label": "Notifikasi pesanan",
+          "description": "Daftar email transaksional yang telah dikirim untuk pesanan."
+        },
+        "alwaysFreePromotion": {
+          "label": "Promosi selalu gratis ongkir",
+          "description": "Tombol penanda gratis ongkir pada halaman promosi (khusus widget)."
+        },
+        "disallowPriceListDiscounts": {
+          "label": "Larang diskon daftar harga",
+          "description": "Aktifkan pada daftar harga agar kode diskon tidak menimpa harga khusus."
+        },
+        "uniqueCouponCodes": {
+          "label": "Kode kupon unik",
+          "description": "Buat kode sekali pakai massal dari promosi templat di halaman kampanye dengan unduhan CSV."
+        }
+      }
+    },
+    "note": {
+      "customerTitle": "Catatan Pelanggan",
+      "orderTitle": "Catatan Pesanan",
+      "genericTitle": "Catatan",
+      "save": "Simpan catatan",
+      "toastSaved": "Catatan berhasil diperbarui",
+      "toastFailed": "Gagal menyimpan catatan"
+    },
+    "customerEmail": {
+      "title": "Email Pelanggan",
+      "label": "Email",
+      "save": "Simpan email",
+      "toastSaved": "Email diperbarui",
+      "toastFailed": "Gagal memperbarui email"
+    },
+    "anonymize": {
+      "title": "AVG / GDPR",
+      "description": "Menghapus permanen semua data pribadi pelanggan ini (permintaan AVG/GDPR). Tindakan ini tidak dapat dibatalkan.",
+      "action": "Anonimkan pelanggan",
+      "confirmTitle": "Anonimkan pelanggan?",
+      "confirmDescription": "Ini akan menghapus permanen semua data pribadi (nama, alamat, telepon, email, ulasan, permintaan ulasan, dan wishlist) di pelanggan, pesanan, keranjang, dan ekstensi terkait. Tindakan ini tidak dapat dibatalkan.",
+      "cancel": "Batal",
+      "confirm": "Anonimkan",
+      "confirmLoading": "Memproses...",
+      "toastSuccess": "Pelanggan berhasil dianonimkan",
+      "toastFailed": "Gagal menganonimkan pelanggan"
+    },
+    "mergeGuestOrders": {
+      "title": "Pesanan Tamu",
+      "description_one": "Ditemukan {{count}} pesanan tamu untuk {{email}}. Gabungkan ke akun pelanggan ini.",
+      "description_other": "Ditemukan {{count}} pesanan tamu untuk {{email}}. Gabungkan ke akun pelanggan ini.",
+      "action": "Gabungkan pesanan tamu",
+      "toastSuccess_one": "{{count}} pesanan tamu dipindahkan ke pelanggan ini",
+      "toastSuccess_other": "{{count}} pesanan tamu dipindahkan ke pelanggan ini",
+      "toastFailed": "Gagal menggabungkan pesanan tamu"
+    },
+    "discountBreakdown": {
+      "title": "Rincian diskon"
+    },
+    "orderNotifications": {
+      "title": "Notifikasi",
+      "empty": "Belum ada notifikasi terkirim",
+      "templates": {
+        "order-invoice": "Email faktur",
+        "order-placed": "Konfirmasi pesanan",
+        "order-shipped": "Notifikasi pengiriman",
+        "abandoned-cart": "Pengingat keranjang tertinggal",
+        "review-request": "Email permintaan ulasan"
+      }
+    },
+    "priceListExt": {
+      "title": "Larang diskon",
+      "description": "Diskon tidak dapat menimpa daftar harga ini saat tombol aktif.",
+      "toastSaved": "Pengaturan daftar harga diperbarui",
+      "toastFailed": "Gagal memperbarui daftar harga"
+    },
+    "alwaysFree": {
+      "title": "Gratis ongkir",
+      "description": "Menandai promosi ini sebagai gratis ongkir di etalase yang mendukung.",
+      "confirmTitle": "Ubah status gratis ongkir?",
+      "confirmDescription": "Yakin ingin mengubah status gratis ongkir promosi ini?",
+      "confirm": "Konfirmasi",
+      "cancel": "Batal",
+      "toastSaved": "Pengaturan gratis ongkir diperbarui",
+      "toastFailed": "Gagal memperbarui pengaturan gratis ongkir"
+    },
+    "couponCodes": {
+      "title": "Kode kupon unik",
+      "subtitle": "Buat kode sekali pakai dari promosi di kampanye ini, misalnya untuk alur Klaviyo.",
+      "noTemplates": "Tambahkan promosi berkode ke kampanye ini sebagai templat diskon dan syaratnya. Biarkan templat berstatus draf agar kode templat tidak bisa dipakai langsung.",
+      "template": "Promosi templat",
+      "templatePlaceholder": "Pilih promosi",
+      "quantity": "Jumlah kode (maksimum {{max}} per batch)",
+      "prefix": "Awalan (opsional)",
+      "prefixHint": "Kosong atau 2 hingga 12 huruf/angka. Contoh kode: {{example}}.",
+      "submit": "Buat kode",
+      "draft": "draf",
+      "createdAt": "Dibuat",
+      "batchPrefix": "Awalan",
+      "total": "Jumlah",
+      "used": "Terpakai",
+      "remaining": "Tersisa",
+      "download": "Unduh CSV",
+      "empty": "Belum ada kode yang dibuat untuk kampanye ini.",
+      "generated": "{{count}} kode dibuat dan CSV diunduh; unggah ke kupon di Klaviyo.",
+      "error": "Kode kupon gagal dibuat",
+      "downloadError": "CSV gagal diunduh"
+    }
   }
 }

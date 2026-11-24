@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react"
 import { Button, Container, Heading, Skeleton, Textarea, toast } from "@medusajs/ui"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useTranslation } from "react-i18next"
 import { sdk } from "../../lib/sdk"
 
 type Note = {
@@ -16,11 +17,8 @@ type NoteUpdateResponse = {
   note: Note
 }
 
-function capitalizeFirstLetter(val: string) {
-  return val.charAt(0).toUpperCase() + val.slice(1)
-}
-
 const NoteWidget = ({ entityType, entityId }: { entityType: string; entityId: string }) => {
+  const { t } = useTranslation()
   const [note, setNote] = useState("")
   const queryClient = useQueryClient()
   const queryKey = ["webbers-note", entityType, entityId]
@@ -51,15 +49,22 @@ const NoteWidget = ({ entityType, entityId }: { entityType: string; entityId: st
         },
       }),
     onSuccess: async () => {
-      toast.success("Note updated successfully")
+      toast.success(t("extensions.note.toastSaved"))
       await queryClient.invalidateQueries({ queryKey })
     },
     onError: (err: Error) => {
-      toast.error(err.message || "Failed to save note")
+      toast.error(err.message || t("extensions.note.toastFailed"))
     },
   })
 
   const isDirty = note !== savedText
+
+  const title =
+    entityType === "customer"
+      ? t("extensions.note.customerTitle")
+      : entityType === "order"
+        ? t("extensions.note.orderTitle")
+        : t("extensions.note.genericTitle")
 
   const onSave = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -70,7 +75,7 @@ const NoteWidget = ({ entityType, entityId }: { entityType: string; entityId: st
     <Container className="p-0">
       <form onSubmit={onSave} className="divide-y">
         <div className="flex items-center justify-between px-6 py-4">
-          <Heading level="h2">{capitalizeFirstLetter(entityType)} Note</Heading>
+          <Heading level="h2">{title}</Heading>
           <Button
             size="small"
             variant="primary"
@@ -78,7 +83,7 @@ const NoteWidget = ({ entityType, entityId }: { entityType: string; entityId: st
             type="submit"
             isLoading={isPending}
           >
-            Save note
+            {t("extensions.note.save")}
           </Button>
         </div>
 

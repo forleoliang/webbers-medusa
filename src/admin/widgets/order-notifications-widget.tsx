@@ -2,14 +2,10 @@ import { defineWidgetConfig } from "@medusajs/admin-sdk"
 import type { AdminOrder, DetailWidgetProps } from "@medusajs/framework/types"
 import { Container, Heading, Skeleton, Text } from "@medusajs/ui"
 import { useQuery } from "@tanstack/react-query"
+import { useTranslation } from "react-i18next"
+import { formatDateTime } from "../lib/api"
 import { sdk } from "../lib/sdk"
 import { useFeatureEnabled } from "../lib/use-feature-flags"
-
-const formatDateTime = (date: string | Date) => {
-  const d = new Date(date)
-  if (Number.isNaN(d.getTime())) return ""
-  return new Intl.DateTimeFormat([], { dateStyle: "medium", timeStyle: "short" }).format(d)
-}
 
 type NotificationGroup = {
   template: string
@@ -21,15 +17,8 @@ type NotificationsResponse = {
   notifications: NotificationGroup[]
 }
 
-const TEMPLATE_LABELS: Record<string, string> = {
-  "order-invoice": "Invoice email",
-  "order-placed": "Order confirmation",
-  "order-shipped": "Shipping notification",
-  "abandoned-cart": "Abandoned cart reminder",
-  "review-request": "Review request email",
-}
-
 const OrderNotificationsWidget = ({ data: order }: DetailWidgetProps<AdminOrder>) => {
+  const { t, i18n } = useTranslation()
   const enabled = useFeatureEnabled("orderNotifications")
 
   const { data, isLoading } = useQuery<NotificationsResponse>({
@@ -45,7 +34,7 @@ const OrderNotificationsWidget = ({ data: order }: DetailWidgetProps<AdminOrder>
   return (
     <Container className="divide-y p-0">
       <div className="flex items-center justify-between px-6 py-4">
-        <Heading level="h2">Notifications</Heading>
+        <Heading level="h2">{t("extensions.orderNotifications.title")}</Heading>
       </div>
 
       {isLoading ? (
@@ -56,7 +45,7 @@ const OrderNotificationsWidget = ({ data: order }: DetailWidgetProps<AdminOrder>
       ) : notifications.length === 0 ? (
         <div className="px-6 py-4">
           <Text size="small" leading="compact" className="text-ui-fg-subtle">
-            No notifications sent
+            {t("extensions.orderNotifications.empty")}
           </Text>
         </div>
       ) : (
@@ -64,7 +53,9 @@ const OrderNotificationsWidget = ({ data: order }: DetailWidgetProps<AdminOrder>
           <div key={i} className="grid grid-cols-2 items-start gap-x-4 px-6 py-4">
             <div className="flex flex-col gap-y-1">
               <Text size="small" leading="compact" className="text-ui-fg-base">
-                {TEMPLATE_LABELS[notification.template] ?? notification.template}
+                {t(`extensions.orderNotifications.templates.${notification.template}`, {
+                  defaultValue: notification.template,
+                })}
               </Text>
               {notification.recipients.map((recipient) => (
                 <Text key={recipient} size="xsmall" leading="compact" className="text-ui-fg-muted break-all">
@@ -73,7 +64,7 @@ const OrderNotificationsWidget = ({ data: order }: DetailWidgetProps<AdminOrder>
               ))}
             </div>
             <Text size="small" leading="compact" className="text-ui-fg-subtle text-right">
-              {formatDateTime(notification.sent_at)}
+              {formatDateTime(notification.sent_at, i18n.language)}
             </Text>
           </div>
         ))
