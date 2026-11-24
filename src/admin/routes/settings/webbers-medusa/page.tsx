@@ -44,24 +44,15 @@ const StoreExtensionsSettingsPage = () => {
   })
 
   const flags = data?.flags ?? {}
-  const enabledCount = WEBBERS_FEATURES.filter((f) => flags[f.key] ?? f.defaultEnabled).length
 
   return (
     <div className="flex flex-col gap-y-3">
       <Container className="p-0">
-        <div className="flex flex-wrap items-center justify-between gap-4 px-6 py-4">
-          <div className="flex flex-col gap-y-1">
-            <Heading level="h1">{t("extensions.settings.title")}</Heading>
-            <Text size="small" leading="compact" className="text-ui-fg-subtle">
-              {t("extensions.settings.description")}
-            </Text>
-          </div>
-          <Badge size="2xsmall" rounded="full" color="green">
-            {t("extensions.settings.enabledCount", {
-              enabled: enabledCount,
-              total: WEBBERS_FEATURES.length,
-            })}
-          </Badge>
+        <div className="flex flex-col gap-y-1 px-6 py-4">
+          <Heading level="h1">{t("extensions.settings.title")}</Heading>
+          <Text size="small" leading="compact" className="text-ui-fg-subtle">
+            {t("extensions.settings.description")}
+          </Text>
         </div>
       </Container>
 

@@ -187,7 +187,6 @@
       "label": "商店扩展",
       "title": "商店扩展",
       "description": "统一启用或停用商品评价、心愿单及后台增强功能。关闭功能后，其后台界面将被隐藏且对应接口将被拦截。",
-      "enabledCount": "已启用 {{enabled}} / {{total}} 项",
       "optIn": "按需开启",
       "apiReady": "API 已就绪 ({{languages}})",
       "apiKeyNotSet": "未配置 API 密钥",

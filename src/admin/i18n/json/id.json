@@ -187,7 +187,6 @@
       "label": "Ekstensi Toko",
       "title": "Ekstensi Toko",
       "description": "Aktifkan atau nonaktifkan modul Ulasan, Wishlist, dan alat admin QoL. Menonaktifkan fitur akan menyembunyikan UI Admin dan memblokir endpoint API-nya.",
-      "enabledCount": "{{enabled}} / {{total}} aktif",
       "optIn": "Opsional",
       "apiReady": "API siap ({{languages}})",
       "apiKeyNotSet": "Kunci API belum diatur",

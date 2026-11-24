@@ -187,7 +187,6 @@
       "label": "Store Extensions",
       "title": "Store Extensions",
       "description": "Enable or disable modules across Reviews, Wishlist, and QoL admin tools. Disabling a feature hides its Admin UI and blocks its API routes.",
-      "enabledCount": "{{enabled}} / {{total}} enabled",
       "optIn": "Opt-in",
       "apiReady": "API ready ({{languages}})",
       "apiKeyNotSet": "API key not set",

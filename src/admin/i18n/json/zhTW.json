@@ -187,7 +187,6 @@
       "label": "商店擴充",
       "title": "商店擴充",
       "description": "統一啟用或停用評價、願望清單與管理後台增強功能。停用後將隱藏對應介面並封鎖其 API 端點。",
-      "enabledCount": "已啟用 {{enabled}} / {{total}} 項",
       "optIn": "按需開啟",
       "apiReady": "API 已就緒 ({{languages}})",
       "apiKeyNotSet": "未設定 API 金鑰",
