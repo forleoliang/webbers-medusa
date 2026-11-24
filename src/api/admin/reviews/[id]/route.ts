@@ -1,40 +1,33 @@
-import { MedusaRequest } from '@medusajs/framework/http';
-import { PostAdminUpdateReview } from './validators';
-import { updateReviewsWorkflow } from '../../../../workflows/review/update-reviews';
-import { z } from '@medusajs/framework/zod';
-import { MedusaResponse } from '@medusajs/framework';
-import { deleteReviewWorkflow } from '../../../../workflows/review/delete-review';
+import type { AuthenticatedMedusaRequest, MedusaResponse } from "@medusajs/framework/http"
+import { MedusaError } from "@medusajs/framework/utils"
+import { REVIEWS_MODULE } from "../../../../modules/reviews"
+import type ReviewsModuleService from "../../../../modules/reviews/service"
+import { toAdminReview } from "../../../../lib/serialize"
+import { moderateReviewsWorkflow } from "../../../../workflows/reviews/moderate-reviews"
+import { deleteReviewsWorkflow } from "../../../../workflows/reviews/delete-reviews"
+import { decorate } from "../route"
 
-type PostAdminUpdateReviewType = z.infer<typeof PostAdminUpdateReview>;
+async function load(req: AuthenticatedMedusaRequest, id: string) {
+  const service = req.scope.resolve<ReviewsModuleService>(REVIEWS_MODULE)
+  const [review] = await service.listReviews({ id }, { relations: ["images", "reply"], take: 1 })
+  if (!review) throw new MedusaError(MedusaError.Types.NOT_FOUND, `Review ${id} not found`)
+  const { titles, displayIds } = await decorate(req, [review])
+  return toAdminReview(review, { product_title: titles.get(review.product_id) ?? null, order_display_id: displayIds.get(review.order_id) ?? null })
+}
 
-export const PATCH = async (req: MedusaRequest<PostAdminUpdateReviewType>, res: MedusaResponse) => {
-  const reviewUpdate = req.validatedBody;
+export const GET = async (req: AuthenticatedMedusaRequest, res: MedusaResponse) => {
+  res.json({ review: await load(req, req.params.id) })
+}
 
-  const review = {
-    id: req.params.id,
-    ...reviewUpdate,
-  };
+/** Approve or reject. Approving publishes the photos; rejecting deletes them. */
+export const POST = async (req: AuthenticatedMedusaRequest<{ status: "approved" | "rejected"; reject_reason?: string }>, res: MedusaResponse) => {
+  const { status, reject_reason } = req.validatedBody
+  await moderateReviewsWorkflow(req.scope).run({ input: { ids: [req.params.id], status, moderated_by: req.auth_context?.actor_id ?? null, reject_reason: reject_reason ?? null } })
+  res.json({ review: await load(req, req.params.id) })
+}
 
-  review.remove_product_ids = undefined;
-  review.add_product_ids = undefined;
-
-  const { result } = await updateReviewsWorkflow(req.scope).run({
-    input: {
-      reviews: [review],
-      add_product_ids: reviewUpdate.add_product_ids ?? [],
-      remove_product_ids: reviewUpdate.remove_product_ids ?? [],
-    },
-  });
-
-  res.json({ reviews: result });
-};
-
-export const DELETE = async (req: MedusaRequest, res: MedusaResponse) => {
-  const { result } = await deleteReviewWorkflow(req.scope).run({
-    input: {
-      id: req.params.id,
-    },
-  });
-
-  res.json({ reviews: result });
-};
+export const DELETE = async (req: AuthenticatedMedusaRequest, res: MedusaResponse) => {
+  await load(req, req.params.id)
+  await deleteReviewsWorkflow(req.scope).run({ input: { ids: [req.params.id] } })
+  res.json({ id: req.params.id, object: "review", deleted: true })
+}

@@ -1,14 +1,20 @@
-import type { AuthenticatedMedusaRequest, MedusaResponse } from '@medusajs/framework';
-import { REVIEW_MODULE } from '../../../modules/review';
-import type ProductReviewService from '../../../modules/review/service';
+import type { AuthenticatedMedusaRequest, MedusaResponse } from "@medusajs/framework/http"
+import { getOptions } from "../../../lib/options"
+import { WEBBERS_SETTINGS_MODULE } from "../../../modules/webbers-settings"
+import type WebbersSettingsService from "../../../modules/webbers-settings/service"
 
-/** Whether review translations are configured, so the admin only offers them when they work. */
+/** Reports whether review translations are enabled by feature flag and configured with API credentials. */
 export const GET = async (req: AuthenticatedMedusaRequest, res: MedusaResponse) => {
-  const { translationOptions } = req.scope.resolve<ProductReviewService>(REVIEW_MODULE);
+  const settings = req.scope.resolve<WebbersSettingsService>(WEBBERS_SETTINGS_MODULE)
+  const featureEnabled = await settings.isEnabled("reviewTranslations")
+  const { apiKey, sourceLanguage, targetLanguages } = getOptions(req.scope).reviews.translations
+  const configured = Boolean(apiKey && targetLanguages.length > 0)
 
   res.status(200).json({
-    enabled: !!translationOptions,
-    source_language: translationOptions?.sourceLanguage ?? null,
-    target_languages: translationOptions?.targetLanguages ?? [],
-  });
-};
+    enabled: featureEnabled && configured,
+    feature_enabled: featureEnabled,
+    configured,
+    source_language: sourceLanguage,
+    target_languages: targetLanguages,
+  })
+}

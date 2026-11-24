@@ -1,45 +1,40 @@
-import { defineWidgetConfig } from '@medusajs/admin-sdk';
-import { Container, Heading, Button, Text, Prompt, toast } from '@medusajs/ui';
-import { DetailWidgetProps, AdminCustomer } from '@medusajs/framework/types';
-import { useState } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { sdk } from '../lib/sdk';
-import { useFeatureEnabled } from '../lib/use-feature-flags';
+import { defineWidgetConfig } from "@medusajs/admin-sdk"
+import type { AdminCustomer, DetailWidgetProps } from "@medusajs/framework/types"
+import { Button, Container, Heading, Prompt, Text, toast } from "@medusajs/ui"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useState } from "react"
+import { sdk } from "../lib/sdk"
+import { useFeatureEnabled } from "../lib/use-feature-flags"
 
 const CustomerAnonymizeWidget = ({ data }: DetailWidgetProps<AdminCustomer>) => {
-  const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const queryClient = useQueryClient();
-  const enabled = useFeatureEnabled('anonymizeCustomer');
+  const [open, setOpen] = useState(false)
+  const queryClient = useQueryClient()
+  const enabled = useFeatureEnabled("anonymizeCustomer")
 
   const { data: currentUser } = useQuery({
-    queryKey: ['current-admin-user'],
+    queryKey: ["current-admin-user"],
     queryFn: () => sdk.admin.user.me(),
-  });
+    enabled,
+  })
 
-  if (!enabled) {
-    return null;
+  const anonymizeMutation = useMutation({
+    mutationFn: () =>
+      sdk.client.fetch(`/admin/customers/${data.id}/anonymize`, {
+        method: "POST",
+      }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries()
+      setOpen(false)
+      toast.success("Customer anonymized")
+    },
+    onError: (e: Error) => {
+      toast.error(e.message || "Error anonymizing customer")
+    },
+  })
+
+  if (!enabled || !currentUser?.user?.metadata?.superadmin) {
+    return null
   }
-
-  if (!currentUser?.user?.metadata?.superadmin) {
-    return null;
-  }
-
-  const onConfirm = async () => {
-    setLoading(true);
-    try {
-      await sdk.client.fetch(`/admin/customers/${data.id}/anonymize`, {
-        method: 'POST',
-      });
-      await queryClient.invalidateQueries({ queryKey: [] });
-      toast.success('Customer anonymized');
-    } catch (e: any) {
-      toast.error(e.message || 'Error anonymizing customer');
-    } finally {
-      setLoading(false);
-      setOpen(false);
-    }
-  };
 
   return (
     <Container className="divide-y p-0">
@@ -62,24 +57,27 @@ const CustomerAnonymizeWidget = ({ data }: DetailWidgetProps<AdminCustomer>) => 
           <Prompt.Header>
             <Prompt.Title>Anonymize customer?</Prompt.Title>
             <Prompt.Description>
-              This will permanently remove all personal data: name, address, phone, email, and payment information
-              across all orders, carts, and subscriptions. This action cannot be undone.
+              This will permanently remove all personal data (name, address, phone, email, reviews, review requests,
+              and wishlists) across customer, order, cart, and configured extension records. This action cannot be undone.
             </Prompt.Description>
           </Prompt.Header>
           <Prompt.Footer>
-            <Prompt.Cancel disabled={loading}>Cancel</Prompt.Cancel>
-            <Prompt.Action onClick={onConfirm} disabled={loading}>
-              {loading ? 'Anonymizing...' : 'Anonymize'}
+            <Prompt.Cancel disabled={anonymizeMutation.isPending}>Cancel</Prompt.Cancel>
+            <Prompt.Action
+              onClick={() => anonymizeMutation.mutate()}
+              disabled={anonymizeMutation.isPending}
+            >
+              {anonymizeMutation.isPending ? "Anonymizing..." : "Anonymize"}
             </Prompt.Action>
           </Prompt.Footer>
         </Prompt.Content>
       </Prompt>
     </Container>
-  );
-};
+  )
+}
 
 export const config = defineWidgetConfig({
-  zone: 'customer.details.side.before',
-});
+  zone: "customer.details.side.before",
+})
 
-export default CustomerAnonymizeWidget;
+export default CustomerAnonymizeWidget

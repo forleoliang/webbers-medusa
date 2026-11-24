@@ -1,10 +1,9 @@
-import {DetailWidgetProps, AdminPromotion} from "@medusajs/framework/types"
-import {defineWidgetConfig} from "@medusajs/admin-sdk"
-import {useQuery} from "@tanstack/react-query"
-import {sdk} from "../lib/sdk"
-import {Container, Heading, Switch, usePrompt} from "@medusajs/ui"
-import {useState, useEffect} from "react"
-import {useFeatureEnabled} from "../lib/use-feature-flags"
+import { defineWidgetConfig } from "@medusajs/admin-sdk"
+import type { AdminPromotion, DetailWidgetProps } from "@medusajs/framework/types"
+import { Container, Heading, Skeleton, Switch, Text, toast, usePrompt } from "@medusajs/ui"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { sdk } from "../lib/sdk"
+import { useFeatureEnabled } from "../lib/use-feature-flags"
 
 type AdminPromotionAlwaysFree = AdminPromotion & {
   always_free?: {
@@ -13,30 +12,38 @@ type AdminPromotionAlwaysFree = AdminPromotion & {
   }
 }
 
-const PromotionAlwaysFreeWidget = ({
-  data: promotion,
-}: DetailWidgetProps<AdminPromotion>) => {
-  const {data: queryResult} = useQuery({
+const PromotionAlwaysFreeWidget = ({ data: promotion }: DetailWidgetProps<AdminPromotion>) => {
+  const dialog = usePrompt()
+  const enabled = useFeatureEnabled("alwaysFreePromotion")
+  const queryClient = useQueryClient()
+  const queryKey = ["promotion-always-free", promotion.id]
+
+  const { data: queryResult, isLoading } = useQuery({
     queryFn: () =>
       sdk.admin.promotion.retrieve(promotion.id, {
         fields: "+always_free.*",
       }),
-    queryKey: [["promotion", promotion.id]],
+    queryKey,
+    enabled,
   })
 
-  const alwaysFreeResult = (queryResult?.promotion as AdminPromotionAlwaysFree)
-    ?.always_free?.always_free
+  const alwaysFree = !!(queryResult?.promotion as AdminPromotionAlwaysFree | undefined)?.always_free?.always_free
 
-  const [alwaysFree, setAlwaysFree] = useState<boolean | null>(null)
-  const dialog = usePrompt()
-  const enabled = useFeatureEnabled("alwaysFreePromotion")
-
-  // Sync state when query data changes
-  useEffect(() => {
-    if (typeof alwaysFreeResult === "boolean") {
-      setAlwaysFree(alwaysFreeResult)
-    }
-  }, [alwaysFreeResult])
+  const mutation = useMutation({
+    mutationFn: (nextValue: boolean) =>
+      sdk.admin.promotion.update(promotion.id, {
+        // @ts-expect-error additional_data extension
+        additional_data: { always_free: nextValue },
+      }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey })
+      await queryClient.invalidateQueries({ queryKey: ["promotion", promotion.id] })
+      toast.success("Free shipping setting updated")
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || "Failed to update free shipping setting")
+    },
+  })
 
   if (!enabled) {
     return null
@@ -52,22 +59,7 @@ const PromotionAlwaysFreeWidget = ({
     })
 
     if (confirmed) {
-      const oldValue = alwaysFree
-      const newValue = !alwaysFree
-
-      setAlwaysFree(newValue)
-
-      try {
-        await sdk.admin.promotion.update(promotion.id, {
-          // @ts-ignore
-          additional_data: {
-            always_free: newValue,
-          },
-        })
-      } catch (error) {
-        console.error("Failed to update free shipping:", error)
-        setAlwaysFree(oldValue)
-      }
+      mutation.mutate(!alwaysFree)
     }
   }
 
@@ -75,11 +67,21 @@ const PromotionAlwaysFreeWidget = ({
     <Container className="divide-y p-0">
       <div className="flex items-center justify-between px-6 py-4">
         <Heading level="h2">Free shipping</Heading>
-        <Switch
-          id="always-free"
-          checked={!!alwaysFree}
-          onCheckedChange={handleChange}
-        />
+        {isLoading ? (
+          <Skeleton className="h-5 w-9 rounded-full" />
+        ) : (
+          <Switch
+            id="always-free"
+            checked={alwaysFree}
+            disabled={mutation.isPending}
+            onCheckedChange={handleChange}
+          />
+        )}
+      </div>
+      <div className="px-6 py-4">
+        <Text size="small" leading="compact" className="text-ui-fg-subtle">
+          Marks this promotion as providing free shipping in supported storefronts.
+        </Text>
       </div>
     </Container>
   )

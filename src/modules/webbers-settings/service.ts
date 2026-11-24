@@ -1,6 +1,10 @@
 import { MedusaService } from '@medusajs/framework/utils';
 import { FeatureFlag } from './models/feature-flag';
-import { DEFAULT_FEATURE_ENABLED, WEBBERS_FEATURE_KEYS, WebbersFeatureKey } from '../../feature-flags';
+import {
+  getDefaultFeatureEnabled,
+  WEBBERS_FEATURE_KEYS,
+  WebbersFeatureKey,
+} from '../../feature-flags';
 import { WebbersMedusaOptions } from '../../options';
 
 class WebbersSettingsService extends MedusaService({ FeatureFlag }) {
@@ -23,13 +27,13 @@ class WebbersSettingsService extends MedusaService({ FeatureFlag }) {
     return this.options_.editEmail ?? {};
   }
 
-  /** Returns every known feature key mapped to its enabled state (default ON). */
+  /** Returns every known feature key mapped to its enabled state. */
   async getFlags(): Promise<Record<string, boolean>> {
-    const rows = await this.listFeatureFlags({});
+    const rows = await this.listFeatureFlags({}, { take: null });
 
     const map: Record<string, boolean> = {};
     for (const key of WEBBERS_FEATURE_KEYS) {
-      map[key] = DEFAULT_FEATURE_ENABLED;
+      map[key] = getDefaultFeatureEnabled(key);
     }
     for (const row of rows) {
       map[row.key] = row.enabled;
@@ -37,15 +41,15 @@ class WebbersSettingsService extends MedusaService({ FeatureFlag }) {
     return map;
   }
 
-  /** Whether a single feature is enabled (default ON when no row exists). */
+  /** Whether a single feature is enabled (uses feature definition default when no row exists). */
   async isEnabled(key: WebbersFeatureKey | string): Promise<boolean> {
-    const [existing] = await this.listFeatureFlags({ key });
-    return existing ? existing.enabled : DEFAULT_FEATURE_ENABLED;
+    const [existing] = await this.listFeatureFlags({ key }, { take: 1 });
+    return existing ? existing.enabled : getDefaultFeatureEnabled(key);
   }
 
   /** Upsert a feature flag. */
   async setFlag(key: WebbersFeatureKey, enabled: boolean) {
-    const [existing] = await this.listFeatureFlags({ key });
+    const [existing] = await this.listFeatureFlags({ key }, { take: 1 });
     if (existing) {
       return this.updateFeatureFlags({ id: existing.id, enabled });
     }

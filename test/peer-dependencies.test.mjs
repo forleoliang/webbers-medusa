@@ -22,8 +22,8 @@ for (const name of ['@medusajs/ui', 'react-router-dom', '@tanstack/react-query']
   });
 }
 
-// Medusa >= 2.19 moved the dashboard to react-router-dom 7 and @medusajs/ui 4.2.x.
-test('peer ranges accept the dashboard dependencies of Medusa 2.21.2', () => {
-  assert.ok(semver.satisfies('7.18.2', pkg.peerDependencies['react-router-dom']));
-  assert.ok(semver.satisfies('4.2.6', pkg.peerDependencies['@medusajs/ui']));
+// Medusa >= 2.23 moved the dashboard to react-router-dom 7.18.5 and @medusajs/ui 4.3.0.
+test('peer ranges accept the dashboard dependencies of Medusa 2.23.0', () => {
+  assert.ok(semver.satisfies('7.18.5', pkg.peerDependencies['react-router-dom']));
+  assert.ok(semver.satisfies('4.3.0', pkg.peerDependencies['@medusajs/ui']));
 });

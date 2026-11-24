@@ -1,7 +1,7 @@
 import { defineWidgetConfig } from '@medusajs/admin-sdk';
 import { AdminCampaign, DetailWidgetProps } from '@medusajs/framework/types';
 import { ArrowDownTray } from '@medusajs/icons';
-import { Button, Container, Heading, Input, Label, Select, Table, Text, toast } from '@medusajs/ui';
+import { Button, Container, Heading, Hint, Input, Label, Select, Skeleton, Table, Text, toast } from '@medusajs/ui';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { sdk } from '../lib/sdk';
@@ -170,7 +170,12 @@ const CampaignCouponCodesWidget = ({ data: campaign }: DetailWidgetProps<AdminCa
         </Text>
       </div>
 
-      {!isLoading && templates.length === 0 ? (
+      {isLoading ? (
+        <div className="flex flex-col gap-y-3 px-6 py-4">
+          <Skeleton className="h-9 w-full" />
+          <Skeleton className="h-8 w-48" />
+        </div>
+      ) : templates.length === 0 ? (
         <div className="px-6 py-4">
           <Text size="small" leading="compact" className="text-ui-fg-subtle">
             {t.noTemplates}
@@ -227,9 +232,9 @@ const CampaignCouponCodesWidget = ({ data: campaign }: DetailWidgetProps<AdminCa
             </div>
           </div>
           <div className="flex items-center justify-between gap-x-4">
-            <Text size="small" leading="compact" className="text-ui-fg-subtle">
+            <Hint>
               {t.prefixHint} {prefix ? `${prefix}-K7M2X9QP` : 'K7M2-X9QP-4HTB'}.
-            </Text>
+            </Hint>
             <Button
               size="small"
               disabled={!isValid || generateMutation.isPending}

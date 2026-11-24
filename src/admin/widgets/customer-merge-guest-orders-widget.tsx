@@ -1,48 +1,49 @@
-import { defineWidgetConfig } from '@medusajs/admin-sdk';
-import { Container, Heading, Text, Button, Badge, toast } from '@medusajs/ui';
-import { DetailWidgetProps, AdminCustomer } from '@medusajs/framework/types';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { sdk } from '../lib/sdk';
-import { useFeatureEnabled } from '../lib/use-feature-flags';
+import { defineWidgetConfig } from "@medusajs/admin-sdk"
+import type { AdminCustomer, DetailWidgetProps } from "@medusajs/framework/types"
+import { Badge, Button, Container, Heading, Text, toast } from "@medusajs/ui"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { sdk } from "../lib/sdk"
+import { useFeatureEnabled } from "../lib/use-feature-flags"
 
-type GuestOrdersResponse = { count: number; email: string };
-type MergeResponse = { transferred_count: number };
+type GuestOrdersResponse = { count: number; email: string }
+type MergeResponse = { transferred_count: number }
 
 const CustomerMergeGuestOrdersWidget = ({ data }: DetailWidgetProps<AdminCustomer>) => {
-  const queryClient = useQueryClient();
-  const featureEnabled = useFeatureEnabled('transferGuestOrders');
+  const queryClient = useQueryClient()
+  const featureEnabled = useFeatureEnabled("transferGuestOrders")
 
   const { data: guestData, isLoading } = useQuery<GuestOrdersResponse>({
-    queryKey: ['customer-guest-orders', data.id],
+    queryKey: ["customer-guest-orders", data.id],
     queryFn: () => sdk.client.fetch(`/admin/customers/${data.id}/merge-guest-orders`),
     enabled: data.has_account && featureEnabled,
-  });
+  })
 
   const mergeMutation = useMutation<MergeResponse>({
     mutationFn: () =>
       sdk.client.fetch(`/admin/customers/${data.id}/merge-guest-orders`, {
-        method: 'POST',
+        method: "POST",
       }),
-    onSuccess: async result => {
-      await queryClient.invalidateQueries({ queryKey: [] });
-      toast.success(`${result.transferred_count} guest order(s) moved to this customer`);
+    onSuccess: async (result) => {
+      await queryClient.invalidateQueries()
+      toast.success(`${result.transferred_count} guest order(s) moved to this customer`)
     },
-    onError: (error: any) => {
-      toast.error(error.message || 'Failed to merge guest orders');
+    onError: (error: Error) => {
+      toast.error(error.message || "Failed to merge guest orders")
     },
-  });
+  })
 
-  if (!featureEnabled || !data.has_account || isLoading) return null;
+  if (!featureEnabled || !data.has_account || isLoading) return null
 
-  const count = guestData?.count ?? 0;
-
-  if (count === 0) return null;
+  const count = guestData?.count ?? 0
+  if (count === 0) return null
 
   return (
     <Container className="divide-y p-0">
       <div className="flex items-center justify-between px-6 py-4">
         <Heading level="h2">Guest Orders</Heading>
-        <Badge color="orange">{count}</Badge>
+        <Badge size="2xsmall" color="orange">
+          {count}
+        </Badge>
       </div>
       <div className="flex flex-col gap-y-3 px-6 py-4">
         <Text size="small" leading="compact" className="text-ui-fg-subtle">
@@ -61,11 +62,11 @@ const CustomerMergeGuestOrdersWidget = ({ data }: DetailWidgetProps<AdminCustome
         </div>
       </div>
     </Container>
-  );
-};
+  )
+}
 
 export const config = defineWidgetConfig({
-  zone: 'customer.details.side.before',
-});
+  zone: "customer.details.side.before",
+})
 
-export default CustomerMergeGuestOrdersWidget;
+export default CustomerMergeGuestOrdersWidget

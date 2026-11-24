@@ -1,23 +1,24 @@
 {
   "name": "@webbers/webbers-medusa",
-  "displayName": "Medusa v2 Webbers QoL Plugin",
-  "version": "1.4.0",
-  "description": "Quality-of-life admin customizations for Medusa v2 (notes, customer anonymization, guest order transfer, price-list discount control, product reviews)",
-  "author": "Webbers B.V. <development@webbers.com>",
+  "displayName": "Webbers QoL + Verified Reviews & Wishlist Plugin",
+  "version": "1.5.0-xft.1",
+  "description": "Unified Medusa v2 plugin combining Webbers QoL admin tools, verified-purchase reviews with translations & Kiyoh sync, review requests, and customer/guest wishlists",
+  "author": "Webbers B.V. <development@webbers.com> & Haus Kayu <dev@hauskayu.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/webbersagency/webbers-medusa.git"
+    "url": "git+https://github.com/forleoliang/webbers-medusa.git"
   },
   "bugs": {
-    "url": "https://github.com/webbersagency/webbers-medusa/issues"
+    "url": "https://github.com/forleoliang/webbers-medusa/issues"
   },
-  "homepage": "https://github.com/webbersagency/webbers-medusa#readme",
+  "homepage": "https://github.com/forleoliang/webbers-medusa#readme",
   "publishConfig": {
     "access": "public"
   },
   "files": [
-    ".medusa/server"
+    ".medusa/server",
+    "!.medusa/server/**/__tests__"
   ],
   "exports": {
     "./package.json": "./package.json",
@@ -26,6 +27,8 @@
     "./modules/*": "./.medusa/server/src/modules/*/index.js",
     "./modules/*/service": "./.medusa/server/src/modules/*/service.js",
     "./links": "./.medusa/server/src/links/index.js",
+    "./jsonld": "./.medusa/server/src/jsonld.js",
+    "./sdk": "./.medusa/server/src/sdk.js",
     "./admin": {
       "import": "./.medusa/server/src/admin/index.mjs",
       "require": "./.medusa/server/src/admin/index.js",
@@ -34,72 +37,85 @@
     "./*": "./.medusa/server/src/*.js"
   },
   "keywords": [
+    "medusa",
     "medusa-v2",
+    "medusa-plugin",
     "medusa-plugin-integration",
     "medusa-plugin-other",
+    "medusa-webbers",
     "reviews",
-    "medusa-webbers"
+    "product-reviews",
+    "verified-purchase",
+    "wishlist",
+    "guest-wishlist",
+    "json-ld"
   ],
   "scripts": {
     "build": "medusa plugin:build",
     "dev": "medusa plugin:develop",
-    "test": "node --test test/peer-dependencies.test.mjs",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p src/admin/tsconfig.json",
+    "test:peers": "node --test test/peer-dependencies.test.mjs",
+    "test:unit": "jest",
+    "test": "node --test test/peer-dependencies.test.mjs && jest",
     "prepublishOnly": "medusa plugin:build"
   },
   "dependencies": {
     "@hookform/resolvers": "3.4.2",
-    "@tanstack/react-table": "^8.21.3",
+    "@tanstack/react-table": "9.3.1",
     "date-fns": "^4.4.0",
     "multer": "^2.2.0",
-    "radix-ui": "^1.6.0",
-    "react-hook-form": "^7.80.0",
-    "react-simple-star-rating": "^5.1.7"
+    "radix-ui": "^1.8.1",
+    "react-hook-form": "^7.92.0"
   },
   "devDependencies": {
-    "@medusajs/admin-sdk": "^2.17.1",
-    "@medusajs/admin-shared": "^2.17.1",
-    "@medusajs/cli": "^2.17.1",
-    "@medusajs/framework": "^2.17.1",
-    "@medusajs/icons": "^2.17.1",
-    "@medusajs/js-sdk": "^2.17.1",
-    "@medusajs/medusa": "^2.17.1",
-    "@medusajs/test-utils": "^2.17.1",
-    "@medusajs/types": "^2.17.1",
-    "@medusajs/ui": "4.0.25",
-    "@medusajs/workflows-sdk": "^2.17.1",
-    "@swc/core": "1.5.7",
-    "@tanstack/react-query": "5.64.2",
+    "@medusajs/admin-sdk": "2.23.0",
+    "@medusajs/admin-shared": "2.23.0",
+    "@medusajs/cli": "2.23.0",
+    "@medusajs/framework": "2.23.0",
+    "@medusajs/icons": "2.23.0",
+    "@medusajs/js-sdk": "2.23.0",
+    "@medusajs/medusa": "2.23.0",
+    "@medusajs/test-utils": "2.23.0",
+    "@medusajs/types": "2.23.0",
+    "@medusajs/ui": "4.3.0",
+    "@medusajs/workflows-sdk": "2.23.0",
+    "@swc/core": "^1.7.28",
+    "@swc/jest": "^0.2.39",
+    "@types/jest": "^29.5.14",
     "@types/multer": "^2.1.0",
     "@types/node": "^20.19.43",
-    "@types/react": "^18.3.31",
-    "@types/react-dom": "^18.3.7",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "jest": "^29.7.0",
     "prop-types": "^15.8.1",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-i18next": "18.0.1",
+    "react-router-dom": "7.18.5",
     "semver": "^7.8.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
-    "vite": "^5.4.21",
+    "vite": "^8.3.8",
     "yalc": "1.0.0-pre.53"
   },
   "peerDependencies": {
-    "@medusajs/admin-sdk": "^2.17.1",
-    "@medusajs/admin-shared": "^2.17.1",
-    "@medusajs/cli": "^2.17.1",
-    "@medusajs/framework": "^2.17.1",
-    "@medusajs/icons": "^2.17.1",
-    "@medusajs/js-sdk": "^2.17.1",
-    "@medusajs/medusa": "^2.17.1",
-    "@medusajs/types": "^2.17.1",
-    "@medusajs/ui": "^4.0.25",
-    "@medusajs/workflows-sdk": "^2.17.1",
-    "@tanstack/react-query": "5.64.2",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-router-dom": "^6.30.4 || ^7.0.0"
+    "@medusajs/admin-sdk": "^2.23.0",
+    "@medusajs/admin-shared": "^2.23.0",
+    "@medusajs/cli": "^2.23.0",
+    "@medusajs/framework": "^2.23.0",
+    "@medusajs/icons": "^2.23.0",
+    "@medusajs/js-sdk": "^2.23.0",
+    "@medusajs/medusa": "^2.23.0",
+    "@medusajs/types": "^2.23.0",
+    "@medusajs/ui": "^4.3.0",
+    "@medusajs/workflows-sdk": "^2.23.0",
+    "@tanstack/react-query": "^5.107.1",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-i18next": "^13.5.0 || ^18.0.0",
+    "react-router-dom": "^7.18.5"
   },
   "engines": {
-    "node": ">=20"
-  },
-  "packageManager": "pnpm@10.33.0+sha512.10568bb4a6afb58c9eb3630da90cc9516417abebd3fabbe6739f0ae795728da1491e9db5a544c76ad8eb7570f5c4bb3d6c637b2cb41bfdcdb47fa823c8649319"
+    "node": ">=22.22.0"
+  }
 }

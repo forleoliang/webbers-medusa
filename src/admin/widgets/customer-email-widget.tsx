@@ -1,74 +1,86 @@
-import { defineWidgetConfig } from '@medusajs/admin-sdk';
-import { Container, Heading, Button, Input, toast } from '@medusajs/ui';
-import { DetailWidgetProps, AdminCustomer } from '@medusajs/framework/types';
-import { useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import { useFeatureEnabled } from '../lib/use-feature-flags';
+import { defineWidgetConfig } from "@medusajs/admin-sdk"
+import type { AdminCustomer, DetailWidgetProps } from "@medusajs/framework/types"
+import { Button, Container, Heading, Input, Label, toast } from "@medusajs/ui"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useEffect, useState } from "react"
+import { sdk } from "../lib/sdk"
+import { useFeatureEnabled } from "../lib/use-feature-flags"
 
-async function updateCustomerEmail(id: string, email: string) {
-  const res = await fetch(`/admin/customers/${id}/edit-email`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
+const CustomerEmailWidget = ({ data }: DetailWidgetProps<AdminCustomer>) => {
+  const [email, setEmail] = useState(data.email ?? "")
+  const queryClient = useQueryClient()
+  const enabled = useFeatureEnabled("editCustomerEmail")
+
+  useEffect(() => {
+    setEmail(data.email ?? "")
+  }, [data.id, data.email])
+
+  const mutation = useMutation({
+    mutationFn: (nextEmail: string) =>
+      sdk.client.fetch(`/admin/customers/${data.id}/edit-email`, {
+        method: "POST",
+        body: { email: nextEmail },
+      }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["customers"] })
+      await queryClient.invalidateQueries({ queryKey: ["customer", data.id] })
+      toast.success("Email updated")
     },
-    body: JSON.stringify({ email }),
-  });
-
-  if (!res.ok) {
-    throw new Error('Failed to update customer');
-  }
-
-  return res.json();
-}
-
-const CustomerEmailWidget = (props: DetailWidgetProps<AdminCustomer>) => {
-  // Remount the form when navigating to another customer, so stale state is discarded
-  return <CustomerEmailForm key={props.data.id} {...props} />;
-};
-
-const CustomerEmailForm = ({ data }: DetailWidgetProps<AdminCustomer>) => {
-  const [email, setEmail] = useState(data.email);
-  const [loading, setLoading] = useState(false);
-  const queryClient = useQueryClient();
-  const enabled = useFeatureEnabled('editCustomerEmail');
+    onError: (e: Error) => {
+      toast.error(e.message || "Error updating email")
+    },
+  })
 
   if (!enabled || !data.has_account) {
-    return null;
+    return null
   }
 
-  const onSave = async () => {
-    setLoading(true);
-
-    try {
-      await updateCustomerEmail(data.id, email);
-      await queryClient.invalidateQueries({ queryKey: [] });
-      toast.success('Email updated');
-    } catch (e: any) {
-      toast.error(e.message || 'Error updating email');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const trimmed = email.trim()
+  const isDirty = trimmed.length > 0 && trimmed !== (data.email ?? "")
 
   return (
     <Container className="divide-y p-0">
       <div className="flex items-center justify-between px-6 py-4">
         <Heading level="h2">Customer Email</Heading>
       </div>
-      <div className="flex flex-col gap-y-3 px-6 py-4">
-        <Input type="email" value={email ?? ''} onChange={e => setEmail(e.target.value)} />
+      <form
+        onSubmit={(e) => {
+          e.preventDefault()
+          if (isDirty) mutation.mutate(trimmed)
+        }}
+        className="flex flex-col gap-y-3 px-6 py-4"
+      >
+        <div className="flex flex-col gap-y-1.5">
+          <Label size="small" weight="plus" htmlFor={`customer-email-${data.id}`}>
+            Email
+          </Label>
+          <Input
+            id={`customer-email-${data.id}`}
+            size="small"
+            type="email"
+            value={email}
+            disabled={mutation.isPending}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
         <div className="flex items-center gap-x-3">
-          <Button size="small" variant="primary" disabled={loading || email === data.email} onClick={onSave}>
-            {loading ? 'Saving...' : 'Save email'}
+          <Button
+            size="small"
+            variant="primary"
+            type="submit"
+            disabled={!isDirty || mutation.isPending}
+            isLoading={mutation.isPending}
+          >
+            Save email
           </Button>
         </div>
-      </div>
+      </form>
     </Container>
-  );
-};
+  )
+}
 
 export const config = defineWidgetConfig({
-  zone: 'customer.details.side.before', // customer detail widget zone
-});
+  zone: "customer.details.side.before",
+})
 
-export default CustomerEmailWidget;
+export default CustomerEmailWidget

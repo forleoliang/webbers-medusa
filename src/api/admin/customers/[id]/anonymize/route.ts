@@ -1,5 +1,6 @@
 import { MedusaRequest, MedusaResponse } from '@medusajs/framework/http';
 import { Modules } from '@medusajs/framework/utils';
+import { getOptions } from '../../../../../lib/options';
 import { WEBBERS_SETTINGS_MODULE } from '../../../../../modules/webbers-settings';
 import WebbersSettingsService from '../../../../../modules/webbers-settings/service';
 import {
@@ -9,6 +10,7 @@ import {
 } from '../../../../../options';
 import { CUSTOM_QUERY } from '../../../../../modules/custom-query';
 import CustomQueryService from '../../../../../modules/custom-query/service';
+import { anonymizeCustomerWorkflow } from '../../../../../workflows/reviews/anonymize-customer';
 
 export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
   const { id } = req.params;
@@ -22,8 +24,7 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
     return res.status(404).json({ error: 'Customer not found' });
   }
 
-  // Extra host-owned tables (e.g. subscriptions) are declared in plugin options so this plugin
-  // stays free of any dependency on those modules.
+  const originalEmail = customer.email ?? null;
   const anonymizeConfig = settings.getAnonymizeConfig();
   const anonEmail = buildAnonEmail(anonymizeConfig.emailDomain, Date.now());
 
@@ -87,6 +88,16 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
        WHERE id = ?`,
       [anonEmail, id]
     );
+  });
+
+  // Also scrub personal fields in the unified Reviews & Wishlist modules.
+  const pluginOptions = getOptions(req.scope);
+  await anonymizeCustomerWorkflow(req.scope).run({
+    input: {
+      customer_id: id,
+      email: originalEmail,
+      mode: pluginOptions.privacy.on_customer_deleted,
+    },
   });
 
   return res.status(200).json({ success: true });

@@ -1,76 +1,84 @@
-import { AdminPriceList, DetailWidgetProps, MetadataType } from '@medusajs/framework/types';
-import { defineWidgetConfig } from '@medusajs/admin-sdk';
-import { Container, Heading, Switch, Text } from '@medusajs/ui';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { sdk } from '../lib/sdk';
-import { useFeatureEnabled } from '../lib/use-feature-flags';
+import { defineWidgetConfig } from "@medusajs/admin-sdk"
+import type { AdminPriceList, DetailWidgetProps, MetadataType } from "@medusajs/framework/types"
+import { Container, Heading, Skeleton, Switch, Text, toast } from "@medusajs/ui"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { sdk } from "../lib/sdk"
+import { useFeatureEnabled } from "../lib/use-feature-flags"
+
+type PriceListExtResponse = {
+  price_list_ext: { id: string; metadata?: MetadataType }
+}
 
 const PriceListExtWidget = ({ data }: DetailWidgetProps<AdminPriceList>) => {
-  const { id } = data;
-  const enabled = useFeatureEnabled('disallowPriceListDiscounts');
+  const { id } = data
+  const enabled = useFeatureEnabled("disallowPriceListDiscounts")
+  const queryClient = useQueryClient()
+  const queryKey = ["price-list-ext", id]
 
-  const {
-    data: extendedPriceList,
-    refetch,
-    isPending: isPendingQuery,
-  } = useQuery<{ price_list_ext: { id: string; metadata?: MetadataType } }>({
+  const { data: extendedPriceList, isLoading } = useQuery<PriceListExtResponse>({
     queryFn: () =>
       sdk.client.fetch(`/admin/price-lists/${id}/ext`, {
-        headers: { cache: 'no-cache' },
+        headers: { cache: "no-cache" },
       }),
-    queryKey: [`${id}-price-list-ext`],
+    queryKey,
     enabled,
-  });
+  })
 
-  const { price_list_ext } = extendedPriceList ?? {};
+  const priceListExt = extendedPriceList?.price_list_ext
 
-  const { mutate, isPending: isPendingMutate } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: (body: { id: string; metadata: MetadataType }) =>
       sdk.client.fetch(`/admin/price-lists/${id}/ext`, {
-        method: 'PATCH',
+        method: "PATCH",
         body,
       }),
     onSuccess: async () => {
-      await refetch();
+      await queryClient.invalidateQueries({ queryKey })
+      toast.success("Price list setting updated")
     },
-  });
-
-  const handleToggle = async () => {
-    if (!price_list_ext) {
-      return;
-    }
-
-    const metadata = price_list_ext?.metadata ?? ({} as MetadataType);
-
-    if (metadata && price_list_ext?.id) {
-      metadata.disallow_discounts = !metadata?.disallow_discounts;
-      mutate({ id: price_list_ext.id, metadata });
-    }
-  };
+    onError: (err: Error) => {
+      toast.error(err.message || "Failed to update price list setting")
+    },
+  })
 
   if (!enabled) {
-    return null;
+    return null
+  }
+
+  const handleToggle = () => {
+    if (!priceListExt?.id) return
+    const nextMetadata: MetadataType = {
+      ...(priceListExt.metadata ?? {}),
+      disallow_discounts: !priceListExt.metadata?.disallow_discounts,
+    }
+    mutate({ id: priceListExt.id, metadata: nextMetadata })
   }
 
   return (
     <Container className="divide-y p-0">
       <div className="flex items-center justify-between px-6 py-4">
         <Heading level="h2">Disallow discounts</Heading>
-        <Switch
-          checked={!!price_list_ext?.metadata?.disallow_discounts}
-          onCheckedChange={handleToggle}
-          disabled={isPendingMutate || isPendingQuery}
-        />
+        {isLoading ? (
+          <Skeleton className="h-5 w-9 rounded-full" />
+        ) : (
+          <Switch
+            checked={!!priceListExt?.metadata?.disallow_discounts}
+            onCheckedChange={handleToggle}
+            disabled={isPending || !priceListExt?.id}
+          />
+        )}
       </div>
       <div className="px-6 py-4">
-        <Text size="small">Discounts can't override this price list if this toggle is enabled.</Text>
+        <Text size="small" leading="compact" className="text-ui-fg-subtle">
+          Discounts can&apos;t override this price list when this toggle is enabled.
+        </Text>
       </div>
     </Container>
-  );
-};
+  )
+}
 
 export const config = defineWidgetConfig({
-  zone: 'price_list.details.side.after',
-});
+  zone: "price_list.details.side.after",
+})
 
-export default PriceListExtWidget;
+export default PriceListExtWidget
