@@ -205,7 +205,14 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
       `SELECT COUNT(*)::integer AS count
        FROM "order" o
        WHERE ${liveFilter.sql}
-         AND o.fulfillment_status IN ('not_fulfilled', 'partially_fulfilled')`,
+         AND EXISTS (
+           SELECT 1
+           FROM order_item oi
+           WHERE oi.order_id = o.id
+             AND oi.version = o.version
+             AND oi.deleted_at IS NULL
+             AND COALESCE(oi.fulfilled_quantity, 0) < COALESCE(oi.quantity, 0)
+         )`,
       liveFilter.params
     ),
     customQuery.PSQLQuery<{

@@ -40,17 +40,27 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
        o.display_id,
        o.created_at,
        o.status,
-       o.payment_status,
-       o.fulfillment_status,
+       COALESCE((
+         SELECT pc.status
+         FROM order_payment_collection opc
+         INNER JOIN payment_collection pc ON pc.id = opc.payment_collection_id AND pc.deleted_at IS NULL
+         WHERE opc.order_id = o.id AND opc.deleted_at IS NULL
+         ORDER BY pc.created_at DESC
+         LIMIT 1
+       ), 'not_paid') AS payment_status,
+       CASE
+         WHEN COALESCE(item_agg.total_qty, 0) = 0 THEN 'not_fulfilled'
+         WHEN COALESCE(item_agg.delivered_qty, 0) >= item_agg.total_qty THEN 'delivered'
+         WHEN COALESCE(item_agg.shipped_qty, 0) >= item_agg.total_qty THEN 'shipped'
+         WHEN COALESCE(item_agg.fulfilled_qty, 0) >= item_agg.total_qty THEN 'fulfilled'
+         WHEN COALESCE(item_agg.fulfilled_qty, 0) > 0 THEN 'partially_fulfilled'
+         ELSE 'not_fulfilled'
+       END AS fulfillment_status,
        LOWER(o.currency_code) AS currency_code,
        ${ORDER_GROSS_EXPR("os")}::numeric AS gross_total,
        ${ORDER_REFUNDED_EXPR("os")}::numeric AS refunded_total,
        ${ORDER_NET_EXPR("os")}::numeric AS net_total,
-       COALESCE((
-         SELECT SUM(oi.quantity)::integer
-         FROM order_item oi
-         WHERE oi.order_id = o.id AND oi.version = o.version AND oi.deleted_at IS NULL
-       ), 0)::integer AS items_count,
+       COALESCE(item_agg.total_qty, 0)::integer AS items_count,
        o.sales_channel_id,
        sc.name AS sales_channel_name,
        o.region_id,
@@ -59,6 +69,15 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
        o.email
      FROM "order" o
      ${ORDER_SUMMARY_JOIN("o", "os")}
+     LEFT JOIN LATERAL (
+       SELECT
+         COALESCE(SUM(oi.quantity), 0)::integer AS total_qty,
+         COALESCE(SUM(oi.fulfilled_quantity), 0)::integer AS fulfilled_qty,
+         COALESCE(SUM(oi.shipped_quantity), 0)::integer AS shipped_qty,
+         COALESCE(SUM(oi.delivered_quantity), 0)::integer AS delivered_qty
+       FROM order_item oi
+       WHERE oi.order_id = o.id AND oi.version = o.version AND oi.deleted_at IS NULL
+     ) item_agg ON true
      LEFT JOIN sales_channel sc ON sc.id = o.sales_channel_id
      LEFT JOIN region r ON r.id = o.region_id
      WHERE ${where.sql}
