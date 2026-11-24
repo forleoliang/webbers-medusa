@@ -61,9 +61,9 @@ const ProductReviewsWidget = ({ data: product }: DetailWidgetProps<AdminProduct>
         {rating && rating.count > 0 ? (
           <>
             <div className="flex items-center gap-3">
-              <Heading level="h1" className="font-mono tabular-nums">
+              <Text size="xlarge" leading="compact" weight="plus" family="mono" className="tabular-nums">
                 {rating.average.toFixed(1)}
-              </Heading>
+              </Text>
               <div className="flex flex-col gap-0.5">
                 <Stars rating={rating.average} size={15} />
                 <Text size="xsmall" leading="compact" className="text-ui-fg-subtle">
@@ -96,6 +96,6 @@ const ProductReviewsWidget = ({ data: product }: DetailWidgetProps<AdminProduct>
   )
 }
 
-export const config = defineWidgetConfig({ zone: "product.details.side.after" })
+export const config = defineWidgetConfig({ zone: "product.details.side" })
 
 export default ProductReviewsWidget

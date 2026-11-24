@@ -1,4 +1,4 @@
-import { AdminOrder, DetailWidgetProps } from '@medusajs/types';
+import type { AdminOrder, DetailWidgetProps } from '@medusajs/framework/types';
 import { defineWidgetConfig } from '@medusajs/admin-sdk';
 import NoteWidget from '../components/note';
 import { useFeatureEnabled } from '../lib/use-feature-flags';
@@ -11,7 +11,7 @@ const OrderNoteWidget = ({ data }: DetailWidgetProps<AdminOrder>) => {
 };
 
 export const config = defineWidgetConfig({
-  zone: 'order.details.side.before',
+  zone: 'order.details.side',
 });
 
 export default OrderNoteWidget;

@@ -26,7 +26,12 @@ const CustomerMergeGuestOrdersWidget = ({ data }: DetailWidgetProps<AdminCustome
         method: "POST",
       }),
     onSuccess: async (result) => {
-      await queryClient.invalidateQueries()
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["customer-guest-orders", data.id] }),
+        queryClient.invalidateQueries({ queryKey: ["customers"] }),
+        queryClient.invalidateQueries({ queryKey: ["customer", data.id] }),
+        queryClient.invalidateQueries({ queryKey: ["orders"] }),
+      ])
       toast.success(t("extensions.mergeGuestOrders.toastSuccess", { count: result.transferred_count }))
     },
     onError: (error: Error) => {
@@ -68,7 +73,7 @@ const CustomerMergeGuestOrdersWidget = ({ data }: DetailWidgetProps<AdminCustome
 }
 
 export const config = defineWidgetConfig({
-  zone: "customer.details.side.before",
+  zone: "customer.details.side",
 })
 
 export default CustomerMergeGuestOrdersWidget

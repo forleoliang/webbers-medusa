@@ -532,3 +532,17 @@ export const analyticsExportUrl = (f: AnalyticsFilters, type: AnalyticsExportTyp
   if (f.currency_code) params.set("currency_code", f.currency_code)
   return backendUrl(`/admin/analytics/export?${params.toString()}`)
 }
+
+export const exportAnalyticsCsv = (f: AnalyticsFilters, type: AnalyticsExportType = "orders") =>
+  sdk.client.fetch<Response>("/admin/analytics/export", {
+    query: clean({
+      range: f.range,
+      type,
+      from: f.from,
+      to: f.to,
+      channel_id: f.channel_id,
+      region_id: f.region_id,
+      currency_code: f.currency_code,
+    }),
+    headers: { accept: "text/csv" },
+  })

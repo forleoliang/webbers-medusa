@@ -4,6 +4,7 @@ import {
   Alert,
   Badge,
   Button,
+  Container,
   Heading,
   Input,
   Select,
@@ -12,7 +13,6 @@ import {
   Text,
   toast,
 } from "@medusajs/ui"
-import {AnalyticsCard} from "../../components/analytics/primitives"
 import {keepPreviousData, useQuery} from "@tanstack/react-query"
 import {useMemo, useState} from "react"
 import {useTranslation} from "react-i18next"
@@ -38,7 +38,7 @@ import {
   type AnalyticsFilters,
   type AnalyticsGranularityOption,
   type AnalyticsRange,
-  analyticsExportUrl,
+  exportAnalyticsCsv,
   formatDateTime,
   getAnalyticsAcquisition,
   getAnalyticsOverview,
@@ -149,11 +149,7 @@ const StoreAnalyticsDashboardPage = () => {
   const handleExportCsv = async (type: AnalyticsExportType = "orders") => {
     setExportingType(type)
     try {
-      const url = analyticsExportUrl(filters, type)
-      const resp = await fetch(url, {credentials: "include"})
-      if (!resp.ok) {
-        throw new Error(`HTTP ${resp.status}`)
-      }
+      const resp = await exportAnalyticsCsv(filters, type)
       const blob = await resp.blob()
       const objectUrl = URL.createObjectURL(blob)
       const link = document.createElement("a")
@@ -175,17 +171,17 @@ const StoreAnalyticsDashboardPage = () => {
 
   if (!enabled) {
     return (
-      <AnalyticsCard className="flex flex-col items-start gap-y-3 p-6">
+      <Container className="flex flex-col items-start gap-y-3 p-6">
         <Heading level="h1">{t("analytics.disabledHeading")}</Heading>
         <Text size="small" className="text-ui-fg-subtle">
           {t("analytics.disabledDescription")}
         </Text>
-        <Link to="/settings/webbers-medusa">
-          <Button variant="secondary" size="small">
+        <Button variant="secondary" size="small" asChild>
+          <Link to="/settings/webbers-medusa">
             {t("extensions.settings.label")}
-          </Button>
-        </Link>
-      </AnalyticsCard>
+          </Link>
+        </Button>
+      </Container>
     )
   }
 
@@ -200,7 +196,7 @@ const StoreAnalyticsDashboardPage = () => {
   return (
     <div className="flex flex-col gap-y-6">
       {/* Header, filters, and view navigation */}
-      <AnalyticsCard className="p-0">
+      <Container className="divide-y p-0">
         <div className="flex flex-col gap-4 px-6 py-5 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex min-w-0 flex-col gap-y-1.5">
             <div className="flex flex-wrap items-center gap-2.5">
@@ -344,7 +340,7 @@ const StoreAnalyticsDashboardPage = () => {
             </Tabs.List>
           </Tabs>
         </div>
-      </AnalyticsCard>
+      </Container>
 
       {overviewQuery.isError && (
         <Alert variant="error">{t("analytics.loadError")}</Alert>
@@ -432,5 +428,14 @@ export const config = defineRouteConfig({
   translationNs: "translation",
   icon: ChartBar,
 })
+
+export const handle = {
+  breadcrumb: () => <Breadcrumb />,
+}
+
+const Breadcrumb = () => {
+  const {t} = useTranslation()
+  return <>{t("analytics.navLabel")}</>
+}
 
 export default StoreAnalyticsDashboardPage

@@ -184,7 +184,8 @@ const CampaignCouponCodesWidget = ({ data: campaign }: DetailWidgetProps<AdminCa
       )}
 
       {batches.length > 0 ? (
-        <Table>
+        <div className="overflow-x-auto">
+          <Table>
           <Table.Header>
             <Table.Row>
               <Table.HeaderCell>{t("extensions.couponCodes.createdAt")}</Table.HeaderCell>
@@ -216,7 +217,8 @@ const CampaignCouponCodesWidget = ({ data: campaign }: DetailWidgetProps<AdminCa
               </Table.Row>
             ))}
           </Table.Body>
-        </Table>
+          </Table>
+        </div>
       ) : (
         !isLoading &&
         templates.length > 0 && (
@@ -232,7 +234,7 @@ const CampaignCouponCodesWidget = ({ data: campaign }: DetailWidgetProps<AdminCa
 }
 
 export const config = defineWidgetConfig({
-  zone: "campaign.details.after",
+  zone: "campaign.details",
 })
 
 export default CampaignCouponCodesWidget

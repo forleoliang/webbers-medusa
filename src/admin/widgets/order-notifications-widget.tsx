@@ -74,7 +74,7 @@ const OrderNotificationsWidget = ({ data: order }: DetailWidgetProps<AdminOrder>
 }
 
 export const config = defineWidgetConfig({
-  zone: "order.details.side.before",
+  zone: "order.details.side",
 })
 
 export default OrderNotificationsWidget

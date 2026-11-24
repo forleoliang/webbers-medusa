@@ -25,7 +25,11 @@ const CustomerAnonymizeWidget = ({ data }: DetailWidgetProps<AdminCustomer>) => 
         method: "POST",
       }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries()
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["customers"] }),
+        queryClient.invalidateQueries({ queryKey: ["customer", data.id] }),
+        queryClient.invalidateQueries({ queryKey: ["orders"] }),
+      ])
       setOpen(false)
       toast.success(t("extensions.anonymize.toastSuccess"))
     },
@@ -80,7 +84,7 @@ const CustomerAnonymizeWidget = ({ data }: DetailWidgetProps<AdminCustomer>) => 
 }
 
 export const config = defineWidgetConfig({
-  zone: "customer.details.side.before",
+  zone: "customer.details.side",
 })
 
 export default CustomerAnonymizeWidget

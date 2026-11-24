@@ -90,7 +90,7 @@ const PromotionAlwaysFreeWidget = ({ data: promotion }: DetailWidgetProps<AdminP
 }
 
 export const config = defineWidgetConfig({
-  zone: "promotion.details.side.after",
+  zone: "promotion.details.side",
 })
 
 export default PromotionAlwaysFreeWidget

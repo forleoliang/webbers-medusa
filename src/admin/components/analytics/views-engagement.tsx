@@ -2,12 +2,12 @@ import {Heart, Star} from "@medusajs/icons"
 import {
   Badge,
   Button,
+  Container,
   Heading,
   StatusBadge,
   Text,
   Tooltip,
 } from "@medusajs/ui"
-import {AnalyticsCard} from "./primitives"
 import {Link} from "react-router-dom"
 import type {AnalyticsOverviewResponse} from "../../lib/api"
 import {Stars} from "../stars"
@@ -24,25 +24,26 @@ export function EngagementView({
 }) {
   return (
     <div className="flex flex-col gap-y-6">
-      <AnalyticsCard className="p-0">
-        <div className="flex items-center justify-between gap-4 px-6 pb-2 pt-5">
+      <Container className="divide-y p-0">
+        <div className="flex items-center justify-between gap-4 px-6 py-4">
           <div>
             <Heading level="h2">{t("analytics.engagement.title")}</Heading>
             <Text size="small" className="text-ui-fg-subtle">
               {t("analytics.engagement.subtitle")}
             </Text>
           </div>
-          <Link to="/reviews" className="shrink-0">
-            <Button
-              variant="secondary"
-              size="small"
-              className="whitespace-nowrap"
-            >
+          <Button
+            variant="secondary"
+            size="small"
+            className="shrink-0 whitespace-nowrap"
+            asChild
+          >
+            <Link to="/reviews">
               {t("analytics.engagement.manageReviews")}
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         </div>
-        <div className="grid grid-cols-1 gap-8 px-6 pb-5 pt-3 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-8 px-6 py-5 lg:grid-cols-2">
           <div className="flex min-w-0 flex-col gap-y-3">
             <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
               <Star className="text-ui-fg-interactive" />
@@ -145,7 +146,7 @@ export function EngagementView({
               ))}
           </div>
         </div>
-      </AnalyticsCard>
+      </Container>
     </div>
   )
 }

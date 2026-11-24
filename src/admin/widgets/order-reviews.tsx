@@ -192,6 +192,6 @@ const OrderReviewsWidget = ({ data: order }: DetailWidgetProps<AdminOrder>) => {
   )
 }
 
-export const config = defineWidgetConfig({ zone: "order.details.side.after" })
+export const config = defineWidgetConfig({ zone: "order.details.side" })
 
 export default OrderReviewsWidget

@@ -9,6 +9,7 @@ import {
 import {
   Alert,
   Button,
+  Container,
   Heading,
   IconBadge,
   Input,
@@ -17,7 +18,6 @@ import {
   StatusBadge,
   Text,
 } from "@medusajs/ui"
-import {AnalyticsCard} from "./primitives"
 import {useState} from "react"
 import {Link} from "react-router-dom"
 import type {
@@ -113,11 +113,11 @@ export function OverviewView({
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {initialLoading ? (
           Array.from({length: 6}).map((_, i) => (
-            <AnalyticsCard key={i} className="min-h-[132px] p-6">
+            <Container key={i} className="min-h-[132px] p-6">
               <Skeleton className="h-4 w-24" />
               <Skeleton className="mt-4 h-7 w-28" />
               <Skeleton className="mt-4 h-3 w-36" />
-            </AnalyticsCard>
+            </Container>
           ))
         ) : (
           <>
@@ -202,7 +202,7 @@ export function OverviewView({
       </div>
 
       {/* Combo Trend Chart */}
-      <AnalyticsCard className="p-0">
+      <Container className="divide-y p-0">
         <div className="flex flex-col gap-3 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <Heading level="h2">{t("analytics.chart.title")}</Heading>
@@ -247,15 +247,11 @@ export function OverviewView({
             emptyLabel={t("analytics.empty")}
           />
         </div>
-      </AnalyticsCard>
+      </Container>
 
       {/* Pending Action Cards */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <AnalyticsCard
-          className={`flex flex-col justify-between gap-y-4 p-6 ${
-            (ops?.pending_capture_count ?? 0) > 0 ? "bg-ui-tag-orange-bg" : ""
-          }`}
-        >
+        <Container className="flex flex-col justify-between gap-y-4 p-6">
           <div className="flex items-center justify-between gap-x-2">
             <Text size="small" weight="plus" className="text-ui-fg-subtle">
               {t("analytics.ops.pendingCapture")}
@@ -286,15 +282,13 @@ export function OverviewView({
                 })}
               </Text>
             </div>
-            <Link to="/orders">
-              <Button variant="transparent" size="small">
-                {t("analytics.view")}
-              </Button>
-            </Link>
+            <Button variant="transparent" size="small" asChild>
+              <Link to="/orders">{t("analytics.view")}</Link>
+            </Button>
           </div>
-        </AnalyticsCard>
+        </Container>
 
-        <AnalyticsCard className="flex flex-col justify-between gap-y-4 p-6">
+        <Container className="flex flex-col justify-between gap-y-4 p-6">
           <div className="flex items-center justify-between gap-x-2">
             <Text size="small" weight="plus" className="text-ui-fg-subtle">
               {t("analytics.ops.awaitingFulfillment")}
@@ -317,15 +311,13 @@ export function OverviewView({
                 {t("analytics.ops.currentStateHint")}
               </Text>
             </div>
-            <Link to="/orders">
-              <Button variant="transparent" size="small">
-                {t("analytics.view")}
-              </Button>
-            </Link>
+            <Button variant="transparent" size="small" asChild>
+              <Link to="/orders">{t("analytics.view")}</Link>
+            </Button>
           </div>
-        </AnalyticsCard>
+        </Container>
 
-        <AnalyticsCard className="flex flex-col justify-between gap-y-4 p-6">
+        <Container className="flex flex-col justify-between gap-y-4 p-6">
           <div className="flex items-center justify-between gap-x-2">
             <Text size="small" weight="plus" className="text-ui-fg-subtle">
               {t("analytics.ops.lowStock")}
@@ -356,12 +348,12 @@ export function OverviewView({
               {t("analytics.view")}
             </Button>
           </div>
-        </AnalyticsCard>
+        </Container>
       </div>
 
       {/* Supporting insights follow the operational metrics and trend. */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <AnalyticsCard className="flex flex-col justify-between gap-y-3 p-6 lg:col-span-2">
+        <Container className="flex flex-col justify-between gap-y-3 p-6 lg:col-span-2">
           <div className="flex items-center gap-x-2">
             <Sparkles className="text-ui-fg-interactive" />
             <Heading level="h2">{t("analytics.insights.title")}</Heading>
@@ -392,9 +384,9 @@ export function OverviewView({
               ))}
             </div>
           )}
-        </AnalyticsCard>
+        </Container>
 
-        <AnalyticsCard className="flex flex-col justify-between gap-y-3 p-6">
+        <Container className="flex flex-col justify-between gap-y-3 p-6">
           <div className="flex items-center justify-between gap-x-2">
             <Heading level="h2">{t("analytics.goal.title")}</Heading>
             <Button
@@ -444,12 +436,12 @@ export function OverviewView({
               </div>
             </>
           )}
-        </AnalyticsCard>
+        </Container>
       </div>
 
       {/* Funnel + Channel Mix Preview */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <AnalyticsCard className="p-0">
+        <Container className="divide-y p-0">
           <div className="flex items-center justify-between px-6 py-4">
             <div>
               <Heading level="h2">{t("analytics.traffic.funnelTitle")}</Heading>
@@ -489,9 +481,9 @@ export function OverviewView({
               </div>
             )}
           </div>
-        </AnalyticsCard>
+        </Container>
 
-        <AnalyticsCard className="p-0">
+        <Container className="divide-y p-0">
           <div className="flex items-center justify-between px-6 py-4">
             <div>
               <Heading level="h2">
@@ -539,7 +531,7 @@ export function OverviewView({
               </div>
             )}
           </div>
-        </AnalyticsCard>
+        </Container>
       </div>
     </div>
   )

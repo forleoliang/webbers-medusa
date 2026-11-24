@@ -1,5 +1,4 @@
-import {Badge, StatusBadge, Text} from "@medusajs/ui"
-import {AnalyticsCard} from "./primitives"
+import {Badge, Container, StatusBadge, Text} from "@medusajs/ui"
 import {useMemo, useState} from "react"
 import type {AnalyticsOverviewResponse} from "../../lib/api"
 import {formatMoney, formatNumber} from "./formatters"
@@ -83,7 +82,6 @@ export function KpiCard({
   inverseDelta,
   vsLabel,
   sparkValues,
-  attention = false,
   status,
   icon,
 }: {
@@ -94,16 +92,11 @@ export function KpiCard({
   inverseDelta?: boolean
   vsLabel?: string
   sparkValues?: number[]
-  attention?: boolean
   status?: {label: string; color: "green" | "orange" | "red" | "grey" | "blue"}
   icon?: React.ReactNode
 }) {
   return (
-    <AnalyticsCard
-      className={`flex min-h-[132px] flex-col justify-between gap-y-3 p-6 ${
-        attention ? "bg-ui-tag-orange-bg" : ""
-      }`}
-    >
+    <Container className="flex min-h-[132px] flex-col justify-between gap-y-3 p-6">
       <div className="flex items-center justify-between gap-x-2">
         <Text
           size="small"
@@ -145,7 +138,7 @@ export function KpiCard({
           {sub}
         </Text>
       ) : null}
-    </AnalyticsCard>
+    </Container>
   )
 }
 
@@ -215,22 +208,40 @@ export function ComboTrendChart({
             </Text>
             <Text size="small" className="text-ui-fg-subtle">
               {netSalesLabel}:{" "}
-              <span className="font-medium text-ui-fg-base">
+              <Text
+                as="span"
+                size="small"
+                leading="compact"
+                weight="plus"
+                className="text-ui-fg-base"
+              >
                 {formatMoney(active.net_sales, currencyCode, locale)}
-              </span>
+              </Text>
             </Text>
             <Text size="small" className="text-ui-fg-subtle">
               {ordersLabel}:{" "}
-              <span className="font-medium text-ui-fg-interactive">
+              <Text
+                as="span"
+                size="small"
+                leading="compact"
+                weight="plus"
+                className="text-ui-fg-interactive"
+              >
                 {formatNumber(active.orders, locale)}
-              </span>
+              </Text>
             </Text>
             {active.refunds > 0 && (
               <Text size="small" className="text-ui-fg-subtle">
                 {refundsLabel}:{" "}
-                <span className="font-medium text-ui-fg-base">
+                <Text
+                  as="span"
+                  size="small"
+                  leading="compact"
+                  weight="plus"
+                  className="text-ui-fg-base"
+                >
                   {formatMoney(active.refunds, currencyCode, locale)}
-                </span>
+                </Text>
               </Text>
             )}
           </div>

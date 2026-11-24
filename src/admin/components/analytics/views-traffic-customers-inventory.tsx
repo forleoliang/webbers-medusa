@@ -3,11 +3,12 @@ import {
   Alert,
   Badge,
   Button,
+  Container,
   Heading,
   StatusBadge,
+  Table,
   Text,
 } from "@medusajs/ui"
-import {AnalyticsCard, AnalyticsTable} from "./primitives"
 import {Link} from "react-router-dom"
 import {
   type AnalyticsAcquisitionResponse,
@@ -97,7 +98,7 @@ export function TrafficView({
 
       {/* 5-Step Funnel + Smart Channel Mix */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <AnalyticsCard className="p-0">
+        <Container className="divide-y p-0">
           <div className="px-6 py-4">
             <Heading level="h2">{t("analytics.traffic.funnelTitle")}</Heading>
             <Text size="xsmall" className="text-ui-fg-subtle">
@@ -122,9 +123,9 @@ export function TrafficView({
               )
             })}
           </div>
-        </AnalyticsCard>
+        </Container>
 
-        <AnalyticsCard className="p-0">
+        <Container className="divide-y p-0">
           <div className="px-6 py-4">
             <Heading level="h2">
               {t("analytics.traffic.channelGroupsTitle")}
@@ -157,12 +158,12 @@ export function TrafficView({
               </div>
             )}
           </div>
-        </AnalyticsCard>
+        </Container>
       </div>
 
       {/* Sources + Countries + Devices */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <AnalyticsCard className="p-0">
+        <Container className="divide-y p-0">
           <div className="px-6 py-4">
             <Heading level="h2">{t("analytics.traffic.sourcesTitle")}</Heading>
           </div>
@@ -185,9 +186,9 @@ export function TrafficView({
               </div>
             )}
           </div>
-        </AnalyticsCard>
+        </Container>
 
-        <AnalyticsCard className="p-0">
+        <Container className="divide-y p-0">
           <div className="px-6 py-4">
             <Heading level="h2">
               {t("analytics.traffic.countriesTitle")}
@@ -196,83 +197,87 @@ export function TrafficView({
           {!acq.countries?.length ? (
             <EmptyState text={t("analytics.empty")} />
           ) : (
-            <AnalyticsTable>
-              <AnalyticsTable.Header>
-                <AnalyticsTable.Row>
-                  <AnalyticsTable.HeaderCell>
+            <div className="overflow-x-auto">
+              <Table>
+              <Table.Header>
+                <Table.Row>
+                  <Table.HeaderCell>
                     {t("analytics.columns.country")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     {t("analytics.columns.visitors")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     {t("analytics.columns.views")}
-                  </AnalyticsTable.HeaderCell>
-                </AnalyticsTable.Row>
-              </AnalyticsTable.Header>
-              <AnalyticsTable.Body>
+                  </Table.HeaderCell>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
                 {acq.countries.map((c) => (
-                  <AnalyticsTable.Row key={c.country}>
-                    <AnalyticsTable.Cell className="font-medium">
+                  <Table.Row key={c.country}>
+                    <Table.Cell className="font-medium">
                       {c.country}
-                    </AnalyticsTable.Cell>
-                    <AnalyticsTable.Cell className="text-right tabular-nums">
+                    </Table.Cell>
+                    <Table.Cell className="text-right tabular-nums">
                       {formatNumber(c.visitors, locale)}
-                    </AnalyticsTable.Cell>
-                    <AnalyticsTable.Cell className="text-right tabular-nums">
+                    </Table.Cell>
+                    <Table.Cell className="text-right tabular-nums">
                       {formatNumber(c.pageviews, locale)}
-                    </AnalyticsTable.Cell>
-                  </AnalyticsTable.Row>
+                    </Table.Cell>
+                  </Table.Row>
                 ))}
-              </AnalyticsTable.Body>
-            </AnalyticsTable>
+              </Table.Body>
+              </Table>
+            </div>
           )}
-        </AnalyticsCard>
+        </Container>
 
-        <AnalyticsCard className="p-0">
+        <Container className="divide-y p-0">
           <div className="px-6 py-4">
             <Heading level="h2">{t("analytics.traffic.devicesTitle")}</Heading>
           </div>
           {!acq.devices?.length ? (
             <EmptyState text={t("analytics.empty")} />
           ) : (
-            <AnalyticsTable>
-              <AnalyticsTable.Header>
-                <AnalyticsTable.Row>
-                  <AnalyticsTable.HeaderCell>
+            <div className="overflow-x-auto">
+              <Table>
+              <Table.Header>
+                <Table.Row>
+                  <Table.HeaderCell>
                     {t("analytics.columns.device")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     {t("analytics.columns.visitors")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     {t("analytics.traffic.sessions")}
-                  </AnalyticsTable.HeaderCell>
-                </AnalyticsTable.Row>
-              </AnalyticsTable.Header>
-              <AnalyticsTable.Body>
+                  </Table.HeaderCell>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
                 {acq.devices.map((d) => (
-                  <AnalyticsTable.Row key={d.device}>
-                    <AnalyticsTable.Cell className="font-medium">
+                  <Table.Row key={d.device}>
+                    <Table.Cell className="font-medium">
                       {d.device}
-                    </AnalyticsTable.Cell>
-                    <AnalyticsTable.Cell className="text-right tabular-nums">
+                    </Table.Cell>
+                    <Table.Cell className="text-right tabular-nums">
                       {formatNumber(d.visitors, locale)}
-                    </AnalyticsTable.Cell>
-                    <AnalyticsTable.Cell className="text-right tabular-nums">
+                    </Table.Cell>
+                    <Table.Cell className="text-right tabular-nums">
                       {formatNumber(d.sessions, locale)}
-                    </AnalyticsTable.Cell>
-                  </AnalyticsTable.Row>
+                    </Table.Cell>
+                  </Table.Row>
                 ))}
-              </AnalyticsTable.Body>
-            </AnalyticsTable>
+              </Table.Body>
+              </Table>
+            </div>
           )}
-        </AnalyticsCard>
+        </Container>
       </div>
 
       {/* Landing Pages + Exit Pages */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <AnalyticsCard className="p-0">
+        <Container className="divide-y p-0">
           <div className="px-6 py-4">
             <Heading level="h2">
               {t("analytics.traffic.landingPagesTitle")}
@@ -281,40 +286,42 @@ export function TrafficView({
           {!acq.landing_pages?.length ? (
             <EmptyState text={t("analytics.empty")} />
           ) : (
-            <AnalyticsTable>
-              <AnalyticsTable.Header>
-                <AnalyticsTable.Row>
-                  <AnalyticsTable.HeaderCell>
+            <div className="overflow-x-auto">
+              <Table>
+              <Table.Header>
+                <Table.Row>
+                  <Table.HeaderCell>
                     {t("analytics.columns.path")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     {t("analytics.columns.views")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     {t("analytics.columns.visitors")}
-                  </AnalyticsTable.HeaderCell>
-                </AnalyticsTable.Row>
-              </AnalyticsTable.Header>
-              <AnalyticsTable.Body>
+                  </Table.HeaderCell>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
                 {acq.landing_pages.map((p) => (
-                  <AnalyticsTable.Row key={p.path}>
-                    <AnalyticsTable.Cell className="max-w-[260px] truncate font-mono text-xs">
+                  <Table.Row key={p.path}>
+                    <Table.Cell className="max-w-[260px] truncate font-mono text-xs">
                       {p.path}
-                    </AnalyticsTable.Cell>
-                    <AnalyticsTable.Cell className="text-right tabular-nums">
+                    </Table.Cell>
+                    <Table.Cell className="text-right tabular-nums">
                       {formatNumber(p.pageviews, locale)}
-                    </AnalyticsTable.Cell>
-                    <AnalyticsTable.Cell className="text-right tabular-nums">
+                    </Table.Cell>
+                    <Table.Cell className="text-right tabular-nums">
                       {formatNumber(p.visitors, locale)}
-                    </AnalyticsTable.Cell>
-                  </AnalyticsTable.Row>
+                    </Table.Cell>
+                  </Table.Row>
                 ))}
-              </AnalyticsTable.Body>
-            </AnalyticsTable>
+              </Table.Body>
+              </Table>
+            </div>
           )}
-        </AnalyticsCard>
+        </Container>
 
-        <AnalyticsCard className="p-0">
+        <Container className="divide-y p-0">
           <div className="px-6 py-4">
             <Heading level="h2">
               {t("analytics.traffic.exitPagesTitle")}
@@ -323,82 +330,86 @@ export function TrafficView({
           {!acq.exit_pages?.length ? (
             <EmptyState text={t("analytics.empty")} />
           ) : (
-            <AnalyticsTable>
-              <AnalyticsTable.Header>
-                <AnalyticsTable.Row>
-                  <AnalyticsTable.HeaderCell>
+            <div className="overflow-x-auto">
+              <Table>
+              <Table.Header>
+                <Table.Row>
+                  <Table.HeaderCell>
                     {t("analytics.columns.path")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     {t("analytics.columns.exits")}
-                  </AnalyticsTable.HeaderCell>
-                </AnalyticsTable.Row>
-              </AnalyticsTable.Header>
-              <AnalyticsTable.Body>
+                  </Table.HeaderCell>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
                 {acq.exit_pages.map((p) => (
-                  <AnalyticsTable.Row key={p.path}>
-                    <AnalyticsTable.Cell className="max-w-[300px] truncate font-mono text-xs">
+                  <Table.Row key={p.path}>
+                    <Table.Cell className="max-w-[300px] truncate font-mono text-xs">
                       {p.path}
-                    </AnalyticsTable.Cell>
-                    <AnalyticsTable.Cell className="text-right tabular-nums">
+                    </Table.Cell>
+                    <Table.Cell className="text-right tabular-nums">
                       {formatNumber(p.exits, locale)}
-                    </AnalyticsTable.Cell>
-                  </AnalyticsTable.Row>
+                    </Table.Cell>
+                  </Table.Row>
                 ))}
-              </AnalyticsTable.Body>
-            </AnalyticsTable>
+              </Table.Body>
+              </Table>
+            </div>
           )}
-        </AnalyticsCard>
+        </Container>
       </div>
 
       {/* UTM Campaigns */}
-      <AnalyticsCard className="p-0">
+      <Container className="divide-y p-0">
         <div className="px-6 py-4">
           <Heading level="h2">{t("analytics.traffic.utmTitle")}</Heading>
         </div>
         {!acq.utm_campaigns?.length ? (
           <EmptyState text={t("analytics.traffic.utmEmpty")} />
         ) : (
-          <AnalyticsTable>
-            <AnalyticsTable.Header>
-              <AnalyticsTable.Row>
-                <AnalyticsTable.HeaderCell>
+          <div className="overflow-x-auto">
+            <Table>
+            <Table.Header>
+              <Table.Row>
+                <Table.HeaderCell>
                   {t("analytics.columns.campaign")}
-                </AnalyticsTable.HeaderCell>
-                <AnalyticsTable.HeaderCell>
+                </Table.HeaderCell>
+                <Table.HeaderCell>
                   {t("analytics.columns.sourceMedium")}
-                </AnalyticsTable.HeaderCell>
-                <AnalyticsTable.HeaderCell className="text-right">
+                </Table.HeaderCell>
+                <Table.HeaderCell className="text-right">
                   {t("analytics.traffic.sessions")}
-                </AnalyticsTable.HeaderCell>
-                <AnalyticsTable.HeaderCell className="text-right">
+                </Table.HeaderCell>
+                <Table.HeaderCell className="text-right">
                   {t("analytics.columns.visitors")}
-                </AnalyticsTable.HeaderCell>
-              </AnalyticsTable.Row>
-            </AnalyticsTable.Header>
-            <AnalyticsTable.Body>
+                </Table.HeaderCell>
+              </Table.Row>
+            </Table.Header>
+            <Table.Body>
               {acq.utm_campaigns.map((u, idx) => (
-                <AnalyticsTable.Row
+                <Table.Row
                   key={`${u.source}-${u.medium}-${u.campaign}-${idx}`}
                 >
-                  <AnalyticsTable.Cell className="font-medium">
+                  <Table.Cell className="font-medium">
                     {u.campaign}
-                  </AnalyticsTable.Cell>
-                  <AnalyticsTable.Cell className="text-xs text-ui-fg-subtle">
+                  </Table.Cell>
+                  <Table.Cell className="text-xs text-ui-fg-subtle">
                     {u.source} / {u.medium}
-                  </AnalyticsTable.Cell>
-                  <AnalyticsTable.Cell className="text-right tabular-nums">
+                  </Table.Cell>
+                  <Table.Cell className="text-right tabular-nums">
                     {formatNumber(u.sessions, locale)}
-                  </AnalyticsTable.Cell>
-                  <AnalyticsTable.Cell className="text-right tabular-nums">
+                  </Table.Cell>
+                  <Table.Cell className="text-right tabular-nums">
                     {formatNumber(u.visitors, locale)}
-                  </AnalyticsTable.Cell>
-                </AnalyticsTable.Row>
+                  </Table.Cell>
+                </Table.Row>
               ))}
-            </AnalyticsTable.Body>
-          </AnalyticsTable>
+            </Table.Body>
+            </Table>
+          </div>
         )}
-      </AnalyticsCard>
+      </Container>
     </div>
   )
 }
@@ -464,7 +475,7 @@ export function CustomersView({
       </div>
 
       {/* First-Time vs Returning Split */}
-      <AnalyticsCard className="p-0">
+      <Container className="divide-y p-0">
         <div className="px-6 py-4">
           <Heading level="h2">
             {t("analytics.customers.firstVsReturningTitle")}
@@ -490,11 +501,11 @@ export function CustomersView({
             barTone="interactive"
           />
         </div>
-      </AnalyticsCard>
+      </Container>
 
       {/* Cohort Retention + Customers by Country */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <AnalyticsCard className="p-0">
+        <Container className="divide-y p-0">
           <div className="px-6 py-4">
             <Heading level="h2">{t("analytics.customers.cohortTitle")}</Heading>
             <Text size="xsmall" className="text-ui-fg-subtle">
@@ -504,58 +515,60 @@ export function CustomersView({
           {!cust?.cohorts?.length ? (
             <EmptyState text={t("analytics.empty")} />
           ) : (
-            <AnalyticsTable>
-              <AnalyticsTable.Header>
-                <AnalyticsTable.Row>
-                  <AnalyticsTable.HeaderCell>
+            <div className="overflow-x-auto">
+              <Table>
+              <Table.Header>
+                <Table.Row>
+                  <Table.HeaderCell>
                     {t("analytics.customers.cohortMonth")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     {t("analytics.customers.cohortSize")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     +1m
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     +2m
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     +3m
-                  </AnalyticsTable.HeaderCell>
-                </AnalyticsTable.Row>
-              </AnalyticsTable.Header>
-              <AnalyticsTable.Body>
+                  </Table.HeaderCell>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
                 {cust.cohorts.map((c) => {
                   const pctCell = (n: number) =>
                     c.cohort_size > 0
                       ? `${n} (${Math.round((n / c.cohort_size) * 100)}%)`
                       : "0"
                   return (
-                    <AnalyticsTable.Row key={c.cohort_month}>
-                      <AnalyticsTable.Cell className="font-mono text-xs">
+                    <Table.Row key={c.cohort_month}>
+                      <Table.Cell className="font-mono text-xs">
                         {c.cohort_month}
-                      </AnalyticsTable.Cell>
-                      <AnalyticsTable.Cell className="text-right tabular-nums">
+                      </Table.Cell>
+                      <Table.Cell className="text-right tabular-nums">
                         {formatNumber(c.cohort_size, locale)}
-                      </AnalyticsTable.Cell>
-                      <AnalyticsTable.Cell className="text-right tabular-nums">
+                      </Table.Cell>
+                      <Table.Cell className="text-right tabular-nums">
                         {pctCell(c.m1)}
-                      </AnalyticsTable.Cell>
-                      <AnalyticsTable.Cell className="text-right tabular-nums">
+                      </Table.Cell>
+                      <Table.Cell className="text-right tabular-nums">
                         {pctCell(c.m2)}
-                      </AnalyticsTable.Cell>
-                      <AnalyticsTable.Cell className="text-right tabular-nums">
+                      </Table.Cell>
+                      <Table.Cell className="text-right tabular-nums">
                         {pctCell(c.m3)}
-                      </AnalyticsTable.Cell>
-                    </AnalyticsTable.Row>
+                      </Table.Cell>
+                    </Table.Row>
                   )
                 })}
-              </AnalyticsTable.Body>
-            </AnalyticsTable>
+              </Table.Body>
+              </Table>
+            </div>
           )}
-        </AnalyticsCard>
+        </Container>
 
-        <AnalyticsCard className="p-0">
+        <Container className="divide-y p-0">
           <div className="px-6 py-4">
             <Heading level="h2">
               {t("analytics.customers.byCountryTitle")}
@@ -564,49 +577,51 @@ export function CustomersView({
           {!cust?.by_country?.length ? (
             <EmptyState text={t("analytics.empty")} />
           ) : (
-            <AnalyticsTable>
-              <AnalyticsTable.Header>
-                <AnalyticsTable.Row>
-                  <AnalyticsTable.HeaderCell>
+            <div className="overflow-x-auto">
+              <Table>
+              <Table.Header>
+                <Table.Row>
+                  <Table.HeaderCell>
                     {t("analytics.columns.country")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     {t("analytics.customers.buyers")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     {t("analytics.columns.orders")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     {t("analytics.columns.spent")}
-                  </AnalyticsTable.HeaderCell>
-                </AnalyticsTable.Row>
-              </AnalyticsTable.Header>
-              <AnalyticsTable.Body>
+                  </Table.HeaderCell>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
                 {cust.by_country.map((r) => (
-                  <AnalyticsTable.Row key={r.country_code}>
-                    <AnalyticsTable.Cell className="font-medium">
+                  <Table.Row key={r.country_code}>
+                    <Table.Cell className="font-medium">
                       {r.country_code}
-                    </AnalyticsTable.Cell>
-                    <AnalyticsTable.Cell className="text-right tabular-nums">
+                    </Table.Cell>
+                    <Table.Cell className="text-right tabular-nums">
                       {formatNumber(r.customers, locale)}
-                    </AnalyticsTable.Cell>
-                    <AnalyticsTable.Cell className="text-right tabular-nums">
+                    </Table.Cell>
+                    <Table.Cell className="text-right tabular-nums">
                       {formatNumber(r.orders, locale)}
-                    </AnalyticsTable.Cell>
-                    <AnalyticsTable.Cell className="text-right tabular-nums">
+                    </Table.Cell>
+                    <Table.Cell className="text-right tabular-nums">
                       {formatMoney(r.net_spent, currency, locale)}
-                    </AnalyticsTable.Cell>
-                  </AnalyticsTable.Row>
+                    </Table.Cell>
+                  </Table.Row>
                 ))}
-              </AnalyticsTable.Body>
-            </AnalyticsTable>
+              </Table.Body>
+              </Table>
+            </div>
           )}
-        </AnalyticsCard>
+        </Container>
       </div>
 
       {/* Repeat & Top Customer Lists */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <AnalyticsCard className="p-0">
+        <Container className="divide-y p-0">
           <div className="flex items-center justify-between px-6 py-4">
             <Heading level="h2">
               {t("analytics.customers.repeatListTitle")}
@@ -618,51 +633,53 @@ export function CustomersView({
           {!cust?.repeat_rows?.length ? (
             <EmptyState text={t("analytics.customers.noRepeatYet")} />
           ) : (
-            <AnalyticsTable>
-              <AnalyticsTable.Header>
-                <AnalyticsTable.Row>
-                  <AnalyticsTable.HeaderCell>
+            <div className="overflow-x-auto">
+              <Table>
+              <Table.Header>
+                <Table.Row>
+                  <Table.HeaderCell>
                     {t("analytics.columns.customer")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     {t("analytics.columns.orders")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     {t("analytics.columns.spent")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     {t("analytics.columns.lastOrder")}
-                  </AnalyticsTable.HeaderCell>
-                </AnalyticsTable.Row>
-              </AnalyticsTable.Header>
-              <AnalyticsTable.Body>
+                  </Table.HeaderCell>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
                 {cust.repeat_rows.map((row) => (
-                  <AnalyticsTable.Row key={row.customer_id}>
-                    <AnalyticsTable.Cell className="font-medium">
+                  <Table.Row key={row.customer_id}>
+                    <Table.Cell className="font-medium">
                       <Link
                         to={`/customers/${row.customer_id}`}
                         className="text-ui-fg-interactive hover:underline"
                       >
                         {row.name}
                       </Link>
-                    </AnalyticsTable.Cell>
-                    <AnalyticsTable.Cell className="text-right tabular-nums">
+                    </Table.Cell>
+                    <Table.Cell className="text-right tabular-nums">
                       {formatNumber(row.order_count, locale)}
-                    </AnalyticsTable.Cell>
-                    <AnalyticsTable.Cell className="text-right tabular-nums">
+                    </Table.Cell>
+                    <Table.Cell className="text-right tabular-nums">
                       {formatMoney(row.net_spent, currency, locale)}
-                    </AnalyticsTable.Cell>
-                    <AnalyticsTable.Cell className="text-right tabular-nums text-xs text-ui-fg-muted">
+                    </Table.Cell>
+                    <Table.Cell className="text-right tabular-nums text-xs text-ui-fg-muted">
                       {formatDateTime(row.last_order_at, locale)}
-                    </AnalyticsTable.Cell>
-                  </AnalyticsTable.Row>
+                    </Table.Cell>
+                  </Table.Row>
                 ))}
-              </AnalyticsTable.Body>
-            </AnalyticsTable>
+              </Table.Body>
+              </Table>
+            </div>
           )}
-        </AnalyticsCard>
+        </Container>
 
-        <AnalyticsCard className="p-0">
+        <Container className="divide-y p-0">
           <div className="flex items-center justify-between px-6 py-4">
             <Heading level="h2">
               {t("analytics.customers.topListTitle")}
@@ -674,49 +691,51 @@ export function CustomersView({
           {!cust?.top_customers?.length ? (
             <EmptyState text={t("analytics.empty")} />
           ) : (
-            <AnalyticsTable>
-              <AnalyticsTable.Header>
-                <AnalyticsTable.Row>
-                  <AnalyticsTable.HeaderCell>
+            <div className="overflow-x-auto">
+              <Table>
+              <Table.Header>
+                <Table.Row>
+                  <Table.HeaderCell>
                     {t("analytics.columns.customer")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     {t("analytics.columns.orders")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     {t("analytics.columns.spent")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     {t("analytics.columns.lastOrder")}
-                  </AnalyticsTable.HeaderCell>
-                </AnalyticsTable.Row>
-              </AnalyticsTable.Header>
-              <AnalyticsTable.Body>
+                  </Table.HeaderCell>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
                 {cust.top_customers.map((row) => (
-                  <AnalyticsTable.Row key={row.customer_id}>
-                    <AnalyticsTable.Cell className="font-medium">
+                  <Table.Row key={row.customer_id}>
+                    <Table.Cell className="font-medium">
                       <Link
                         to={`/customers/${row.customer_id}`}
                         className="text-ui-fg-interactive hover:underline"
                       >
                         {row.name}
                       </Link>
-                    </AnalyticsTable.Cell>
-                    <AnalyticsTable.Cell className="text-right tabular-nums">
+                    </Table.Cell>
+                    <Table.Cell className="text-right tabular-nums">
                       {formatNumber(row.order_count, locale)}
-                    </AnalyticsTable.Cell>
-                    <AnalyticsTable.Cell className="text-right tabular-nums">
+                    </Table.Cell>
+                    <Table.Cell className="text-right tabular-nums">
                       {formatMoney(row.net_spent, currency, locale)}
-                    </AnalyticsTable.Cell>
-                    <AnalyticsTable.Cell className="text-right tabular-nums text-xs text-ui-fg-muted">
+                    </Table.Cell>
+                    <Table.Cell className="text-right tabular-nums text-xs text-ui-fg-muted">
                       {formatDateTime(row.last_order_at, locale)}
-                    </AnalyticsTable.Cell>
-                  </AnalyticsTable.Row>
+                    </Table.Cell>
+                  </Table.Row>
                 ))}
-              </AnalyticsTable.Body>
-            </AnalyticsTable>
+              </Table.Body>
+              </Table>
+            </div>
           )}
-        </AnalyticsCard>
+        </Container>
       </div>
     </div>
   )
@@ -795,7 +814,7 @@ export function InventoryReportsView({
       </div>
 
       {/* Mutually Exclusive Fulfillment Pipeline */}
-      <AnalyticsCard className="p-0">
+      <Container className="divide-y p-0">
         <div className="px-6 py-4">
           <Heading level="h2">
             {t("analytics.inventory.fulfillmentTitle")}
@@ -824,10 +843,10 @@ export function InventoryReportsView({
             </div>
           ))}
         </div>
-      </AnalyticsCard>
+      </Container>
 
       {/* Inventory Velocity & Est Days Remaining */}
-      <AnalyticsCard className="p-0">
+      <Container className="divide-y p-0">
         <div className="flex items-center justify-between px-6 py-4">
           <div>
             <Heading level="h2">
@@ -846,47 +865,47 @@ export function InventoryReportsView({
           <EmptyState text={t("analytics.inventory.noTracked")} />
         ) : (
           <div className="overflow-x-auto">
-            <AnalyticsTable>
-              <AnalyticsTable.Header>
-                <AnalyticsTable.Row>
-                  <AnalyticsTable.HeaderCell>
+            <Table>
+              <Table.Header>
+                <Table.Row>
+                  <Table.HeaderCell>
                     {t("analytics.columns.product")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell>
+                  </Table.HeaderCell>
+                  <Table.HeaderCell>
                     {t("analytics.columns.variant")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell>
+                  </Table.HeaderCell>
+                  <Table.HeaderCell>
                     {t("analytics.columns.sku")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     {t("analytics.lowStock.available")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     {t("analytics.inventory.units30d")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     {t("analytics.inventory.daysRemaining")}
-                  </AnalyticsTable.HeaderCell>
-                </AnalyticsTable.Row>
-              </AnalyticsTable.Header>
-              <AnalyticsTable.Body>
+                  </Table.HeaderCell>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
                 {data.inventory_velocity.map((row) => (
-                  <AnalyticsTable.Row key={row.variant_id}>
-                    <AnalyticsTable.Cell className="font-medium">
+                  <Table.Row key={row.variant_id}>
+                    <Table.Cell className="font-medium">
                       <Link
                         to={`/products/${row.product_id}`}
                         className="text-ui-fg-interactive hover:underline"
                       >
                         {row.product_title}
                       </Link>
-                    </AnalyticsTable.Cell>
-                    <AnalyticsTable.Cell>
+                    </Table.Cell>
+                    <Table.Cell>
                       {row.variant_title}
-                    </AnalyticsTable.Cell>
-                    <AnalyticsTable.Cell className="font-mono text-xs">
+                    </Table.Cell>
+                    <Table.Cell className="font-mono text-xs">
                       {row.sku || "–"}
-                    </AnalyticsTable.Cell>
-                    <AnalyticsTable.Cell className="text-right tabular-nums">
+                    </Table.Cell>
+                    <Table.Cell className="text-right tabular-nums">
                       <StatusBadge
                         color={
                           row.available_quantity <= 0
@@ -898,25 +917,25 @@ export function InventoryReportsView({
                       >
                         {formatNumber(row.available_quantity, locale)}
                       </StatusBadge>
-                    </AnalyticsTable.Cell>
-                    <AnalyticsTable.Cell className="text-right tabular-nums">
+                    </Table.Cell>
+                    <Table.Cell className="text-right tabular-nums">
                       {formatNumber(row.units_30d, locale)}
-                    </AnalyticsTable.Cell>
-                    <AnalyticsTable.Cell className="text-right tabular-nums">
+                    </Table.Cell>
+                    <Table.Cell className="text-right tabular-nums">
                       {row.days_remaining === null
                         ? "∞"
                         : `${row.days_remaining}d`}
-                    </AnalyticsTable.Cell>
-                  </AnalyticsTable.Row>
+                    </Table.Cell>
+                  </Table.Row>
                 ))}
-              </AnalyticsTable.Body>
-            </AnalyticsTable>
+              </Table.Body>
+            </Table>
           </div>
         )}
-      </AnalyticsCard>
+      </Container>
 
       {/* 4-Report Export Center */}
-      <AnalyticsCard className="p-0">
+      <Container className="divide-y p-0">
         <div className="px-6 py-4">
           <Heading level="h2">{t("analytics.reports.title")}</Heading>
           <Text size="small" className="text-ui-fg-subtle">
@@ -928,7 +947,7 @@ export function InventoryReportsView({
             (type) => (
               <div
                 key={type}
-                className="flex flex-col justify-between gap-y-3 rounded-lg border border-ui-border-base p-4"
+                className="bg-ui-bg-component shadow-elevation-card-rest flex flex-col justify-between gap-y-3 rounded-md p-4"
               >
                 <div>
                   <Text size="small" weight="plus">
@@ -951,7 +970,7 @@ export function InventoryReportsView({
             )
           )}
         </div>
-      </AnalyticsCard>
+      </Container>
     </div>
   )
 }

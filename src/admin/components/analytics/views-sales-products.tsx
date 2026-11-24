@@ -1,5 +1,4 @@
-import {Badge, Heading, Select, Text} from "@medusajs/ui"
-import {AnalyticsCard, AnalyticsTable} from "./primitives"
+import {Badge, Container, Heading, Select, Table, Text} from "@medusajs/ui"
 import {Link} from "react-router-dom"
 import type {
   AnalyticsAcquisitionResponse,
@@ -111,14 +110,14 @@ export function SalesView({
 
       {/* Financial Waterfall + Trend */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <AnalyticsCard className="p-0">
+        <Container className="divide-y p-0">
           <div className="px-6 py-4">
             <Heading level="h2">{t("analytics.waterfall.title")}</Heading>
             <Text size="xsmall" className="text-ui-fg-subtle">
               {t("analytics.waterfall.subtitle")}
             </Text>
           </div>
-          <div>
+          <div className="divide-y">
             {waterfallRows.map((row) => (
               <div
                 key={row.label}
@@ -143,9 +142,9 @@ export function SalesView({
               </div>
             ))}
           </div>
-        </AnalyticsCard>
+        </Container>
 
-        <AnalyticsCard className="p-0 lg:col-span-2">
+        <Container className="divide-y p-0 lg:col-span-2">
           <div className="flex items-center justify-between gap-3 px-6 py-4">
             <div>
               <Heading level="h2">{t("analytics.chart.title")}</Heading>
@@ -190,12 +189,12 @@ export function SalesView({
               emptyLabel={t("analytics.empty")}
             />
           </div>
-        </AnalyticsCard>
+        </Container>
       </div>
 
       {/* Channels & Markets */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <AnalyticsCard className="p-0">
+        <Container className="divide-y p-0">
           <div className="px-6 py-4">
             <Heading level="h2">
               {t("analytics.segments.channelsTitle")}
@@ -205,53 +204,53 @@ export function SalesView({
             <EmptyState text={t("analytics.empty")} />
           ) : (
             <div className="overflow-x-auto">
-              <AnalyticsTable>
-                <AnalyticsTable.Header>
-                  <AnalyticsTable.Row>
-                    <AnalyticsTable.HeaderCell>
+              <Table>
+                <Table.Header>
+                  <Table.Row>
+                    <Table.HeaderCell>
                       {t("analytics.columns.name")}
-                    </AnalyticsTable.HeaderCell>
-                    <AnalyticsTable.HeaderCell className="text-right">
+                    </Table.HeaderCell>
+                    <Table.HeaderCell className="text-right">
                       {t("analytics.columns.orders")}
-                    </AnalyticsTable.HeaderCell>
-                    <AnalyticsTable.HeaderCell className="text-right">
+                    </Table.HeaderCell>
+                    <Table.HeaderCell className="text-right">
                       {t("analytics.columns.revenue")}
-                    </AnalyticsTable.HeaderCell>
-                    <AnalyticsTable.HeaderCell className="text-right">
+                    </Table.HeaderCell>
+                    <Table.HeaderCell className="text-right">
                       {t("analytics.kpis.refunds")}
-                    </AnalyticsTable.HeaderCell>
-                    <AnalyticsTable.HeaderCell className="text-right">
+                    </Table.HeaderCell>
+                    <Table.HeaderCell className="text-right">
                       {t("analytics.columns.aov")}
-                    </AnalyticsTable.HeaderCell>
-                  </AnalyticsTable.Row>
-                </AnalyticsTable.Header>
-                <AnalyticsTable.Body>
+                    </Table.HeaderCell>
+                  </Table.Row>
+                </Table.Header>
+                <Table.Body>
                   {data.channel_breakdown.map((c) => (
-                    <AnalyticsTable.Row key={c.channel_id}>
-                      <AnalyticsTable.Cell className="font-medium">
+                    <Table.Row key={c.channel_id}>
+                      <Table.Cell className="font-medium">
                         {c.name}
-                      </AnalyticsTable.Cell>
-                      <AnalyticsTable.Cell className="text-right tabular-nums">
+                      </Table.Cell>
+                      <Table.Cell className="text-right tabular-nums">
                         {formatNumber(c.orders, locale)}
-                      </AnalyticsTable.Cell>
-                      <AnalyticsTable.Cell className="text-right tabular-nums">
+                      </Table.Cell>
+                      <Table.Cell className="text-right tabular-nums">
                         {formatMoney(c.net_revenue, currency, locale)}
-                      </AnalyticsTable.Cell>
-                      <AnalyticsTable.Cell className="text-right tabular-nums">
+                      </Table.Cell>
+                      <Table.Cell className="text-right tabular-nums">
                         {formatMoney(c.refunds, currency, locale)}
-                      </AnalyticsTable.Cell>
-                      <AnalyticsTable.Cell className="text-right tabular-nums">
+                      </Table.Cell>
+                      <Table.Cell className="text-right tabular-nums">
                         {formatMoney(c.aov, currency, locale)}
-                      </AnalyticsTable.Cell>
-                    </AnalyticsTable.Row>
+                      </Table.Cell>
+                    </Table.Row>
                   ))}
-                </AnalyticsTable.Body>
-              </AnalyticsTable>
+                </Table.Body>
+              </Table>
             </div>
           )}
-        </AnalyticsCard>
+        </Container>
 
-        <AnalyticsCard className="p-0">
+        <Container className="divide-y p-0">
           <div className="px-6 py-4">
             <Heading level="h2">{t("analytics.segments.regionsTitle")}</Heading>
           </div>
@@ -259,59 +258,64 @@ export function SalesView({
             <EmptyState text={t("analytics.empty")} />
           ) : (
             <div className="overflow-x-auto">
-              <AnalyticsTable>
-                <AnalyticsTable.Header>
-                  <AnalyticsTable.Row>
-                    <AnalyticsTable.HeaderCell>
+              <Table>
+                <Table.Header>
+                  <Table.Row>
+                    <Table.HeaderCell>
                       {t("analytics.columns.name")}
-                    </AnalyticsTable.HeaderCell>
-                    <AnalyticsTable.HeaderCell className="text-right">
+                    </Table.HeaderCell>
+                    <Table.HeaderCell className="text-right">
                       {t("analytics.columns.orders")}
-                    </AnalyticsTable.HeaderCell>
-                    <AnalyticsTable.HeaderCell className="text-right">
+                    </Table.HeaderCell>
+                    <Table.HeaderCell className="text-right">
                       {t("analytics.columns.revenue")}
-                    </AnalyticsTable.HeaderCell>
-                    <AnalyticsTable.HeaderCell className="text-right">
+                    </Table.HeaderCell>
+                    <Table.HeaderCell className="text-right">
                       {t("analytics.kpis.refunds")}
-                    </AnalyticsTable.HeaderCell>
-                    <AnalyticsTable.HeaderCell className="text-right">
+                    </Table.HeaderCell>
+                    <Table.HeaderCell className="text-right">
                       {t("analytics.columns.aov")}
-                    </AnalyticsTable.HeaderCell>
-                  </AnalyticsTable.Row>
-                </AnalyticsTable.Header>
-                <AnalyticsTable.Body>
+                    </Table.HeaderCell>
+                  </Table.Row>
+                </Table.Header>
+                <Table.Body>
                   {data.region_breakdown.map((r) => (
-                    <AnalyticsTable.Row key={r.region_id}>
-                      <AnalyticsTable.Cell className="font-medium">
+                    <Table.Row key={r.region_id}>
+                      <Table.Cell className="font-medium">
                         {r.name}{" "}
-                        <span className="text-xs text-ui-fg-muted">
+                        <Text
+                          as="span"
+                          size="xsmall"
+                          leading="compact"
+                          className="text-ui-fg-muted"
+                        >
                           ({r.currency_code.toUpperCase()})
-                        </span>
-                      </AnalyticsTable.Cell>
-                      <AnalyticsTable.Cell className="text-right tabular-nums">
+                        </Text>
+                      </Table.Cell>
+                      <Table.Cell className="text-right tabular-nums">
                         {formatNumber(r.orders, locale)}
-                      </AnalyticsTable.Cell>
-                      <AnalyticsTable.Cell className="text-right tabular-nums">
+                      </Table.Cell>
+                      <Table.Cell className="text-right tabular-nums">
                         {formatMoney(r.net_revenue, r.currency_code, locale)}
-                      </AnalyticsTable.Cell>
-                      <AnalyticsTable.Cell className="text-right tabular-nums">
+                      </Table.Cell>
+                      <Table.Cell className="text-right tabular-nums">
                         {formatMoney(r.refunds, r.currency_code, locale)}
-                      </AnalyticsTable.Cell>
-                      <AnalyticsTable.Cell className="text-right tabular-nums">
+                      </Table.Cell>
+                      <Table.Cell className="text-right tabular-nums">
                         {formatMoney(r.aov, r.currency_code, locale)}
-                      </AnalyticsTable.Cell>
-                    </AnalyticsTable.Row>
+                      </Table.Cell>
+                    </Table.Row>
                   ))}
-                </AnalyticsTable.Body>
-              </AnalyticsTable>
+                </Table.Body>
+              </Table>
             </div>
           )}
-        </AnalyticsCard>
+        </Container>
       </div>
 
       {/* Collections & Countries */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <AnalyticsCard className="p-0">
+        <Container className="divide-y p-0">
           <div className="px-6 py-4">
             <Heading level="h2">
               {t("analytics.segments.collectionsTitle")}
@@ -320,46 +324,48 @@ export function SalesView({
           {!data?.collection_breakdown?.length ? (
             <EmptyState text={t("analytics.empty")} />
           ) : (
-            <AnalyticsTable>
-              <AnalyticsTable.Header>
-                <AnalyticsTable.Row>
-                  <AnalyticsTable.HeaderCell>
+            <div className="overflow-x-auto">
+              <Table>
+              <Table.Header>
+                <Table.Row>
+                  <Table.HeaderCell>
                     {t("analytics.columns.collection")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     {t("analytics.columns.units")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     {t("analytics.columns.orders")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     {t("analytics.columns.revenue")}
-                  </AnalyticsTable.HeaderCell>
-                </AnalyticsTable.Row>
-              </AnalyticsTable.Header>
-              <AnalyticsTable.Body>
+                  </Table.HeaderCell>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
                 {data.collection_breakdown.map((col) => (
-                  <AnalyticsTable.Row key={col.collection_id}>
-                    <AnalyticsTable.Cell className="font-medium">
+                  <Table.Row key={col.collection_id}>
+                    <Table.Cell className="font-medium">
                       {col.title}
-                    </AnalyticsTable.Cell>
-                    <AnalyticsTable.Cell className="text-right tabular-nums">
+                    </Table.Cell>
+                    <Table.Cell className="text-right tabular-nums">
                       {formatNumber(col.units, locale)}
-                    </AnalyticsTable.Cell>
-                    <AnalyticsTable.Cell className="text-right tabular-nums">
+                    </Table.Cell>
+                    <Table.Cell className="text-right tabular-nums">
                       {formatNumber(col.orders, locale)}
-                    </AnalyticsTable.Cell>
-                    <AnalyticsTable.Cell className="text-right tabular-nums">
+                    </Table.Cell>
+                    <Table.Cell className="text-right tabular-nums">
                       {formatMoney(col.revenue, currency, locale)}
-                    </AnalyticsTable.Cell>
-                  </AnalyticsTable.Row>
+                    </Table.Cell>
+                  </Table.Row>
                 ))}
-              </AnalyticsTable.Body>
-            </AnalyticsTable>
+              </Table.Body>
+              </Table>
+            </div>
           )}
-        </AnalyticsCard>
+        </Container>
 
-        <AnalyticsCard className="p-0">
+        <Container className="divide-y p-0">
           <div className="px-6 py-4">
             <Heading level="h2">
               {t("analytics.segments.countriesTitle")}
@@ -368,49 +374,51 @@ export function SalesView({
           {!data?.country_breakdown?.length ? (
             <EmptyState text={t("analytics.empty")} />
           ) : (
-            <AnalyticsTable>
-              <AnalyticsTable.Header>
-                <AnalyticsTable.Row>
-                  <AnalyticsTable.HeaderCell>
+            <div className="overflow-x-auto">
+              <Table>
+              <Table.Header>
+                <Table.Row>
+                  <Table.HeaderCell>
                     {t("analytics.columns.country")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     {t("analytics.columns.orders")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     {t("analytics.columns.revenue")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     {t("analytics.columns.aov")}
-                  </AnalyticsTable.HeaderCell>
-                </AnalyticsTable.Row>
-              </AnalyticsTable.Header>
-              <AnalyticsTable.Body>
+                  </Table.HeaderCell>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
                 {data.country_breakdown.map((c) => (
-                  <AnalyticsTable.Row key={c.country_code}>
-                    <AnalyticsTable.Cell className="font-medium">
+                  <Table.Row key={c.country_code}>
+                    <Table.Cell className="font-medium">
                       {c.country_code}
-                    </AnalyticsTable.Cell>
-                    <AnalyticsTable.Cell className="text-right tabular-nums">
+                    </Table.Cell>
+                    <Table.Cell className="text-right tabular-nums">
                       {formatNumber(c.orders, locale)}
-                    </AnalyticsTable.Cell>
-                    <AnalyticsTable.Cell className="text-right tabular-nums">
+                    </Table.Cell>
+                    <Table.Cell className="text-right tabular-nums">
                       {formatMoney(c.net_revenue, currency, locale)}
-                    </AnalyticsTable.Cell>
-                    <AnalyticsTable.Cell className="text-right tabular-nums">
+                    </Table.Cell>
+                    <Table.Cell className="text-right tabular-nums">
                       {formatMoney(c.aov, currency, locale)}
-                    </AnalyticsTable.Cell>
-                  </AnalyticsTable.Row>
+                    </Table.Cell>
+                  </Table.Row>
                 ))}
-              </AnalyticsTable.Body>
-            </AnalyticsTable>
+              </Table.Body>
+              </Table>
+            </div>
           )}
-        </AnalyticsCard>
+        </Container>
       </div>
 
       {/* Promotions & Currencies */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <AnalyticsCard className="p-0">
+        <Container className="divide-y p-0">
           <div className="px-6 py-4">
             <Heading level="h2">
               {t("analytics.segments.promotionsTitle")}
@@ -419,55 +427,63 @@ export function SalesView({
           {!data?.promotion_breakdown?.length ? (
             <EmptyState text={t("analytics.empty")} />
           ) : (
-            <AnalyticsTable>
-              <AnalyticsTable.Header>
-                <AnalyticsTable.Row>
-                  <AnalyticsTable.HeaderCell>
+            <div className="overflow-x-auto">
+              <Table>
+              <Table.Header>
+                <Table.Row>
+                  <Table.HeaderCell>
                     {t("analytics.columns.promoCode")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     {t("analytics.columns.orders")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     {t("analytics.columns.discount")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     {t("analytics.columns.revenue")}
-                  </AnalyticsTable.HeaderCell>
-                </AnalyticsTable.Row>
-              </AnalyticsTable.Header>
-              <AnalyticsTable.Body>
+                  </Table.HeaderCell>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
                 {data.promotion_breakdown.map((p) => (
-                  <AnalyticsTable.Row key={p.promotion_id}>
-                    <AnalyticsTable.Cell>
+                  <Table.Row key={p.promotion_id}>
+                    <Table.Cell>
                       <div className="flex items-center gap-x-2">
-                        <span className="font-mono text-xs font-medium">
+                        <Text
+                          as="span"
+                          size="xsmall"
+                          leading="compact"
+                          weight="plus"
+                          family="mono"
+                        >
                           {p.code}
-                        </span>
+                        </Text>
                         {p.is_automatic && (
                           <Badge size="2xsmall" color="grey">
                             {t("analytics.segments.automaticPromo")}
                           </Badge>
                         )}
                       </div>
-                    </AnalyticsTable.Cell>
-                    <AnalyticsTable.Cell className="text-right tabular-nums">
+                    </Table.Cell>
+                    <Table.Cell className="text-right tabular-nums">
                       {formatNumber(p.orders, locale)}
-                    </AnalyticsTable.Cell>
-                    <AnalyticsTable.Cell className="text-right tabular-nums">
+                    </Table.Cell>
+                    <Table.Cell className="text-right tabular-nums">
                       {formatMoney(p.discount_amount, currency, locale)}
-                    </AnalyticsTable.Cell>
-                    <AnalyticsTable.Cell className="text-right tabular-nums">
+                    </Table.Cell>
+                    <Table.Cell className="text-right tabular-nums">
                       {formatMoney(p.net_revenue, currency, locale)}
-                    </AnalyticsTable.Cell>
-                  </AnalyticsTable.Row>
+                    </Table.Cell>
+                  </Table.Row>
                 ))}
-              </AnalyticsTable.Body>
-            </AnalyticsTable>
+              </Table.Body>
+              </Table>
+            </div>
           )}
-        </AnalyticsCard>
+        </Container>
 
-        <AnalyticsCard className="p-0">
+        <Container className="divide-y p-0">
           <div className="px-6 py-4">
             <Heading level="h2">
               {t("analytics.segments.currenciesTitle")}
@@ -476,50 +492,52 @@ export function SalesView({
           {!data?.currency_breakdown?.length ? (
             <EmptyState text={t("analytics.empty")} />
           ) : (
-            <AnalyticsTable>
-              <AnalyticsTable.Header>
-                <AnalyticsTable.Row>
-                  <AnalyticsTable.HeaderCell>
+            <div className="overflow-x-auto">
+              <Table>
+              <Table.Header>
+                <Table.Row>
+                  <Table.HeaderCell>
                     {t("analytics.columns.currency")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     {t("analytics.columns.orders")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     {t("analytics.columns.canceled")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     {t("analytics.kpis.refunds")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     {t("analytics.kpis.netSales")}
-                  </AnalyticsTable.HeaderCell>
-                </AnalyticsTable.Row>
-              </AnalyticsTable.Header>
-              <AnalyticsTable.Body>
+                  </Table.HeaderCell>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
                 {data.currency_breakdown.map((c) => (
-                  <AnalyticsTable.Row key={c.currency_code}>
-                    <AnalyticsTable.Cell className="font-medium">
+                  <Table.Row key={c.currency_code}>
+                    <Table.Cell className="font-medium">
                       {c.currency_code.toUpperCase()}
-                    </AnalyticsTable.Cell>
-                    <AnalyticsTable.Cell className="text-right tabular-nums">
+                    </Table.Cell>
+                    <Table.Cell className="text-right tabular-nums">
                       {formatNumber(c.standing_orders, locale)}
-                    </AnalyticsTable.Cell>
-                    <AnalyticsTable.Cell className="text-right tabular-nums">
+                    </Table.Cell>
+                    <Table.Cell className="text-right tabular-nums">
                       {formatNumber(c.canceled_orders, locale)}
-                    </AnalyticsTable.Cell>
-                    <AnalyticsTable.Cell className="text-right tabular-nums">
+                    </Table.Cell>
+                    <Table.Cell className="text-right tabular-nums">
                       {formatMoney(c.refunded_amount, c.currency_code, locale)}
-                    </AnalyticsTable.Cell>
-                    <AnalyticsTable.Cell className="text-right tabular-nums font-medium">
+                    </Table.Cell>
+                    <Table.Cell className="text-right tabular-nums font-medium">
                       {formatMoney(c.net_revenue, c.currency_code, locale)}
-                    </AnalyticsTable.Cell>
-                  </AnalyticsTable.Row>
+                    </Table.Cell>
+                  </Table.Row>
                 ))}
-              </AnalyticsTable.Body>
-            </AnalyticsTable>
+              </Table.Body>
+              </Table>
+            </div>
           )}
-        </AnalyticsCard>
+        </Container>
       </div>
     </div>
   )
@@ -545,7 +563,7 @@ export function ProductsView({
   return (
     <div className="flex flex-col gap-y-6">
       {/* Unified Views -> Orders -> Revenue -> Conv% Product Matrix */}
-      <AnalyticsCard className="p-0">
+      <Container className="divide-y p-0">
         <div className="px-6 py-5">
           <Heading level="h2">
             {t("analytics.merchandising.matrixTitle")}
@@ -558,73 +576,73 @@ export function ProductsView({
           <EmptyState text={t("analytics.empty")} />
         ) : (
           <div className="overflow-x-auto">
-            <AnalyticsTable>
-              <AnalyticsTable.Header>
-                <AnalyticsTable.Row>
-                  <AnalyticsTable.HeaderCell>
+            <Table>
+              <Table.Header>
+                <Table.Row>
+                  <Table.HeaderCell>
                     {t("analytics.columns.product")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     {t("analytics.columns.views")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     {t("analytics.columns.visitors")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     {t("analytics.columns.units")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     {t("analytics.columns.orders")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     {t("analytics.columns.revenue")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     {t("analytics.columns.conversion")}
-                  </AnalyticsTable.HeaderCell>
-                </AnalyticsTable.Row>
-              </AnalyticsTable.Header>
-              <AnalyticsTable.Body>
+                  </Table.HeaderCell>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
                 {mergedProducts.slice(0, 20).map((row) => (
-                  <AnalyticsTable.Row key={row.product_id}>
-                    <AnalyticsTable.Cell className="font-medium">
+                  <Table.Row key={row.product_id}>
+                    <Table.Cell className="font-medium">
                       <Link
                         to={`/products/${row.product_id}`}
                         className="text-ui-fg-interactive hover:underline"
                       >
                         {row.title}
                       </Link>
-                    </AnalyticsTable.Cell>
-                    <AnalyticsTable.Cell className="text-right tabular-nums">
+                    </Table.Cell>
+                    <Table.Cell className="text-right tabular-nums">
                       {formatNumber(row.views, locale)}
-                    </AnalyticsTable.Cell>
-                    <AnalyticsTable.Cell className="text-right tabular-nums">
+                    </Table.Cell>
+                    <Table.Cell className="text-right tabular-nums">
                       {formatNumber(row.visitors, locale)}
-                    </AnalyticsTable.Cell>
-                    <AnalyticsTable.Cell className="text-right tabular-nums">
+                    </Table.Cell>
+                    <Table.Cell className="text-right tabular-nums">
                       {formatNumber(row.units, locale)}
-                    </AnalyticsTable.Cell>
-                    <AnalyticsTable.Cell className="text-right tabular-nums">
+                    </Table.Cell>
+                    <Table.Cell className="text-right tabular-nums">
                       {formatNumber(row.orders, locale)}
-                    </AnalyticsTable.Cell>
-                    <AnalyticsTable.Cell className="text-right tabular-nums">
+                    </Table.Cell>
+                    <Table.Cell className="text-right tabular-nums">
                       {formatMoney(row.revenue, currency, locale)}
-                    </AnalyticsTable.Cell>
-                    <AnalyticsTable.Cell className="text-right tabular-nums">
+                    </Table.Cell>
+                    <Table.Cell className="text-right tabular-nums">
                       {row.conversion_rate !== null
                         ? `${row.conversion_rate}%`
                         : "–"}
-                    </AnalyticsTable.Cell>
-                  </AnalyticsTable.Row>
+                    </Table.Cell>
+                  </Table.Row>
                 ))}
-              </AnalyticsTable.Body>
-            </AnalyticsTable>
+              </Table.Body>
+            </Table>
           </div>
         )}
-      </AnalyticsCard>
+      </Container>
 
       {/* Filter Sizes Share */}
-      <AnalyticsCard className="p-0">
+      <Container className="divide-y p-0">
         <div className="px-6 py-4">
           <Heading level="h2">{t("analytics.merchandising.sizes")}</Heading>
           <Text size="small" className="text-ui-fg-subtle">
@@ -648,64 +666,72 @@ export function ProductsView({
             ))}
           </div>
         )}
-      </AnalyticsCard>
+      </Container>
 
       {/* Top SKUs + Frequently Bought Together */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <AnalyticsCard className="p-0">
+        <Container className="divide-y p-0">
           <div className="px-6 py-4">
             <Heading level="h2">{t("analytics.merchandising.skus")}</Heading>
           </div>
           {!data?.top_skus?.length ? (
             <EmptyState text={t("analytics.empty")} />
           ) : (
-            <AnalyticsTable>
-              <AnalyticsTable.Header>
-                <AnalyticsTable.Row>
-                  <AnalyticsTable.HeaderCell>
+            <div className="overflow-x-auto">
+              <Table>
+              <Table.Header>
+                <Table.Row>
+                  <Table.HeaderCell>
                     {t("analytics.columns.sku")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell>
+                  </Table.HeaderCell>
+                  <Table.HeaderCell>
                     {t("analytics.columns.variant")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     {t("analytics.columns.units")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     {t("analytics.columns.revenue")}
-                  </AnalyticsTable.HeaderCell>
-                </AnalyticsTable.Row>
-              </AnalyticsTable.Header>
-              <AnalyticsTable.Body>
+                  </Table.HeaderCell>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
                 {data.top_skus.map((row) => (
-                  <AnalyticsTable.Row key={`${row.sku}-${row.variant_title}`}>
-                    <AnalyticsTable.Cell>
+                  <Table.Row key={`${row.sku}-${row.variant_title}`}>
+                    <Table.Cell>
                       <div className="flex flex-col">
-                        <span className="font-mono text-xs">{row.sku}</span>
-                        <span className="text-xs text-ui-fg-subtle">
+                        <Text size="xsmall" leading="compact" family="mono">
+                          {row.sku}
+                        </Text>
+                        <Text
+                          size="xsmall"
+                          leading="compact"
+                          className="text-ui-fg-subtle"
+                        >
                           {row.product_title}
-                        </span>
+                        </Text>
                       </div>
-                    </AnalyticsTable.Cell>
-                    <AnalyticsTable.Cell>
+                    </Table.Cell>
+                    <Table.Cell>
                       <Badge size="2xsmall" color="grey">
                         {row.variant_title}
                       </Badge>
-                    </AnalyticsTable.Cell>
-                    <AnalyticsTable.Cell className="text-right tabular-nums">
+                    </Table.Cell>
+                    <Table.Cell className="text-right tabular-nums">
                       {formatNumber(row.units, locale)}
-                    </AnalyticsTable.Cell>
-                    <AnalyticsTable.Cell className="text-right tabular-nums">
+                    </Table.Cell>
+                    <Table.Cell className="text-right tabular-nums">
                       {formatMoney(row.revenue, currency, locale)}
-                    </AnalyticsTable.Cell>
-                  </AnalyticsTable.Row>
+                    </Table.Cell>
+                  </Table.Row>
                 ))}
-              </AnalyticsTable.Body>
-            </AnalyticsTable>
+              </Table.Body>
+              </Table>
+            </div>
           )}
-        </AnalyticsCard>
+        </Container>
 
-        <AnalyticsCard className="p-0">
+        <Container className="divide-y p-0">
           <div className="px-6 py-4">
             <Heading level="h2">
               {t("analytics.merchandising.boughtTogetherTitle")}
@@ -717,41 +743,47 @@ export function ProductsView({
           {!data?.bought_together?.length ? (
             <EmptyState text={t("analytics.empty")} />
           ) : (
-            <AnalyticsTable>
-              <AnalyticsTable.Header>
-                <AnalyticsTable.Row>
-                  <AnalyticsTable.HeaderCell>
+            <div className="overflow-x-auto">
+              <Table>
+              <Table.Header>
+                <Table.Row>
+                  <Table.HeaderCell>
                     {t("analytics.columns.pair")}
-                  </AnalyticsTable.HeaderCell>
-                  <AnalyticsTable.HeaderCell className="text-right">
+                  </Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">
                     {t("analytics.columns.orders")}
-                  </AnalyticsTable.HeaderCell>
-                </AnalyticsTable.Row>
-              </AnalyticsTable.Header>
-              <AnalyticsTable.Body>
+                  </Table.HeaderCell>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
                 {data.bought_together.map((pair) => (
-                  <AnalyticsTable.Row
+                  <Table.Row
                     key={`${pair.product_a_id}-${pair.product_b_id}`}
                   >
-                    <AnalyticsTable.Cell>
-                      <div className="flex flex-col text-xs">
-                        <span className="font-medium">
+                    <Table.Cell>
+                      <div className="flex flex-col">
+                        <Text size="small" leading="compact" weight="plus">
                           {pair.product_a_title}
-                        </span>
-                        <span className="text-ui-fg-subtle">
+                        </Text>
+                        <Text
+                          size="xsmall"
+                          leading="compact"
+                          className="text-ui-fg-subtle"
+                        >
                           + {pair.product_b_title}
-                        </span>
+                        </Text>
                       </div>
-                    </AnalyticsTable.Cell>
-                    <AnalyticsTable.Cell className="text-right tabular-nums">
+                    </Table.Cell>
+                    <Table.Cell className="text-right tabular-nums">
                       {formatNumber(pair.pair_orders, locale)}
-                    </AnalyticsTable.Cell>
-                  </AnalyticsTable.Row>
+                    </Table.Cell>
+                  </Table.Row>
                 ))}
-              </AnalyticsTable.Body>
-            </AnalyticsTable>
+              </Table.Body>
+              </Table>
+            </div>
           )}
-        </AnalyticsCard>
+        </Container>
       </div>
     </div>
   )

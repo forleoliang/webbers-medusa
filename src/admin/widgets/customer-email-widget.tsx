@@ -82,7 +82,7 @@ const CustomerEmailWidget = ({ data }: DetailWidgetProps<AdminCustomer>) => {
 }
 
 export const config = defineWidgetConfig({
-  zone: "customer.details.side.before",
+  zone: "customer.details.side",
 })
 
 export default CustomerEmailWidget

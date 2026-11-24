@@ -80,7 +80,7 @@ const PriceListExtWidget = ({ data }: DetailWidgetProps<AdminPriceList>) => {
 }
 
 export const config = defineWidgetConfig({
-  zone: "price_list.details.side.after",
+  zone: "price_list.details.side",
 })
 
 export default PriceListExtWidget

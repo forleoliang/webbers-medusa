@@ -899,10 +899,14 @@ const RequestsTab = () => {
           <FocusModal.Body className="flex flex-col items-center py-16">
             <div className="flex w-full max-w-lg flex-col gap-y-6">
               <div className="flex flex-col gap-y-1">
-                <Heading level="h1">{t("reviews.requests.modalTitle")}</Heading>
-                <Text size="small" leading="compact" className="text-ui-fg-subtle">
-                  {t("reviews.requests.modalDescription")}
-                </Text>
+                <FocusModal.Title asChild>
+                  <Heading level="h1">{t("reviews.requests.modalTitle")}</Heading>
+                </FocusModal.Title>
+                <FocusModal.Description asChild>
+                  <Text size="small" leading="compact" className="text-ui-fg-subtle">
+                    {t("reviews.requests.modalDescription")}
+                  </Text>
+                </FocusModal.Description>
               </div>
               <div className="flex flex-col gap-y-2">
                 <Label htmlFor="review-request-order-id" size="small" weight="plus">

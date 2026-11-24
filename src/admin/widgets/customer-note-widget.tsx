@@ -1,4 +1,4 @@
-import { AdminCustomer, DetailWidgetProps } from '@medusajs/types';
+import type { AdminCustomer, DetailWidgetProps } from '@medusajs/framework/types';
 import { defineWidgetConfig } from '@medusajs/admin-sdk';
 import NoteWidget from '../components/note';
 import { useFeatureEnabled } from '../lib/use-feature-flags';
@@ -11,7 +11,7 @@ const CustomerNoteWidget = ({ data }: DetailWidgetProps<AdminCustomer>) => {
 };
 
 export const config = defineWidgetConfig({
-  zone: 'customer.details.side.before',
+  zone: 'customer.details.side',
 });
 
 export default CustomerNoteWidget;

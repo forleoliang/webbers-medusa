@@ -92,7 +92,9 @@ const OrderDiscountBreakdownWidget = ({ data: order }: DetailWidgetProps<AdminOr
           {breakdown.map(({ code, total, percentage }) => (
             <div key={code} className="flex items-center justify-between gap-x-4 px-6 py-3">
               <Text size="small" leading="compact" className="text-ui-fg-subtle">
-                <span className="font-mono">{code}</span>
+                <Text as="span" size="small" leading="compact" family="mono">
+                  {code}
+                </Text>
                 {typeof percentage === "number" ? ` (${percentage}%)` : ""}
               </Text>
               <Text size="small" leading="compact" family="mono" className="text-ui-fg-base tabular-nums">
@@ -107,7 +109,7 @@ const OrderDiscountBreakdownWidget = ({ data: order }: DetailWidgetProps<AdminOr
 }
 
 export const config = defineWidgetConfig({
-  zone: "order.details.side.after",
+  zone: "order.details.side",
 })
 
 export default OrderDiscountBreakdownWidget

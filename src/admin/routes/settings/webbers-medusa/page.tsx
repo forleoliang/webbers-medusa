@@ -134,4 +134,13 @@ export const config = defineRouteConfig({
   icon: Adjustments,
 })
 
+export const handle = {
+  breadcrumb: () => <Breadcrumb />,
+}
+
+const Breadcrumb = () => {
+  const { t } = useTranslation()
+  return <>{t("extensions.settings.label")}</>
+}
+
 export default StoreExtensionsSettingsPage
