@@ -28,16 +28,27 @@ import type { AdminAnalyticsQueryType } from "../../../validators"
 export async function GET(req: MedusaRequest, res: MedusaResponse) {
   const query = (req.validatedQuery || req.query || {}) as AdminAnalyticsQueryType
   const range = parseAnalyticsRange(query.range)
-  const bounds = resolveRangeBounds(range)
+  const bounds = resolveRangeBounds(
+    range,
+    new Date(),
+    query.from || null,
+    query.to || null,
+    query.granularity || null
+  )
 
   const channelId = query.channel_id || null
   const regionId = query.region_id || null
   const requestedCurrency = query.currency_code ? query.currency_code.toLowerCase() : null
   const forceRefresh = isRefreshRequested(query.refresh)
 
-  const cacheKey = `overview:${range}:${channelId || "all"}:${regionId || "all"}:${
-    requestedCurrency || "auto"
-  }`
+  const customTag =
+    range === "custom" && bounds.start
+      ? `:${bounds.start.toISOString().slice(0, 10)}:${bounds.end.toISOString().slice(0, 10)}`
+      : ""
+  const cacheKey = `overview:${range}${customTag}:${bounds.granularity}:${channelId || "all"}:${
+    regionId || "all"
+  }:${requestedCurrency || "auto"}`
+
   if (!forceRefresh) {
     const hit = getCached<Record<string, unknown>>(cacheKey)
     if (hit) {
@@ -149,7 +160,9 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
   const bucketExpr =
     bounds.granularity === "day"
       ? `TO_CHAR(DATE_TRUNC('day', o.created_at AT TIME ZONE 'UTC'), 'YYYY-MM-DD')`
-      : `TO_CHAR(DATE_TRUNC('month', o.created_at AT TIME ZONE 'UTC'), 'YYYY-MM')`
+      : bounds.granularity === "week"
+        ? `TO_CHAR(DATE_TRUNC('week', o.created_at AT TIME ZONE 'UTC'), 'YYYY-MM-DD')`
+        : `TO_CHAR(DATE_TRUNC('month', o.created_at AT TIME ZONE 'UTC'), 'YYYY-MM')`
 
   const cartWhere = buildCartWhereClause("c", bounds, scopedFilters)
 
@@ -163,22 +176,32 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
     guestOrdersRows,
     repeatCustomerRows,
     topCustomerRows,
+    firstVsReturningRows,
+    cohortRows,
+    customersByCountryRows,
     timeseriesRows,
+    waterfallProductRows,
+    waterfallShippingRows,
     pendingCaptureRows,
     awaitingFulfillmentRows,
     topProductsRows,
+    catalogProductsRows,
     topSkusRows,
     topSizesRows,
+    collectionBreakdownRows,
+    boughtTogetherRows,
     channelBreakdownRows,
     regionBreakdownRows,
     countryBreakdownRows,
     promotionBreakdownRows,
     inventorySummaryRows,
     lowStockRows,
+    inventoryVelocityRows,
     fulfillmentSummaryRows,
     fulfillmentTimingRows,
     abandonedCartRows,
     activeCarts30mRows,
+    liveOrders30mRows,
   ] = await Promise.all([
     customQuery.PSQLQuery<Record<string, unknown>>(kpiSql(curWhere.sql), curWhere.params),
     prevWhere
@@ -265,6 +288,87 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
        LIMIT 15`,
       curWhere.params
     ),
+    // first-time vs returning orders within current window (based on customer's lifetime order rank)
+    customQuery.PSQLQuery<Record<string, unknown>>(
+      `WITH ranked_orders AS (
+         SELECT
+           o.id,
+           ROW_NUMBER() OVER (PARTITION BY o.customer_id ORDER BY o.created_at ASC, o.id ASC) AS order_rank
+         FROM "order" o
+         WHERE o.deleted_at IS NULL
+           AND COALESCE(o.is_draft_order, false) = false
+           AND NOT ${IS_ORDER_CANCELED_EXPR("o")}
+           AND o.customer_id IS NOT NULL
+       )
+       SELECT
+         COUNT(*) FILTER (WHERE ro.order_rank = 1)::integer AS first_time_orders,
+         COALESCE(SUM(${ORDER_NET_EXPR("os")}) FILTER (WHERE ro.order_rank = 1), 0)::numeric AS first_time_revenue,
+         COUNT(*) FILTER (WHERE ro.order_rank >= 2)::integer AS returning_orders,
+         COALESCE(SUM(${ORDER_NET_EXPR("os")}) FILTER (WHERE ro.order_rank >= 2), 0)::numeric AS returning_revenue
+       FROM "order" o
+       INNER JOIN ranked_orders ro ON ro.id = o.id
+       ${ORDER_SUMMARY_JOIN("o", "os")}
+       WHERE ${curWhere.sql}
+         AND NOT ${IS_ORDER_CANCELED_EXPR("o")}`,
+      curWhere.params
+    ),
+    // cohort retention (last 6 customer acquisition months)
+    customQuery.PSQLQuery<Record<string, unknown>>(
+      `WITH standing AS (
+         SELECT
+           o.customer_id,
+           DATE_TRUNC('month', o.created_at AT TIME ZONE 'UTC') AS ord_month
+         FROM "order" o
+         WHERE o.deleted_at IS NULL
+           AND COALESCE(o.is_draft_order, false) = false
+           AND NOT ${IS_ORDER_CANCELED_EXPR("o")}
+           AND o.customer_id IS NOT NULL
+       ),
+       first_ord AS (
+         SELECT customer_id, MIN(ord_month) AS cohort_month
+         FROM standing
+         GROUP BY customer_id
+       ),
+       paired AS (
+         SELECT DISTINCT
+           f.cohort_month,
+           s.customer_id,
+           (EXTRACT(YEAR FROM AGE(s.ord_month, f.cohort_month)) * 12
+            + EXTRACT(MONTH FROM AGE(s.ord_month, f.cohort_month)))::integer AS month_offset
+         FROM first_ord f
+         INNER JOIN standing s ON s.customer_id = f.customer_id
+       )
+       SELECT
+         TO_CHAR(cohort_month, 'YYYY-MM') AS cohort_month,
+         COUNT(DISTINCT customer_id) FILTER (WHERE month_offset = 0)::integer AS cohort_size,
+         COUNT(DISTINCT customer_id) FILTER (WHERE month_offset = 1)::integer AS m1,
+         COUNT(DISTINCT customer_id) FILTER (WHERE month_offset = 2)::integer AS m2,
+         COUNT(DISTINCT customer_id) FILTER (WHERE month_offset = 3)::integer AS m3
+       FROM paired
+       GROUP BY cohort_month
+       ORDER BY cohort_month DESC
+       LIMIT 6`,
+      []
+    ),
+    // customers by shipping country
+    customQuery.PSQLQuery<Record<string, unknown>>(
+      `SELECT
+         UPPER(COALESCE(NULLIF(BTRIM(oa.country_code), ''), 'UNKNOWN')) AS country_code,
+         COUNT(DISTINCT o.customer_id)::integer AS customers,
+         COUNT(*)::integer AS orders,
+         COALESCE(SUM(${ORDER_NET_EXPR("os")}), 0)::numeric AS net_spent
+       FROM "order" o
+       ${ORDER_SUMMARY_JOIN("o", "os")}
+       LEFT JOIN order_address oa ON oa.id = o.shipping_address_id AND oa.deleted_at IS NULL
+       WHERE ${curWhere.sql}
+         AND NOT ${IS_ORDER_CANCELED_EXPR("o")}
+         AND o.customer_id IS NOT NULL
+       GROUP BY 1
+       ORDER BY net_spent DESC, customers DESC
+       LIMIT 12`,
+      curWhere.params
+    ),
+    // timeseries
     customQuery.PSQLQuery<{
       bucket: string
       orders: number
@@ -285,6 +389,47 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
        ORDER BY 1 ASC`,
       curWhere.params
     ),
+    // waterfall product gross & discounts
+    customQuery.PSQLQuery<Record<string, unknown>>(
+      `WITH scoped_orders AS (
+         SELECT o.id, o.version
+         FROM "order" o
+         WHERE ${curWhere.sql} AND NOT ${IS_ORDER_CANCELED_EXPR("o")}
+       ),
+       item_gross AS (
+         SELECT COALESCE(SUM(COALESCE(oi.quantity, 0) * COALESCE(oli.unit_price, oi.unit_price, 0)), 0)::numeric AS gross_product_sales
+         FROM scoped_orders so
+         INNER JOIN order_item oi ON oi.order_id = so.id AND oi.version = so.version AND oi.deleted_at IS NULL
+         INNER JOIN order_line_item oli ON oli.id = oi.item_id AND oli.deleted_at IS NULL
+       ),
+       item_disc AS (
+         SELECT COALESCE(SUM(olia.amount), 0)::numeric AS item_discounts
+         FROM scoped_orders so
+         INNER JOIN order_item oi ON oi.order_id = so.id AND oi.version = so.version AND oi.deleted_at IS NULL
+         INNER JOIN order_line_item_adjustment olia ON olia.item_id = oi.item_id AND olia.deleted_at IS NULL
+       )
+       SELECT
+         (SELECT gross_product_sales FROM item_gross) AS gross_product_sales,
+         (SELECT item_discounts FROM item_disc) AS item_discounts`,
+      curWhere.params
+    ),
+    // waterfall shipping & shipping discounts
+    customQuery.PSQLQuery<Record<string, unknown>>(
+      `WITH scoped_orders AS (
+         SELECT o.id, o.version
+         FROM "order" o
+         WHERE ${curWhere.sql} AND NOT ${IS_ORDER_CANCELED_EXPR("o")}
+       )
+       SELECT
+         COALESCE(SUM(osm.amount), 0)::numeric AS shipping_amount,
+         COALESCE(SUM(osma.amount), 0)::numeric AS shipping_discounts
+       FROM scoped_orders so
+       INNER JOIN order_shipping os2 ON os2.order_id = so.id AND os2.version = so.version AND os2.deleted_at IS NULL
+       INNER JOIN order_shipping_method osm ON osm.id = os2.shipping_method_id AND osm.deleted_at IS NULL
+       LEFT JOIN order_shipping_method_adjustment osma ON osma.shipping_method_id = osm.id AND osma.deleted_at IS NULL`,
+      curWhere.params
+    ),
+    // pending capture
     customQuery.PSQLQuery<{ count: number; amount: number }>(
       `SELECT
          COUNT(DISTINCT o.id)::integer AS count,
@@ -297,6 +442,7 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
          AND p.canceled_at IS NULL`,
       liveFilter.params
     ),
+    // awaiting fulfillment
     customQuery.PSQLQuery<{ count: number }>(
       `SELECT COUNT(*)::integer AS count
        FROM "order" o
@@ -311,9 +457,11 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
          )`,
       liveFilter.params
     ),
+    // top products (sales only)
     customQuery.PSQLQuery<{
       product_id: string
       title: string
+      handle: string | null
       units: number
       revenue: number
       orders: number
@@ -321,6 +469,7 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
       `SELECT
          COALESCE(oli.product_id, oli.title) AS product_id,
          COALESCE(NULLIF(BTRIM(pr.title), ''), oli.title, 'Unknown') AS title,
+         COALESCE(pr.handle, oli.product_handle) AS handle,
          COALESCE(SUM(oi.quantity), 0)::integer AS units,
          COALESCE(SUM(COALESCE(oi.quantity, 0) * COALESCE(oli.unit_price, oi.unit_price, 0)), 0)::numeric AS revenue,
          COUNT(DISTINCT o.id)::integer AS orders
@@ -329,11 +478,49 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
        INNER JOIN order_line_item oli ON oli.id = oi.item_id AND oli.deleted_at IS NULL
        LEFT JOIN product pr ON pr.id = oli.product_id
        WHERE ${curWhere.sql} AND NOT ${IS_ORDER_CANCELED_EXPR("o")}
-       GROUP BY 1, 2
+       GROUP BY 1, 2, 3
        ORDER BY units DESC, revenue DESC
-       LIMIT 15`,
+       LIMIT 20`,
       curWhere.params
     ),
+    // full catalog merged with windowed product sales (for PostHog handle join)
+    customQuery.PSQLQuery<{
+      product_id: string
+      title: string
+      handle: string
+      units: number
+      revenue: number
+      orders: number
+    }>(
+      `WITH product_sales AS (
+         SELECT
+           oli.product_id,
+           COALESCE(SUM(oi.quantity), 0)::integer AS units,
+           COALESCE(SUM(COALESCE(oi.quantity, 0) * COALESCE(oli.unit_price, oi.unit_price, 0)), 0)::numeric AS revenue,
+           COUNT(DISTINCT o.id)::integer AS orders
+         FROM "order" o
+         INNER JOIN order_item oi ON oi.order_id = o.id AND oi.version = o.version AND oi.deleted_at IS NULL
+         INNER JOIN order_line_item oli ON oli.id = oi.item_id AND oli.deleted_at IS NULL
+         WHERE ${curWhere.sql}
+           AND NOT ${IS_ORDER_CANCELED_EXPR("o")}
+           AND oli.product_id IS NOT NULL
+         GROUP BY oli.product_id
+       )
+       SELECT
+         p.id AS product_id,
+         p.title,
+         LOWER(p.handle) AS handle,
+         COALESCE(ps.units, 0)::integer AS units,
+         COALESCE(ps.revenue, 0)::numeric AS revenue,
+         COALESCE(ps.orders, 0)::integer AS orders
+       FROM product p
+       LEFT JOIN product_sales ps ON ps.product_id = p.id
+       WHERE p.deleted_at IS NULL AND p.status = 'published'
+       ORDER BY COALESCE(ps.revenue, 0) DESC, COALESCE(ps.units, 0) DESC, p.title ASC
+       LIMIT 100`,
+      curWhere.params
+    ),
+    // top skus
     customQuery.PSQLQuery<{
       sku: string
       product_title: string
@@ -359,6 +546,7 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
        LIMIT 15`,
       curWhere.params
     ),
+    // top filter sizes
     customQuery.PSQLQuery<{
       variant_title: string
       units: number
@@ -379,6 +567,66 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
        LIMIT 15`,
       curWhere.params
     ),
+    // collection breakdown
+    customQuery.PSQLQuery<{
+      collection_id: string
+      title: string
+      units: number
+      orders: number
+      revenue: number
+    }>(
+      `SELECT
+         COALESCE(pc.id, 'uncategorized') AS collection_id,
+         COALESCE(pc.title, 'Uncategorized') AS title,
+         COALESCE(SUM(oi.quantity), 0)::integer AS units,
+         COUNT(DISTINCT o.id)::integer AS orders,
+         COALESCE(SUM(COALESCE(oi.quantity, 0) * COALESCE(oli.unit_price, oi.unit_price, 0)), 0)::numeric AS revenue
+       FROM "order" o
+       INNER JOIN order_item oi ON oi.order_id = o.id AND oi.version = o.version AND oi.deleted_at IS NULL
+       INNER JOIN order_line_item oli ON oli.id = oi.item_id AND oli.deleted_at IS NULL
+       LEFT JOIN product pr ON pr.id = oli.product_id
+       LEFT JOIN product_collection pc ON pc.id = pr.collection_id AND pc.deleted_at IS NULL
+       WHERE ${curWhere.sql} AND NOT ${IS_ORDER_CANCELED_EXPR("o")}
+       GROUP BY 1, 2
+       ORDER BY revenue DESC, units DESC
+       LIMIT 15`,
+      curWhere.params
+    ),
+    // frequently bought together pairs
+    customQuery.PSQLQuery<{
+      product_a_id: string
+      product_a_title: string
+      product_b_id: string
+      product_b_title: string
+      pair_orders: number
+    }>(
+      `WITH order_products AS (
+         SELECT DISTINCT
+           o.id AS order_id,
+           oli.product_id,
+           COALESCE(NULLIF(BTRIM(pr.title), ''), oli.title, oli.product_id) AS title
+         FROM "order" o
+         INNER JOIN order_item oi ON oi.order_id = o.id AND oi.version = o.version AND oi.deleted_at IS NULL
+         INNER JOIN order_line_item oli ON oli.id = oi.item_id AND oli.deleted_at IS NULL
+         LEFT JOIN product pr ON pr.id = oli.product_id
+         WHERE ${curWhere.sql}
+           AND NOT ${IS_ORDER_CANCELED_EXPR("o")}
+           AND oli.product_id IS NOT NULL
+       )
+       SELECT
+         a.product_id AS product_a_id,
+         a.title AS product_a_title,
+         b.product_id AS product_b_id,
+         b.title AS product_b_title,
+         COUNT(DISTINCT a.order_id)::integer AS pair_orders
+       FROM order_products a
+       INNER JOIN order_products b ON a.order_id = b.order_id AND a.product_id < b.product_id
+       GROUP BY 1, 2, 3, 4
+       ORDER BY pair_orders DESC
+       LIMIT 10`,
+      curWhere.params
+    ),
+    // channel breakdown
     customQuery.PSQLQuery<{
       channel_id: string
       name: string
@@ -400,6 +648,7 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
        ORDER BY net_revenue DESC, orders DESC`,
       curWhere.params
     ),
+    // region breakdown
     customQuery.PSQLQuery<{
       region_id: string
       name: string
@@ -423,6 +672,7 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
        ORDER BY net_revenue DESC, orders DESC`,
       curWhere.params
     ),
+    // country breakdown
     customQuery.PSQLQuery<{
       country_code: string
       orders: number
@@ -441,6 +691,7 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
        LIMIT 15`,
       curWhere.params
     ),
+    // promotion breakdown
     customQuery.PSQLQuery<{
       promotion_id: string
       code: string
@@ -489,6 +740,7 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
        LIMIT 15`,
       curWhere.params
     ),
+    // inventory summary
     customQuery.PSQLQuery<Record<string, unknown>>(
       `WITH stock_per_variant AS (
          SELECT
@@ -514,6 +766,7 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
        FROM stock_per_variant`,
       []
     ),
+    // low stock variants
     customQuery.PSQLQuery<{
       variant_id: string
       product_id: string
@@ -545,6 +798,57 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
        LIMIT 25`,
       []
     ),
+    // inventory velocity + days remaining
+    customQuery.PSQLQuery<Record<string, unknown>>(
+      `WITH sales_30d AS (
+         SELECT
+           oli.variant_id,
+           COALESCE(SUM(oi.quantity), 0)::integer AS units_30d
+         FROM "order" o
+         INNER JOIN order_item oi ON oi.order_id = o.id AND oi.version = o.version AND oi.deleted_at IS NULL
+         INNER JOIN order_line_item oli ON oli.id = oi.item_id AND oli.deleted_at IS NULL
+         WHERE o.deleted_at IS NULL
+           AND COALESCE(o.is_draft_order, false) = false
+           AND NOT ${IS_ORDER_CANCELED_EXPR("o")}
+           AND o.created_at >= NOW() - INTERVAL '30 days'
+           AND oli.variant_id IS NOT NULL
+         GROUP BY oli.variant_id
+       ),
+       stock AS (
+         SELECT
+           pv.id AS variant_id,
+           pr.id AS product_id,
+           pr.title AS product_title,
+           pv.title AS variant_title,
+           pv.sku AS sku,
+           COALESCE(SUM(il.stocked_quantity), 0)::integer AS stocked_quantity,
+           COALESCE(SUM(il.reserved_quantity), 0)::integer AS reserved_quantity,
+           COALESCE(SUM(il.stocked_quantity - il.reserved_quantity), 0)::integer AS available_quantity
+         FROM product_variant pv
+         INNER JOIN product pr ON pr.id = pv.product_id AND pr.deleted_at IS NULL
+         INNER JOIN product_variant_inventory_item pvii ON pvii.variant_id = pv.id AND pvii.deleted_at IS NULL
+         INNER JOIN inventory_item ii ON ii.id = pvii.inventory_item_id AND ii.deleted_at IS NULL
+         INNER JOIN inventory_level il ON il.inventory_item_id = ii.id AND il.deleted_at IS NULL
+         WHERE pv.deleted_at IS NULL AND pv.manage_inventory = true
+         GROUP BY pv.id, pr.id, pr.title, pv.title, pv.sku
+       )
+       SELECT
+         s.variant_id,
+         s.product_id,
+         s.product_title,
+         s.variant_title,
+         s.sku,
+         s.stocked_quantity,
+         s.reserved_quantity,
+         s.available_quantity,
+         COALESCE(s30.units_30d, 0)::integer AS units_30d
+       FROM stock s
+       LEFT JOIN sales_30d s30 ON s30.variant_id = s.variant_id
+       ORDER BY s.available_quantity ASC, COALESCE(s30.units_30d, 0) DESC, s.product_title ASC
+       LIMIT 30`,
+      []
+    ),
+    // strictly mutually-exclusive fulfillment stages
     customQuery.PSQLQuery<Record<string, unknown>>(
       `WITH order_states AS (
          SELECT
@@ -561,12 +865,13 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
        SELECT
          COUNT(*) FILTER (WHERE delivered_qty >= total_qty AND total_qty > 0)::integer AS delivered,
          COUNT(*) FILTER (WHERE shipped_qty >= total_qty AND delivered_qty < total_qty AND total_qty > 0)::integer AS shipped,
-         COUNT(*) FILTER (WHERE fulfilled_qty >= total_qty AND shipped_qty < total_qty AND total_qty > 0)::integer AS fulfilled,
-         COUNT(*) FILTER (WHERE fulfilled_qty > 0 AND fulfilled_qty < total_qty)::integer AS partially_fulfilled,
-         COUNT(*) FILTER (WHERE total_qty = 0 OR fulfilled_qty = 0)::integer AS awaiting_fulfillment
+         COUNT(*) FILTER (WHERE fulfilled_qty >= total_qty AND shipped_qty < total_qty AND delivered_qty < total_qty AND total_qty > 0)::integer AS fulfilled,
+         COUNT(*) FILTER (WHERE fulfilled_qty > 0 AND fulfilled_qty < total_qty AND shipped_qty < total_qty AND delivered_qty < total_qty)::integer AS partially_fulfilled,
+         COUNT(*) FILTER (WHERE total_qty = 0 OR (fulfilled_qty = 0 AND shipped_qty = 0 AND delivered_qty = 0))::integer AS awaiting_fulfillment
        FROM order_states`,
       curWhere.params
     ),
+    // fulfillment timing
     customQuery.PSQLQuery<Record<string, unknown>>(
       `SELECT
          AVG(EXTRACT(EPOCH FROM (f.shipped_at - o.created_at)) / 3600.0) FILTER (
@@ -581,6 +886,7 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
        WHERE ${curWhere.sql} AND NOT ${IS_ORDER_CANCELED_EXPR("o")}`,
       curWhere.params
     ),
+    // abandoned carts in window
     customQuery.PSQLQuery<{
       total_carts: number
       with_email: number
@@ -610,6 +916,7 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
        FROM active_carts`,
       cartWhere.params
     ),
+    // active carts in last 30m
     customQuery.PSQLQuery<{ count: number }>(
       `SELECT COUNT(*)::integer AS count
        FROM cart c
@@ -620,6 +927,17 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
            SELECT 1 FROM cart_line_item cli WHERE cli.cart_id = c.id AND cli.deleted_at IS NULL
          )`,
       []
+    ),
+    // orders & sales in last 30m
+    customQuery.PSQLQuery<{ orders_30m: number; sales_30m: number }>(
+      `SELECT
+         COUNT(*)::integer AS orders_30m,
+         COALESCE(SUM(${ORDER_NET_EXPR("os")}), 0)::numeric AS sales_30m
+       FROM "order" o
+       ${ORDER_SUMMARY_JOIN("o", "os")}
+       WHERE ${liveFilter.sql}
+         AND o.created_at >= NOW() - INTERVAL '30 minutes'`,
+      liveFilter.params
     ),
   ])
 
@@ -790,6 +1108,13 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
         ? 0
         : null
 
+  const wfProd = waterfallProductRows[0] || {}
+  const wfShip = waterfallShippingRows[0] || {}
+  const wfGrossProduct = toNum(wfProd.gross_product_sales)
+  const wfDiscounts = toNum(wfProd.item_discounts) + toNum(wfShip.shipping_discounts)
+  const wfShipping = toNum(wfShip.shipping_amount)
+  const wfNetProduct = Math.max(0, wfGrossProduct - wfDiscounts - refunds)
+
   const tsByBucket = new Map<
     string,
     { orders: number; gross_sales: number; refunds: number; net_sales: number }
@@ -835,6 +1160,8 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
   const invSum = inventorySummaryRows[0] || {}
   const fulSum = fulfillmentSummaryRows[0] || {}
   const fulTiming = fulfillmentTimingRows[0] || {}
+  const fvr = firstVsReturningRows[0] || {}
+  const liveOrd = liveOrders30mRows[0] || {}
 
   const formatCustomerName = (r: Record<string, unknown>) => {
     const first = r.first_name ? String(r.first_name).trim() : ""
@@ -875,6 +1202,14 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
       repeat_rate: Number(repeatRate.toFixed(1)),
       repeat_rate_delta: pctDelta(repeatRate, prevRepeatRate),
     },
+    finance_waterfall: {
+      gross_product_sales: Number(wfGrossProduct.toFixed(2)),
+      discounts: Number(wfDiscounts.toFixed(2)),
+      refunds: Number(refunds.toFixed(2)),
+      net_product_sales: Number(wfNetProduct.toFixed(2)),
+      shipping: Number(wfShipping.toFixed(2)),
+      total_sales: Number(netSales.toFixed(2)),
+    },
     customers: {
       total_customers_all_time: toInt(totalCustomersAllTimeRows[0]?.count),
       new_customers: bounds.start ? toInt(newCustomersRows[0]?.count) : null,
@@ -884,6 +1219,25 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
       avg_orders_per_customer: Number(avgOrdersPerCustomer.toFixed(2)),
       avg_customer_value: Number(avgCustomerValue.toFixed(2)),
       guest_orders: toInt(guestOrdersRows[0]?.count),
+      first_vs_returning: {
+        first_time_orders: toInt(fvr.first_time_orders),
+        first_time_revenue: Number(toNum(fvr.first_time_revenue).toFixed(2)),
+        returning_orders: toInt(fvr.returning_orders),
+        returning_revenue: Number(toNum(fvr.returning_revenue).toFixed(2)),
+      },
+      cohorts: cohortRows.map((c: Record<string, unknown>) => ({
+        cohort_month: String(c.cohort_month ?? ""),
+        cohort_size: toInt(c.cohort_size),
+        m1: toInt(c.m1),
+        m2: toInt(c.m2),
+        m3: toInt(c.m3),
+      })),
+      by_country: customersByCountryRows.map((r: Record<string, unknown>) => ({
+        country_code: String(r.country_code ?? "UNKNOWN"),
+        customers: toInt(r.customers),
+        orders: toInt(r.orders),
+        net_spent: Number(toNum(r.net_spent).toFixed(2)),
+      })),
       repeat_rows: repeatCustomerRows.map((r: Record<string, unknown>) => ({
         customer_id: String(r.customer_id ?? ""),
         name: formatCustomerName(r),
@@ -917,6 +1271,10 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
       awaiting_fulfillment_count: toInt(awaitingFulfillmentRows[0]?.count),
       low_stock_count: toInt(invSum.low_stock_count),
     },
+    live_orders_30m: {
+      orders_30m: toInt(liveOrd.orders_30m),
+      sales_30m: Number(toNum(liveOrd.sales_30m).toFixed(2)),
+    },
     abandoned_carts: {
       total_carts: toInt(acRow.total_carts),
       with_email: toInt(acRow.with_email),
@@ -936,6 +1294,15 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
     top_products: topProductsRows.map((r: Record<string, unknown>) => ({
       product_id: String(r.product_id ?? ""),
       title: String(r.title ?? ""),
+      handle: r.handle ? String(r.handle).toLowerCase() : null,
+      units: toInt(r.units),
+      revenue: Number(toNum(r.revenue).toFixed(2)),
+      orders: toInt(r.orders),
+    })),
+    catalog_products: catalogProductsRows.map((r: Record<string, unknown>) => ({
+      product_id: String(r.product_id ?? ""),
+      title: String(r.title ?? ""),
+      handle: String(r.handle ?? "").toLowerCase(),
       units: toInt(r.units),
       revenue: Number(toNum(r.revenue).toFixed(2)),
       orders: toInt(r.orders),
@@ -958,6 +1325,20 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
         share_pct: totalSizeUnits > 0 ? Number(((units / totalSizeUnits) * 100).toFixed(1)) : 0,
       }
     }),
+    collection_breakdown: collectionBreakdownRows.map((r: Record<string, unknown>) => ({
+      collection_id: String(r.collection_id ?? "uncategorized"),
+      title: String(r.title ?? "Uncategorized"),
+      units: toInt(r.units),
+      orders: toInt(r.orders),
+      revenue: Number(toNum(r.revenue).toFixed(2)),
+    })),
+    bought_together: boughtTogetherRows.map((r: Record<string, unknown>) => ({
+      product_a_id: String(r.product_a_id ?? ""),
+      product_a_title: String(r.product_a_title ?? ""),
+      product_b_id: String(r.product_b_id ?? ""),
+      product_b_title: String(r.product_b_title ?? ""),
+      pair_orders: toInt(r.pair_orders),
+    })),
     channel_breakdown: channelBreakdownRows.map((r: Record<string, unknown>) => {
       const orders = toInt(r.orders)
       const net = toNum(r.net_revenue)
@@ -1019,6 +1400,26 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
       reserved_quantity: toInt(r.reserved_quantity),
       available_quantity: toInt(r.available_quantity),
     })),
+    inventory_velocity: inventoryVelocityRows.map((r: Record<string, unknown>) => {
+      const available = toInt(r.available_quantity)
+      const units30 = toInt(r.units_30d)
+      const dailyVelocity = Number((units30 / 30).toFixed(2))
+      const daysRemaining =
+        available <= 0 ? 0 : dailyVelocity > 0 ? Math.round(available / dailyVelocity) : null
+      return {
+        variant_id: String(r.variant_id ?? ""),
+        product_id: String(r.product_id ?? ""),
+        product_title: String(r.product_title ?? ""),
+        variant_title: String(r.variant_title ?? ""),
+        sku: r.sku ? String(r.sku) : null,
+        stocked_quantity: toInt(r.stocked_quantity),
+        reserved_quantity: toInt(r.reserved_quantity),
+        available_quantity: available,
+        units_30d: units30,
+        daily_velocity: dailyVelocity,
+        days_remaining: daysRemaining,
+      }
+    }),
     fulfillment_summary: {
       awaiting_fulfillment: toInt(fulSum.awaiting_fulfillment),
       partially_fulfilled: toInt(fulSum.partially_fulfilled),

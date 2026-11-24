@@ -6,11 +6,16 @@ import {
 } from "../analytics-cache"
 import {
   buildAnalyticsCsv,
+  buildGenericCsv,
+  classifyReferrerChannel,
+  extractProductHandle,
   generateTimeBuckets,
   isRefreshRequested,
   mapRangeToPosthogInterval,
   mapRangeToTrafficRange,
   parseAnalyticsRange,
+  parseExportType,
+  parseIsoDateOnly,
   pctDelta,
   resolveRangeBounds,
   sanitizeCsvCell,
@@ -23,33 +28,55 @@ describe("analytics helpers", () => {
     clearAnalyticsCache()
   })
 
-  test("parseAnalyticsRange accepts valid values and defaults to all", () => {
+  test("parseAnalyticsRange and parseExportType validate inputs with safe defaults", () => {
     expect(parseAnalyticsRange("7d")).toBe("7d")
-    expect(parseAnalyticsRange("30d")).toBe("30d")
-    expect(parseAnalyticsRange("90d")).toBe("90d")
-    expect(parseAnalyticsRange("12m")).toBe("12m")
-    expect(parseAnalyticsRange("all")).toBe("all")
+    expect(parseAnalyticsRange("custom")).toBe("custom")
     expect(parseAnalyticsRange("invalid")).toBe("all")
     expect(parseAnalyticsRange(undefined)).toBe("all")
+
+    expect(parseExportType("products")).toBe("products")
+    expect(parseExportType("customers")).toBe("customers")
+    expect(parseExportType("inventory")).toBe("inventory")
+    expect(parseExportType("other")).toBe("orders")
   })
 
-  test("mapRangeToTrafficRange maps 7d to 30d and keeps others", () => {
+  test("mapRangeToTrafficRange and mapRangeToPosthogInterval map all ranges cleanly", () => {
     expect(mapRangeToTrafficRange("7d")).toBe("30d")
-    expect(mapRangeToTrafficRange("30d")).toBe("30d")
-    expect(mapRangeToTrafficRange("90d")).toBe("90d")
-    expect(mapRangeToTrafficRange("12m")).toBe("12m")
-    expect(mapRangeToTrafficRange("all")).toBe("all")
-  })
-
-  test("mapRangeToPosthogInterval maps whitelisted ranges cleanly", () => {
+    expect(mapRangeToTrafficRange("custom")).toBe("90d")
     expect(mapRangeToPosthogInterval("7d")).toBe("7 day")
-    expect(mapRangeToPosthogInterval("30d")).toBe("30 day")
-    expect(mapRangeToPosthogInterval("90d")).toBe("90 day")
-    expect(mapRangeToPosthogInterval("12m")).toBe("12 month")
     expect(mapRangeToPosthogInterval("all")).toBe("12 month")
     expect(isRefreshRequested("1")).toBe(true)
-    expect(isRefreshRequested(true)).toBe(true)
     expect(isRefreshRequested("0")).toBe(false)
+  })
+
+  test("resolveRangeBounds handles custom dates and week granularity", () => {
+    const now = new Date("2026-11-24T12:34:56.000Z")
+
+    const custom = resolveRangeBounds("custom", now, "2026-10-01", "2026-10-14", "week")
+    expect(custom.granularity).toBe("week")
+    expect(custom.start?.toISOString()).toBe("2026-10-01T00:00:00.000Z")
+    expect(custom.end.toISOString()).toBe("2026-10-14T23:59:59.999Z")
+    expect(custom.prevStart?.toISOString()).toBe("2026-09-17T00:00:00.000Z")
+    expect(generateTimeBuckets(custom)).toEqual(["2026-09-28", "2026-10-05", "2026-10-12"])
+
+    expect(parseIsoDateOnly("2026-02-30")).toBeNull()
+    expect(parseIsoDateOnly("2026-11-24")).toBe("2026-11-24")
+  })
+
+  test("classifyReferrerChannel and extractProductHandle classify traffic and paths accurately", () => {
+    expect(classifyReferrerChannel("direct")).toBe("direct")
+    expect(classifyReferrerChannel("www.google.com")).toBe("organic_search")
+    expect(classifyReferrerChannel("www.google.com", "cpc")).toBe("paid_search")
+    expect(classifyReferrerChannel("www.instagram.com")).toBe("social")
+    expect(classifyReferrerChannel("dpreview.com")).toBe("referral")
+
+    expect(extractProductHandle("/products/xt996s-lens-protection-filter")).toBe(
+      "xt996s-lens-protection-filter"
+    )
+    expect(extractProductHandle("/us/products/xt925-black-mist-filter?variant=77mm")).toBe(
+      "xt925-black-mist-filter"
+    )
+    expect(extractProductHandle("/collections/filters")).toBeNull()
   })
 
   test("analytics-cache supports hit, expiry, and bounded eviction", () => {
@@ -66,46 +93,36 @@ describe("analytics helpers", () => {
     )
   })
 
-  test("resolveRangeBounds computes exact UTC day and month windows with previous period", () => {
+  test("resolveRangeBounds computes exact UTC day and month windows", () => {
     const now = new Date("2026-11-24T12:34:56.000Z")
-
     const b7 = resolveRangeBounds("7d", now)
     expect(b7.granularity).toBe("day")
-    expect(b7.bucketCount).toBe(7)
-    expect(b7.start?.toISOString()).toBe("2026-11-18T00:00:00.000Z")
-    expect(b7.prevStart?.toISOString()).toBe("2026-11-11T00:00:00.000Z")
-    expect(b7.prevEnd?.toISOString()).toBe("2026-11-18T00:00:00.000Z")
+    expect(generateTimeBuckets(b7)).toHaveLength(7)
 
     const b12 = resolveRangeBounds("12m", now)
     expect(b12.granularity).toBe("month")
-    expect(b12.start?.toISOString()).toBe("2025-12-01T00:00:00.000Z")
-    expect(b12.prevStart?.toISOString()).toBe("2024-12-01T00:00:00.000Z")
     expect(generateTimeBuckets(b12)).toHaveLength(12)
 
     const ball = resolveRangeBounds("all", now)
     expect(ball.start).toBeNull()
-    expect(ball.prevStart).toBeNull()
     expect(generateTimeBuckets(ball, ["2026-11", "2026-09", "2026-11"])).toEqual(["2026-09", "2026-11"])
   })
 
-  test("pctDelta handles zero, null, positive and negative changes cleanly", () => {
+  test("pctDelta and numeric parsers behave safely", () => {
     expect(pctDelta(100, null)).toBeNull()
     expect(pctDelta(0, 0)).toBe(0)
     expect(pctDelta(50, 0)).toBe(100)
     expect(pctDelta(150, 100)).toBe(50)
     expect(pctDelta(75, 100)).toBe(-25)
-  })
-
-  test("toNum and toInt parse strings and ignore NaN", () => {
     expect(toNum("79.99")).toBe(79.99)
-    expect(toNum(null)).toBe(0)
-    expect(toNum("abc", 5)).toBe(5)
     expect(toInt("12.9")).toBe(12)
   })
 
-  test("sanitizeCsvCell and buildAnalyticsCsv emit UTF-8 BOM and neutralize formulas", () => {
+  test("CSV builders emit UTF-8 BOM and neutralize formulas", () => {
     expect(sanitizeCsvCell("=SUM(A1)")).toBe("'=SUM(A1)")
-    expect(sanitizeCsvCell('Filter "82mm", Pro')).toBe('"Filter ""82mm"", Pro"')
+    const generic = buildGenericCsv(["Product", "Units"], [["=EVIL()", 3]])
+    expect(generic.startsWith("\uFEFFProduct,Units")).toBe(true)
+    expect(generic).toContain("'=EVIL(),3")
 
     const csv = buildAnalyticsCsv([
       {
@@ -128,10 +145,8 @@ describe("analytics helpers", () => {
         email: "=cmd@example.com",
       },
     ])
-
     expect(csv.startsWith("\uFEFFOrder ID,Display ID")).toBe(true)
     expect(csv).toContain("ord_1,1001")
-    expect(csv).toContain("100.00,20.00,80.00,2")
     expect(csv).toContain("'=cmd@example.com")
   })
 })

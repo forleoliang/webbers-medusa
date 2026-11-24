@@ -84,7 +84,11 @@ export const StoreWishlistMerge = z.object({ token: z.string().min(32).max(64) }
 export const StoreWishlistCounts = z.object({ product_id: z.union([id, z.array(id).max(100)]) })
 
 export const AdminAnalyticsQuery = z.object({
-  range: z.enum(["7d", "30d", "90d", "12m", "all"]).optional(),
+  range: z.enum(["7d", "30d", "90d", "12m", "all", "custom"]).optional(),
+  from: z.string().max(32).optional(),
+  to: z.string().max(32).optional(),
+  granularity: z.enum(["auto", "day", "week", "month"]).optional(),
+  type: z.enum(["orders", "products", "customers", "inventory"]).optional(),
   channel_id: id.optional(),
   region_id: id.optional(),
   currency_code: z.string().min(3).max(10).optional(),
@@ -93,7 +97,9 @@ export const AdminAnalyticsQuery = z.object({
 export type AdminAnalyticsQueryType = z.infer<typeof AdminAnalyticsQuery>
 
 export const AdminAnalyticsAcquisitionQuery = z.object({
-  range: z.enum(["7d", "30d", "90d", "12m", "all"]).optional(),
+  range: z.enum(["7d", "30d", "90d", "12m", "all", "custom"]).optional(),
+  from: z.string().max(32).optional(),
+  to: z.string().max(32).optional(),
   refresh: z.union([z.boolean(), z.string()]).optional(),
 })
 export type AdminAnalyticsAcquisitionQueryType = z.infer<typeof AdminAnalyticsAcquisitionQuery>

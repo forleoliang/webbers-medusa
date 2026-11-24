@@ -151,10 +151,16 @@ export const STATUS_COLOR: Record<string, "grey" | "blue" | "orange" | "green" |
   opted_out: "grey",
 }
 
-export type AnalyticsRange = "7d" | "30d" | "90d" | "12m" | "all"
+export type AnalyticsRange = "7d" | "30d" | "90d" | "12m" | "all" | "custom"
+export type AnalyticsGranularityOption = "auto" | "day" | "week" | "month"
+export type AnalyticsExportType = "orders" | "products" | "customers" | "inventory"
+export type ChannelGroup = "direct" | "organic_search" | "paid_search" | "social" | "referral"
 
 export type AnalyticsFilters = {
   range: AnalyticsRange
+  from?: string
+  to?: string
+  granularity?: AnalyticsGranularityOption
   channel_id?: string
   region_id?: string
   currency_code?: string
@@ -171,7 +177,7 @@ export type AnalyticsCustomerRow = {
 
 export type AnalyticsOverviewResponse = {
   range: AnalyticsRange
-  granularity: "day" | "month"
+  granularity: "day" | "week" | "month"
   currency_code: string
   multi_currency_warning: boolean
   cached?: boolean
@@ -203,6 +209,14 @@ export type AnalyticsOverviewResponse = {
     repeat_rate: number
     repeat_rate_delta: number | null
   }
+  finance_waterfall: {
+    gross_product_sales: number
+    discounts: number
+    refunds: number
+    net_product_sales: number
+    shipping: number
+    total_sales: number
+  }
   customers: {
     total_customers_all_time: number
     new_customers: number | null
@@ -212,6 +226,25 @@ export type AnalyticsOverviewResponse = {
     avg_orders_per_customer: number
     avg_customer_value: number
     guest_orders: number
+    first_vs_returning: {
+      first_time_orders: number
+      first_time_revenue: number
+      returning_orders: number
+      returning_revenue: number
+    }
+    cohorts: {
+      cohort_month: string
+      cohort_size: number
+      m1: number
+      m2: number
+      m3: number
+    }[]
+    by_country: {
+      country_code: string
+      customers: number
+      orders: number
+      net_spent: number
+    }[]
     repeat_rows: AnalyticsCustomerRow[]
     top_customers: AnalyticsCustomerRow[]
   }
@@ -220,6 +253,10 @@ export type AnalyticsOverviewResponse = {
     pending_capture_amount: number
     awaiting_fulfillment_count: number
     low_stock_count: number
+  }
+  live_orders_30m: {
+    orders_30m: number
+    sales_30m: number
   }
   abandoned_carts: {
     total_carts: number
@@ -246,6 +283,15 @@ export type AnalyticsOverviewResponse = {
   top_products: {
     product_id: string
     title: string
+    handle: string | null
+    units: number
+    revenue: number
+    orders: number
+  }[]
+  catalog_products: {
+    product_id: string
+    title: string
+    handle: string
     units: number
     revenue: number
     orders: number
@@ -264,6 +310,20 @@ export type AnalyticsOverviewResponse = {
     revenue: number
     orders: number
     share_pct: number
+  }[]
+  collection_breakdown: {
+    collection_id: string
+    title: string
+    units: number
+    orders: number
+    revenue: number
+  }[]
+  bought_together: {
+    product_a_id: string
+    product_a_title: string
+    product_b_id: string
+    product_b_title: string
+    pair_orders: number
   }[]
   channel_breakdown: {
     channel_id: string
@@ -314,6 +374,19 @@ export type AnalyticsOverviewResponse = {
     reserved_quantity: number
     available_quantity: number
   }[]
+  inventory_velocity: {
+    variant_id: string
+    product_id: string
+    product_title: string
+    variant_title: string
+    sku: string | null
+    stocked_quantity: number
+    reserved_quantity: number
+    available_quantity: number
+    units_30d: number
+    daily_velocity: number
+    days_remaining: number | null
+  }[]
   fulfillment_summary: {
     awaiting_fulfillment: number
     partially_fulfilled: number
@@ -362,6 +435,17 @@ export type AnalyticsAcquisitionResponse = {
     active_pageviews: number
     recent_add_to_cart: number
     recent_checkout: number
+    locations?: {
+      country: string
+      city: string
+      visitors: number
+      pageviews: number
+    }[]
+    active_pages?: {
+      path: string
+      views: number
+      visitors: number
+    }[]
   }
   funnel?: {
     event: string
@@ -371,6 +455,12 @@ export type AnalyticsAcquisitionResponse = {
   sources?: {
     domain: string
     count: number
+  }[]
+  channel_groups?: {
+    channel: ChannelGroup
+    pageviews: number
+    sessions: number
+    visitors: number
   }[]
   countries?: {
     country: string
@@ -387,6 +477,10 @@ export type AnalyticsAcquisitionResponse = {
     pageviews: number
     visitors: number
   }[]
+  exit_pages?: {
+    path: string
+    exits: number
+  }[]
   utm_campaigns?: {
     source: string
     medium: string
@@ -396,6 +490,7 @@ export type AnalyticsAcquisitionResponse = {
   }[]
   product_views?: {
     key: string
+    handle: string | null
     name: string
     views: number
     people: number
@@ -404,28 +499,34 @@ export type AnalyticsAcquisitionResponse = {
 
 export const ANALYTICS_KEY = ["webbers-analytics"]
 
-export const getAnalyticsOverview = (f: AnalyticsFilters, refresh?: boolean) =>
+export const getAnalyticsOverview = (f: AnalyticsFilters) =>
   sdk.client.fetch<AnalyticsOverviewResponse>("/admin/analytics/overview", {
     query: clean({
       range: f.range,
+      from: f.from,
+      to: f.to,
+      granularity: f.granularity && f.granularity !== "auto" ? f.granularity : undefined,
       channel_id: f.channel_id,
       region_id: f.region_id,
       currency_code: f.currency_code,
-      refresh: refresh ? "1" : undefined,
     }),
   })
 
-export const getAnalyticsAcquisition = (range: AnalyticsRange, refresh?: boolean) =>
+export const getAnalyticsAcquisition = (f: { range: AnalyticsRange; from?: string; to?: string }) =>
   sdk.client.fetch<AnalyticsAcquisitionResponse>("/admin/analytics/acquisition", {
     query: clean({
-      range,
-      refresh: refresh ? "1" : undefined,
+      range: f.range,
+      from: f.from,
+      to: f.to,
     }),
   })
 
-export const analyticsExportUrl = (f: AnalyticsFilters) => {
+export const analyticsExportUrl = (f: AnalyticsFilters, type: AnalyticsExportType = "orders") => {
   const params = new URLSearchParams()
   params.set("range", f.range)
+  params.set("type", type)
+  if (f.from) params.set("from", f.from)
+  if (f.to) params.set("to", f.to)
   if (f.channel_id) params.set("channel_id", f.channel_id)
   if (f.region_id) params.set("region_id", f.region_id)
   if (f.currency_code) params.set("currency_code", f.currency_code)

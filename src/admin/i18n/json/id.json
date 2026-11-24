@@ -365,9 +365,8 @@
   "analytics": {
     "navLabel": "Analitik Toko",
     "title": "Pusat Analitik Toko",
-    "subtitle": "Pusat analitik e-commerce 6 tampilan berbasis PostgreSQL & PostHog dengan cache 60 detik.",
-    "updatedAt": "Diperbarui {{time}}",
-    "refresh": "Muat ulang",
+    "subtitle": "Pusat analitik e-commerce 7 tampilan berbasis PostgreSQL & PostHog (pembaruan otomatis tiap 30 menit).",
+    "autoRefreshBadge": "Otomatis 30m · Diperbarui {{time}}",
     "exportCsv": "Ekspor CSV",
     "exportSuccess": "CSV analitik berhasil diunduh",
     "exportError": "Gagal mengekspor CSV analitik",
@@ -379,44 +378,76 @@
     "allTimeBaseline": "Semua waktu",
     "disabledHeading": "Analitik toko dinonaktifkan",
     "disabledDescription": "Aktifkan \"Dasbor analitik toko\" di Pengaturan Ekstensi untuk melihat laporan performa langsung.",
-    "multiCurrencyNotice": "Beberapa mata uang terdeteksi. KPI utama dan grafik tren menampilkan {{currency}}; ubah filter Mata Uang atau buka tab Penjualan > Mata Uang.",
+    "multiCurrencyNotice": "Beberapa mata uang terdeteksi. KPI utama dan grafik tren menampilkan {{currency}}; ubah filter Mata Uang atau buka Penjualan & Keuangan > Mata Uang.",
     "views": {
       "overview": "Ringkasan",
-      "sales": "Penjualan",
+      "live": "Live View",
+      "sales": "Penjualan & Keuangan",
       "products": "Produk & Ukuran",
       "traffic": "Trafik & Funnel",
-      "customers": "Pelanggan",
-      "inventory": "Stok & Pengiriman"
+      "customers": "Pelanggan & Kohort",
+      "inventory": "Stok, Kirim & Ekspor"
     },
     "ranges": {
       "all": "Semua waktu",
       "12m": "12 bulan",
       "90d": "90 hari",
       "30d": "30 hari",
-      "7d": "7 hari"
+      "7d": "7 hari",
+      "custom": "Rentang kustom"
+    },
+    "granularity": {
+      "auto": "Interval otomatis",
+      "day": "Harian",
+      "week": "Mingguan",
+      "month": "Bulanan"
     },
     "filters": {
       "allChannels": "Semua saluran",
       "allRegions": "Semua pasar",
       "autoCurrency": "Mata uang otomatis"
     },
+    "insights": {
+      "title": "Wawasan toko otomatis",
+      "empty": "Belum cukup aktivitas untuk menampilkan rekomendasi otomatis.",
+      "abandonedCarts": "{{count}} keranjang terbuka senilai {{value}} ({{notified}} sudah dikirimi email).",
+      "lowStock": "{{count}} SKU terlacak tersisa ≤ 5 unit ({{outOfStock}} habis stok).",
+      "funnelAtc": "{{views}} penonton produk menghasilkan {{atc}} pengguna tambah keranjang (rasio {{rate}}%).",
+      "topSize": "Ukuran filter terlaris: {{size}} ({{share}}% pangsa unit, {{units}} terjual).",
+      "tags": {
+        "info": "Sinyal",
+        "warning": "Perhatian",
+        "success": "Unggul"
+      }
+    },
+    "goal": {
+      "title": "Target penjualan bersih",
+      "edit": "Ubah",
+      "cancel": "Batal",
+      "save": "Simpan"
+    },
     "live": {
       "badge": "Live 30m",
-      "title": "Aktivitas etalase real-time",
+      "viewTitle": "Pemantau etalase real-time",
+      "viewSubtitle": "Pengunjung aktif, keranjang, checkout, pesanan, dan lokasi dalam 30 menit terakhir.",
       "visitors": "Pengunjung aktif",
       "activeCarts": "Keranjang aktif",
-      "recentAtc": "Tambah keranjang (30m)",
-      "recentCheckout": "Checkout (30m)",
-      "visitorsWindowSub": "30m terakhir: {{count}} aktif",
-      "sessionsWindowSub": "30m terakhir: {{count}} aktif",
-      "pageviewsWindowSub": "30m terakhir: {{count}} tampilan"
+      "checkingOut": "Sedang checkout (30m)",
+      "orders30m": "Pesanan terbaru (30m)",
+      "sessionsCountSub": "{{sessions}} sesi aktif",
+      "recentAtcSub": "{{count}} aksi tambah keranjang",
+      "window30m": "30 menit terakhir",
+      "locationsTitle": "Lokasi pengunjung aktif (30m)",
+      "city": "Kota",
+      "activePagesTitle": "Halaman aktif (30m)",
+      "noActivityYet": "Belum ada aktivitas pengunjung dalam 30 menit terakhir."
     },
     "kpis": {
       "netSales": "Penjualan bersih",
       "grossSub": "Kotor: {{gross}}",
+      "grossAndRefundSub": "Kotor: {{gross}} · Refund: {{refunds}} ({{rate}}%)",
       "refunds": "Refund",
       "refundsSub": "Tingkat refund: {{rate}}%",
-      "refundsCanceledSub": "Tingkat refund: {{rate}}% · Pesanan dibatalkan: {{canceled}}",
       "orders": "Pesanan aktif",
       "ordersSub": "Dibatalkan: {{canceled}} ({{rate}}%)",
       "aov": "Rata-rata nilai pesanan",
@@ -439,19 +470,31 @@
     },
     "chart": {
       "title": "Tren penjualan & pesanan",
-      "subtitle": "Pendapatan bersih dan volume pesanan harian atau bulanan (UTC)."
+      "subtitle": "Grafik gabungan batang (penjualan bersih) dan garis (pesanan) per interval UTC."
+    },
+    "waterfall": {
+      "title": "Rincian keuangan penjualan",
+      "subtitle": "Rekonsiliasi dari nilai kotor produk menuju total penjualan bersih.",
+      "grossProduct": "Penjualan kotor produk",
+      "discounts": "Diskon promosi",
+      "refunds": "Refund",
+      "netProduct": "Penjualan bersih produk",
+      "shipping": "Ongkos kirim",
+      "totalSales": "Total penjualan"
     },
     "merchandising": {
-      "products": "Produk terlaris",
+      "matrixTitle": "Performa tampilan & konversi produk",
+      "matrixSubtitle": "Menggabungkan data view_item PostHog (berdasarkan handle) dengan pesanan Medusa.",
       "skus": "SKU terlaris",
       "sizes": "Performa ukuran filter",
       "sizesSubtitle": "Porsi penjualan berdasarkan diameter / varian ukuran filter.",
-      "viewedTitle": "Produk paling banyak dilihat (PostHog)",
-      "viewedSubtitle": "Jumlah event view_item di etalase pada periode dipilih."
+      "boughtTogetherTitle": "Sering dibeli bersamaan",
+      "boughtTogetherSubtitle": "Pasangan produk yang paling sering dibeli dalam satu pesanan."
     },
     "segments": {
       "channelsTitle": "Penjualan per saluran",
       "regionsTitle": "Penjualan per pasar",
+      "collectionsTitle": "Penjualan per koleksi",
       "countriesTitle": "Penjualan per negara tujuan",
       "promotionsTitle": "Penjualan per kupon / promosi",
       "automaticPromo": "Otomatis",
@@ -471,11 +514,14 @@
       "promoCode": "Kode",
       "discount": "Diskon",
       "canceled": "Dibatalkan",
-      "gross": "Kotor",
       "views": "Tampilan",
       "visitors": "Pengunjung",
+      "conversion": "Konversi %",
+      "collection": "Koleksi",
+      "pair": "Pasangan produk",
       "device": "Perangkat",
       "path": "Jalur",
+      "exits": "Keluar",
       "campaign": "Kampanye",
       "sourceMedium": "Sumber / Medium",
       "customer": "Pelanggan",
@@ -489,17 +535,31 @@
       "visitors": "Pengunjung",
       "sessions": "Sesi",
       "visitorsPvSub": "{{visitors}} pengunjung · {{pageviews}} tampilan",
-      "funnelTitle": "Funnel konversi",
-      "funnelHint": "Persentase menunjukkan tingkat konversi pengguna dari langkah sebelumnya.",
-      "peopleCount": "{{people}} pengguna ({{count}} event)",
-      "sourcesTitle": "Sumber trafik utama",
-      "sourcesHint": "Tampilan halaman dikelompokkan berdasarkan domain perujuk.",
+      "sessionsSub": "{{sessions}} total sesi",
+      "productViewsCount": "{{views}} penonton produk",
+      "atcRate": "Rasio tambah keranjang",
+      "checkoutConv": "Konversi checkout",
+      "funnelTitle": "Funnel konversi 5 langkah",
+      "funnelHint": "Menampilkan rasio terhadap sesi beserta konversi langkah demi langkah.",
+      "peopleUnit": "pengguna",
+      "channelGroupsTitle": "Klasifikasi saluran akuisisi",
+      "channelGroupsHint": "Pengelompokan domain perujuk dan UTM medium ke saluran pemasaran.",
+      "sourcesTitle": "Domain perujuk",
       "countriesTitle": "Pengunjung berdasarkan negara",
       "devicesTitle": "Pengunjung berdasarkan perangkat",
       "landingPagesTitle": "Halaman masuk teratas",
+      "exitPagesTitle": "Halaman keluar teratas",
       "utmTitle": "Kampanye UTM",
       "utmEmpty": "Tidak ada sesi bertag UTM pada periode ini.",
+      "channels": {
+        "direct": "Langsung (Direct)",
+        "organic_search": "Pencarian Organik",
+        "paid_search": "Iklan Pencarian",
+        "social": "Media Sosial",
+        "referral": "Rujukan Eksternal"
+      },
       "steps": {
+        "sessions": "Mengunjungi situs",
         "view_item": "Melihat produk",
         "add_to_cart": "Tambah ke keranjang",
         "begin_checkout": "Memulai checkout",
@@ -511,10 +571,18 @@
       "newCustomers": "Pelanggan baru",
       "buyers": "Pembeli aktif",
       "repeatCustomers": "Pelanggan berulang",
-      "repeatSub": "2+ pesanan aktif di rentang ini",
       "repeatRate": "Tingkat pembelian berulang",
       "avgOrdersPerCustomer": "Rata-rata pesanan / pembeli",
       "avgCustomerValue": "Nilai rata-rata pelanggan",
+      "firstVsReturningTitle": "Penjualan pelanggan baru vs berulang",
+      "firstVsReturningSubtitle": "Perbandingan kontribusi pesanan pertama dan pesanan berulang.",
+      "firstTime": "Pembelian pertama",
+      "returning": "Pembelian berulang",
+      "cohortTitle": "Retensi kohort bulanan",
+      "cohortSubtitle": "Pembeli dikelompokkan per bulan pesanan pertama dengan retensi bulan +1, +2, +3.",
+      "cohortMonth": "Kohort",
+      "cohortSize": "Pembeli",
+      "byCountryTitle": "Pelanggan per negara",
       "repeatListTitle": "Daftar pelanggan berulang",
       "noRepeatYet": "Belum ada pelanggan yang membuat pesanan kedua pada rentang ini.",
       "topListTitle": "Pelanggan teratas berdasarkan belanja bersih"
@@ -528,13 +596,40 @@
       "avgDeliverSub": "Rata-rata tiba: {{hours}} jam",
       "noFulfillmentTiming": "Belum ada riwayat pengiriman selesai",
       "fulfillmentTitle": "Alur pemenuhan pesanan",
-      "fulfillmentSubtitle": "Pesanan aktif pada rentang dipilih berdasarkan tahap pengiriman.",
+      "fulfillmentSubtitle": "Pesanan aktif pada rentang dipilih berdasarkan tahap pengiriman yang saling lepas.",
+      "velocityTitle": "Kecepatan stok & estimasi hari tersisa",
+      "velocitySubtitle": "Stok tersedia dibandingkan laju penjualan harian 30 hari terakhir.",
+      "noTracked": "Belum ada varian dengan manajemen stok aktif.",
+      "units30d": "Terjual 30h",
+      "daysRemaining": "Est. hari",
       "stages": {
         "awaiting": "Menunggu kirim",
         "partiallyFulfilled": "Sebagian dikirim",
         "fulfilled": "Siap dikirim",
         "shipped": "Dikirim",
         "delivered": "Terkirim"
+      }
+    },
+    "reports": {
+      "title": "Pusat ekspor laporan CSV",
+      "subtitle": "Unduh file CSV UTF-8 BOM sesuai filter tanggal, saluran, dan pasar aktif.",
+      "types": {
+        "orders": {
+          "title": "Buku besar pesanan",
+          "description": "Pesanan aktif & dibatalkan beserta nilai kotor, refund, bersih, bayar & kirim."
+        },
+        "products": {
+          "title": "Produk & ukuran filter",
+          "description": "Unit terjual, jumlah pesanan, dan pendapatan per SKU / varian."
+        },
+        "customers": {
+          "title": "Laporan LTV pelanggan",
+          "description": "Pembeli terdaftar dengan jumlah pesanan, belanja bersih, dan pesanan terakhir."
+        },
+        "inventory": {
+          "title": "Stok & kecepatan jual",
+          "description": "Stok SKU terlacak, reservasi, penjualan 30 hari, dan estimasi hari tersisa."
+        }
       }
     },
     "engagement": {
@@ -551,11 +646,6 @@
       "wishlistSummary": "{{items}} item · {{customers}} pelanggan / {{guests}} tamu"
     },
     "lowStock": {
-      "title": "Peringatan stok rendah",
-      "subtitle": "Varian terlacak dengan 5 unit tersedia atau kurang di seluruh lokasi stok.",
-      "empty": "Semua varian terlacak memiliki stok yang sehat (> 5 unit).",
-      "stocked": "Stok",
-      "reserved": "Direservasi",
       "available": "Tersedia"
     },
     "footnotes": {
